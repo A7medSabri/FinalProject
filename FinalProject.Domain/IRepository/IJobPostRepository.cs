@@ -11,13 +11,15 @@ namespace FinalProject.Domain.IRepository
 {
     public interface IJobPostRepository : IRepository<JobPost>
     {
+
+        public List<GetJobPostDto> GetAllJobPosts();
         public List<GetMyJobPostDto> GetAllJobPostsByUserId(string userId);
         void Update(int id, JobPostDto jobPostDto);
         public List<AllJopPostDto> GetAllByName(string name);
         public GetMyJobPostDto GetjopPostWithId(int id);
 
         //void Create(JobPostDto jobPostDto);
-        void Create(JobPostDto jobPostDto);
+        void Create(JobPostDto jobPostDto,string UserId);
 
     }
 }

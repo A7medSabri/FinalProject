@@ -9,6 +9,8 @@ namespace FinalProject.DTO
         [Required]
         public string Title { get; set; }
 
+
+
         [MaxLength(8000)]
         [MinLength(2)]
         [Required]
@@ -17,7 +19,6 @@ namespace FinalProject.DTO
         public decimal Price { get; set; }
         public DateTime? DurationTime { get; set; }
         public int CategoryId { get; set; }
-        public List<int>? JobPostSkill { get; set; }
-        public string ?UserId { get; set; }
+
     }
 }
