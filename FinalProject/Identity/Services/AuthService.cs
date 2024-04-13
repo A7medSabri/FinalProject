@@ -162,7 +162,6 @@ namespace FinalProject.Identity.Services
                 Country = model.Country,
                 State = model.State,
                 Address = model.Address,
-                //CodePhone = model.Phonecode,
                 PhoneNumber = model.PhoneNumber,
                 Age = model.Age,
                 UserLanguages = UserLanguages,
