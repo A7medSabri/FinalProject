@@ -17,7 +17,7 @@ namespace FinalProject.Domain.IRepository
         public GetMyJobPostDto GetjopPostWithId(int id);
 
         //void Create(JobPostDto jobPostDto);
-        void Create(JobPostDto jobPostDto);
+        void Create(JobPostDto jobPostDto,string UserId);
 
     }
 }

@@ -20,8 +20,6 @@ namespace FinalProject.Domain.Models.JobPostAndContract
         [Required]
         public decimal TotalAmount { get; set; }
 
-        [RegularExpression("^(Pending|Paid|Refund)$", ErrorMessage = "Status must be either 'Pending' or 'Paid'  or 'Refund'.")]
-        public string? PaymentStatus { get; set; }
         [DefaultValue("false")]
         public bool IsDeleted { get; set; }
 

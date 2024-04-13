@@ -22,6 +22,8 @@ namespace FinalProject.DataAccess.Repository
             _context = context;
 
         }
+
+
         public GetMyJobPostDto GetjopPostWithId(int id)
         {
             var jopPost = _context.JobPosts
@@ -31,6 +33,7 @@ namespace FinalProject.DataAccess.Repository
                 .FirstOrDefault(u => u.Id == id);
             var jopPostDto = new GetMyJobPostDto
             {
+                Id = jopPost.Id,
                 Title = jopPost.Title,
                 Description = jopPost.Description,
                 Price = jopPost.Price,
@@ -51,6 +54,7 @@ namespace FinalProject.DataAccess.Repository
                 .Where(u => u.Title.ToLower().Contains(lower)).ToList();
             var AllJopPostDto = AllJopPost.Select(jp => new AllJopPostDto
             {
+                Id = jp.Id,
                 Title = jp.Title,
                 Description = jp.Description,
                 Price = jp.Price,
@@ -67,23 +71,28 @@ namespace FinalProject.DataAccess.Repository
         {
             var jobPosts = _context.JobPosts
                 .Include(jp => jp.JobPostSkill)
-                    .ThenInclude(u=>u.Skill)
-                .Include(u=>u.Category)
+                    .ThenInclude(u => u.Skill)
+                .Include(u => u.Category)
+                .Include(u => u.ApplicationUser)
                 .Where(jp => jp.UserId == userId).ToList();
 
             var jobPostDtos = jobPosts.Select(jp => new GetMyJobPostDto
             {
+                Id = jp.Id,
                 Title = jp.Title,
                 Description = jp.Description,
                 CategoryName = jp.Category.Name,
                 Price = jp.Price,
                 DurationTime = jp.DurationTime,
                 JobPostSkill = jp.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
+                Status = jp.Status,
+                UserFullName = jp.ApplicationUser.FirstName + " " + jp.ApplicationUser.LastName
 
             }).ToList();
 
             return jobPostDtos;
         }
+
         public void Update(int id, JobPostDto jobPostDto)
         {
             // jobPost always exist
@@ -95,39 +104,22 @@ namespace FinalProject.DataAccess.Repository
             NewJobPost.DurationTime = jobPostDto.DurationTime;
         }
 
-        //public void Create(JobPostDto jobPostDto)
-        //{
 
-        //    JobPost jobPost = new JobPost();
-        //    jobPost.Title = jobPostDto.Title;
-        //    jobPost.Description = jobPostDto.Description;
-        //    jobPost.Price = jobPostDto.Price;
-        //    jobPost.DurationTime = jobPostDto.DurationTime;
-        //    jobPost.Status = "Uncompleted";
-        //    jobPost.CategoryId = 3;
-        //    jobPost.UserId = "be258344-4614-4f6c-b431-e1a161b2bd26";
-        //    _context.JobPosts.Add(jobPost);
-        //    _context.SaveChanges();
-
-        //}
-
-        public void Create(JobPostDto jobPostDto)
+        public void Create(JobPostDto jobPostDto,string UserId)
         {
             JobPost jobPost = new JobPost();
 
             // Use the provided userId instead of accessing User object
-            jobPost.UserId = jobPostDto.UserId;
+            jobPost.UserId = UserId;
 
             jobPost.Title = jobPostDto.Title;
             jobPost.Description = jobPostDto.Description;
             jobPost.Price = jobPostDto.Price;
             jobPost.DurationTime = jobPostDto.DurationTime;
             jobPost.Status = "Uncompleted";
-            jobPost.JobPostSkill = jobPostDto.JobPostSkill.Select(skillId => new JobPostSkill { SkillId = skillId }).ToList();
             jobPost.CategoryId = jobPostDto.CategoryId;
 
             _context.JobPosts.Add(jobPost);
-            _context.SaveChanges();
         }
 
     }

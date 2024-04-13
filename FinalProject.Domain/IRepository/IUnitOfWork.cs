@@ -10,6 +10,7 @@ namespace FinalProject.Domain.IRepository
         IlangauageRepository language { get; }
         ICategoryRepository Category { get; }
         IRepositoryReport Report { get; }
+        IApplyTasksRepository ApplyTasks { get; }
 
         void Save();
         

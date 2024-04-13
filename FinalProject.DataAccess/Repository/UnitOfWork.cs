@@ -1,5 +1,6 @@
 ﻿using FinalProject.DataAccess.Data;
 using FinalProject.Domain.IRepository;
+using FinalProject.Domain.Models.JobPostAndContract;
 using Microsoft.AspNetCore.Hosting;
 
 namespace FinalProject.DataAccess.Repository
@@ -17,6 +18,8 @@ namespace FinalProject.DataAccess.Repository
 
         public ISkillsRepository Skill {  get; }
 
+        public IApplyTasksRepository ApplyTasks { get; }
+
         public UnitOfWork(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
@@ -30,9 +33,11 @@ namespace FinalProject.DataAccess.Repository
             language = new langauageRepository(_context);
             Category = new CategoryRepository(_context);
             Report = new RepositoryReport(_context);
+            ApplyTasks = new ApplyTasksRepository(_context);
+
         }
 
-        
+
 
         public void Save()
         {
