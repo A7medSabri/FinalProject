@@ -27,14 +27,13 @@
 	  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />  </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\FreeLancerProfileImage\" />
-    <Folder Include="wwwroot\ProtfolioMedia\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\FinalProject.DataAccess\FinalProject.DataAccess.csproj" />
     <ProjectReference Include="..\FinalProject.Domain\FinalProject.Domain.csproj" />
     <ProjectReference Include="..\UserMangmentService\UserMangmentService.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\ProtfolioMedia\" />
   </ItemGroup>
 
 </Project>
