@@ -102,7 +102,7 @@ namespace FinalProject.Controllers
                 Address = user.Address,
                 State = user.State,
                 country = user.Country,
-                PortfolioURl =user.PortfolioURl ,
+                PortfolioURl =user.PortfolioURl,
                 ProfilePicture = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(wwwRootPath, "FreeLancerProfileImage", user.ProfilePicture)
             };
 
