@@ -99,7 +99,9 @@ namespace FinalProject.Controllers
                 SelectedSkills = user.UserSkills?.Select(skill => skill.Skill.Name).ToList() ?? new List<string>(),
                 HourlyRate = user.HourlyRate,
                 ZIP = user.ZIP,
-                Address = user.Country + " " + user.State + " " + user.Address,
+                Address = user.Address,
+                State = user.State,
+                country = user.Country,
                 PortfolioURl =user.PortfolioURl ,
                 ProfilePicture = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(wwwRootPath, "FreeLancerProfileImage", user.ProfilePicture)
             };

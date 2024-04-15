@@ -8,6 +8,8 @@ namespace FinalProject.Domain.DTO.AccountModel
 {
     public class FreelancerProfileDto
     {
+        public string? country;
+
         public string FirstName { get; set; }
         public string Username { get; set; }
         public string LastName { get; set; }
@@ -26,6 +28,6 @@ namespace FinalProject.Domain.DTO.AccountModel
         public string? Address { get; set; }
         public string? PortfolioURl { get; set; }
         public string ProfilePicture { get; set; }
-
+        public string? State { get; set; }
     }
 }
