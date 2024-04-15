@@ -172,7 +172,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("JobpostId");
 
-                    b.ToTable("Favorites");
+                    b.ToTable("Favorites", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.JobPostAndContract.ApplyTask", b =>
@@ -228,7 +228,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("JobPostId");
 
-                    b.ToTable("ApplyTasks");
+                    b.ToTable("ApplyTasks", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.JobPostAndContract.Contract", b =>
@@ -287,7 +287,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("PaymentMethodId");
 
-                    b.ToTable("Contracts");
+                    b.ToTable("Contracts", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.JobPostAndContract.JobPost", b =>
@@ -334,7 +334,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("JobPosts");
+                    b.ToTable("JobPosts", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.JobPostAndContract.JobPostSkill", b =>
@@ -349,7 +349,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("JobPostId");
 
-                    b.ToTable("JobPostSkill");
+                    b.ToTable("JobPostSkill", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.NotificationAndMessageModel.Notification", b =>
@@ -394,7 +394,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.Payment.PaymentMethod", b =>
@@ -414,7 +414,7 @@ namespace FinalProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods");
+                    b.ToTable("PaymentMethods", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.Payment.Transaction", b =>
@@ -456,7 +456,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.Payment.UserPaymentInfo", b =>
@@ -473,7 +473,7 @@ namespace FinalProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserPaymentInfo");
+                    b.ToTable("UserPaymentInfo", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.ProtfolioModle.Protfolio", b =>
@@ -511,7 +511,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Protfolios");
+                    b.ToTable("Protfolios", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.RatingModel.Review", b =>
@@ -564,7 +564,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("FreelancerId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.RegisterNeeded.ApplicationUserLanguage", b =>
@@ -579,7 +579,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("LanguageValue");
 
-                    b.ToTable("ApplicationUserLanguages");
+                    b.ToTable("ApplicationUserLanguages", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.RegisterNeeded.Language", b =>
@@ -596,7 +596,7 @@ namespace FinalProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Languages");
+                    b.ToTable("Languages", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.ReportModel.Reports", b =>
@@ -638,7 +638,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.ToTable("Reports");
+                    b.ToTable("Reports", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.SkillAndCat.Category", b =>
@@ -658,7 +658,7 @@ namespace FinalProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.SkillAndCat.Skill", b =>
@@ -679,7 +679,7 @@ namespace FinalProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Skills");
+                    b.ToTable("Skills", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.SkillAndCat.SkillCategory", b =>
@@ -694,7 +694,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("SkillCategory");
+                    b.ToTable("SkillCategory", (string)null);
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.SkillAndCat.UserSkill", b =>
@@ -709,7 +709,7 @@ namespace FinalProject.Migrations
 
                     b.HasIndex("SkillId");
 
-                    b.ToTable("UserSkills");
+                    b.ToTable("UserSkills", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

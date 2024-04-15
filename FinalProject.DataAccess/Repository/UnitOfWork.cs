@@ -14,7 +14,7 @@ namespace FinalProject.DataAccess.Repository
         public IlangauageRepository language { get; }
         public ICategoryRepository Category { get; }
         public IRepositoryReport Report { get; }
-
+        public IRatingRepository Rating { get; }
         public ISkillsRepository Skill {  get; }
 
         public UnitOfWork(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
@@ -30,6 +30,7 @@ namespace FinalProject.DataAccess.Repository
             language = new langauageRepository(_context);
             Category = new CategoryRepository(_context);
             Report = new RepositoryReport(_context);
+            Rating = new RatingRepository(_context);
         }
 
         

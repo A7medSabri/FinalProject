@@ -1,5 +1,6 @@
 ﻿using FinalProject.Domain.AccountModel;
 using FinalProject.Domain.DTO.AccountModel;
+using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.ApplicationUserModel;
 using FinalProject.Domain.Models.RegisterNeeded;
 using FinalProject.Domain.Models.SkillAndCat;
@@ -20,12 +21,13 @@ namespace FinalProject.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment)
+        public AccountController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment , IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
-
+            _unitOfWork = unitOfWork;
         }
         //Profile User
 
@@ -63,6 +65,7 @@ namespace FinalProject.Controllers
         {
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId2 = User.FindFirst("uid")?.Value;
 
             if (userId == null)
             {
@@ -78,6 +81,8 @@ namespace FinalProject.Controllers
                     .ThenInclude(u => u.Language)
                 .SingleOrDefaultAsync(u => u.UserName == userId);
 
+            var result = _unitOfWork.Rating.FreeRate(userId2);
+
             if (user == null)
             {
                 return NotFound("User not found");
@@ -89,6 +94,7 @@ namespace FinalProject.Controllers
                 LastName = user.LastName,
                 Username = user.UserName,
                 Email = user.Email,
+                Rate = result,
                 SelectedLanguages = user.UserLanguages?.Select(lang => lang.Language.Value).ToList() ?? new List<string>(),
                 PhoneNumber = user.PhoneNumber,
                 Age = user.Age,
@@ -102,12 +108,13 @@ namespace FinalProject.Controllers
                 Address = user.Address,
                 State = user.State,
                 country = user.Country,
-                PortfolioURl =user.PortfolioURl,
+                PortfolioURl = user.PortfolioURl,
                 ProfilePicture = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(wwwRootPath, "FreeLancerProfileImage", user.ProfilePicture)
             };
 
             return Ok(freelancerProfileDto);
         }
+
         //Password
         [HttpPost("ChangePassword-All")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)

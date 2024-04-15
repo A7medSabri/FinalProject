@@ -22,8 +22,6 @@ namespace FinalProject.Domain.Models.RatingModel
         [DefaultValue("false")]
         public bool IsDeleted { get; set; } = false;
 
-
-
         //Client
         [ForeignKey("Client")]
         public string ClientId { get; set; }

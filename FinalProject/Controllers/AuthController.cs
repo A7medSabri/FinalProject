@@ -161,7 +161,7 @@ namespace FinalProject.Controllers
 
         [HttpPost("Login")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTokenAsync([FromForm] TokenRequestModel model)
+        public async Task<IActionResult> GetTokenAsync([FromBody] TokenRequestModel model)
         {
             if (!ModelState.IsValid)
             {

@@ -13,6 +13,7 @@ namespace FinalProject.Domain.DTO.AccountModel
         public string Username { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+        public double? Rate { get; set; }
         //public int Country { get; set; }
         public string? PhoneNumber { get; set; }
         public int? Age { get; set; }

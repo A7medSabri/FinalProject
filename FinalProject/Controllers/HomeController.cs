@@ -18,11 +18,14 @@ namespace FinalProject.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public HomeController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment)
+
+        public HomeController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment , IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             this._webHostEnvironment = webHostEnvironment;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet("Get-Freelancer-By-ID")]
@@ -35,8 +38,10 @@ namespace FinalProject.Controllers
                     .ThenInclude(i => i.Skill)
                  .FirstOrDefault(u => u.Id == Fid);
 
-            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            var result = _unitOfWork.Rating.FreeRate(Fid);
 
+            
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
             string fileName = user.ProfilePicture;
             string filePath = Path.Combine(wwwRootPath, @"FreeLancerProfileImage", fileName);
 
@@ -52,12 +57,15 @@ namespace FinalProject.Controllers
                 ProfilePicture = filePath,
                 Address =  user.State + " " + user.Address,
                 Country = user.Country,
-                HourlyRate = user.HourlyRate
+                HourlyRate = user.HourlyRate,
+                Rate = result
             };
 
             return Ok(freelancer);
 
         }
+
+        
 
         [HttpGet("Get-All-Freelancer-With-The-SameName")]
         public async Task<IActionResult> GetAllFreelancerWithTheSameName(string name)
@@ -84,16 +92,13 @@ namespace FinalProject.Controllers
 
             foreach (var user in users)
             {
-                if (user.ProfilePicture == null)
-                {
-                    continue; 
-                }
 
-
-                string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", user.ProfilePicture);
+                string profilePictureFileName = user.ProfilePicture ?? "default.jpg";
+                string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
 
                 var isFreeLancer = await _userManager.IsInRoleAsync(user, "Freelancer");
                 var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
 
                 if (user.Age != null && user.YourTitle != null && user.Description != null && user.ZIP != null
                     && isFreeLancer && !isAdmin)
@@ -104,7 +109,7 @@ namespace FinalProject.Controllers
                         FullName = $"{user.FirstName} {user.LastName}",
                         YourTitle = user.YourTitle,
                         Description = user.Description,
-                        ProfilePicture = filePath,
+                        ProfilePicture = filePath ?? " ",
                         HourlyRate = user.HourlyRate
                     };
 

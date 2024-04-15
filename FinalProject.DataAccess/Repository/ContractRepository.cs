@@ -4,6 +4,7 @@ using FinalProject.Domain.Models.JobPostAndContract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,6 +46,11 @@ namespace FinalProject.DataAccess.Repository
                 _context.Contracts.Add(con);
                 
             }
+        }
+
+        public bool FindContract(Expression<Func<Contract, bool>> predicate)
+        {
+            return _context.Set<Contract>().Any(predicate);
         }
 
         public void Update(Contract contract)
