@@ -147,15 +147,16 @@ namespace FinalProject.DataAccess.Data
                 .WithMany(j => j.Notifications)
                 .HasForeignKey(n => n.JobPostId);
             #endregion
+
             #region Favoirtes
-            modelBuilder.Entity<Favorites>()
+            modelBuilder.Entity<FavoritesFreelancer>()
                 .HasOne(f => f.Freelancer)
                 .WithMany(u => u.Favorites)
                 .HasForeignKey(f => f.FreelancerId);
-            modelBuilder.Entity<Favorites>()
-                .HasOne(f => f.Jobpost)
-                .WithMany(j => j.Favorites)
-                .HasForeignKey(f => f.JobpostId);
+            //modelBuilder.Entity<Favorites>()
+            //    .HasOne(f => f.Jobpost)
+            //    .WithMany(j => j.Favorites)
+            //    .HasForeignKey(f => f.JobpostId);
             #endregion
         }
         //public DbSet<Country> Countries { get; set; }
@@ -170,7 +171,7 @@ namespace FinalProject.DataAccess.Data
         public DbSet<Contract> Contracts { get; set; }
         public DbSet<ApplyTask> ApplyTasks { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<Favorites> Favorites { get; set; }
+        public DbSet<FavoritesFreelancer> Favorites { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<UserPaymentInfo> UserPaymentInfo { get; set; }

@@ -16,6 +16,7 @@ namespace FinalProject.DataAccess.Repository
         public IRepositoryReport Report { get; }
         public IRatingRepository Rating { get; }
         public ISkillsRepository Skill {  get; }
+        public IFavoritesRepository Favorites { get; }
 
         public UnitOfWork(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -31,6 +32,7 @@ namespace FinalProject.DataAccess.Repository
             Category = new CategoryRepository(_context);
             Report = new RepositoryReport(_context);
             Rating = new RatingRepository(_context);
+            Favorites = new FavoritesRepository(_context);
         }
 
         

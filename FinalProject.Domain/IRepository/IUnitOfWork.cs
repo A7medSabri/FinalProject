@@ -11,6 +11,7 @@ namespace FinalProject.Domain.IRepository
         ICategoryRepository Category { get; }
         IRepositoryReport Report { get; }
         IRatingRepository Rating { get; }
+        IFavoritesRepository Favorites { get; }
 
         void Save();
         
