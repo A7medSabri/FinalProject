@@ -18,9 +18,9 @@ namespace FinalProject.Domain.Models.RatingModel
         [MaxLength(1000)]
         public string? Comments { get; set; }
         // Default value Date.Now
-        public DateTime RateDate { get; set; }
+        public DateTime RateDate { get; set; } = DateTime.Now;
         [DefaultValue("false")]
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
 
 

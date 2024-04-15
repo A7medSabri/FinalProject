@@ -45,26 +45,7 @@ namespace FinalProject.DataAccess.Repository
             return portfolioDtos;
         }
 
-
-        public async Task EditPortfolio(int id, portfolioDto portfolioDto)
-        {
-            var portfolio = await _context.Protfolios.FindAsync(id);
-
-            if (portfolio == null)
-            {
-                return;
-            }
-
-            portfolio.Name = portfolioDto.Name;
-            portfolio.Description = portfolioDto.Description;
-            portfolio.URL = portfolioDto.URL;
-            portfolio.Media = portfolioDto.Media;
-            portfolio.ProjectDate = portfolioDto.ProjectDate; 
-
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<portfolioDto> GetByIdAsync(int id)
+        public async Task<ProtfolioGetDto> GetByIdAsync(int id)
         {
             var portfolio = await _context.Protfolios.FindAsync(id);
 
@@ -73,19 +54,20 @@ namespace FinalProject.DataAccess.Repository
                 return null;
             }
 
-            portfolioDto portfolioDto = new portfolioDto
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            var portfolioDto = new ProtfolioGetDto
             {
                 Name = portfolio.Name,
                 Description = portfolio.Description,
                 URL = portfolio.URL ?? "",
-                Media = portfolio.Media?? "",
+                Media = string.IsNullOrEmpty(portfolio.Media) ? "" : Path.Combine(wwwRootPath, "ProtfolioMedia", portfolio.Media),
                 UserId = portfolio.UserId
             };
 
             return portfolioDto;
         }
 
-        public async Task<AddPortfolio> AddPortfolioAsync(AddPortfolio portfolioDto, IFormFile file)
+        public async Task<AddPortfolio> AddPortfolioAsync(AddPortfolio portfolioDto, IFormFile file , string UserId)
         {
             // التحقق من الملف
             if (file == null || file.Length == 0)
@@ -121,7 +103,7 @@ namespace FinalProject.DataAccess.Repository
                 Name = portfolioDto.Name,
                 Description = portfolioDto.Description,
                 URL = portfolioDto.URL,
-                UserId = portfolioDto.UserId,
+                UserId = UserId,
                 ProjectDate = portfolioDto.ProjectDate
             };
 
@@ -133,6 +115,19 @@ namespace FinalProject.DataAccess.Repository
 
         }
 
+
+        public async Task EditPortfolio(int id, portfolioDto portfolioDto)
+        {
+            var portfolio = await _context.Protfolios.FindAsync(id);
+
+            portfolio.Name = portfolioDto.Name;
+            portfolio.Description = portfolioDto.Description;
+            portfolio.URL = portfolioDto.URL;
+            portfolio.Media = portfolioDto.Media;
+            portfolio.ProjectDate = portfolioDto.ProjectDate;
+
+            await _context.SaveChangesAsync();
+        }
 
         public async Task<bool> DeletePortfolioAsync(int id)
         {
