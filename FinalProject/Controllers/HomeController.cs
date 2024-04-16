@@ -118,45 +118,42 @@ namespace FinalProject.Controllers
                 return Ok(freelancer);
 
             }
-        
-        
-
         [HttpGet("Get-All-Freelancer-With-The-SameName")]
-        public async Task<IActionResult> GetAllFreelancerWithTheSameName(string name)
+        public async Task<IActionResult> GetAllFreelancerWithTheSameName(string? name)
         {
+            var freeLancersList = new List<GetAllFreelancer>();
+            List<ApplicationUser> users;
+
             if (string.IsNullOrEmpty(name))
             {
-                return BadRequest("The name parameter cannot be null or empty.");
+                users = await _userManager.Users.ToListAsync();
             }
-
-            var lowercaseName = name.ToLower();
-
-            var users = await _userManager.Users
-                .Where(u => (u.FirstName.ToLower() + " " + u.LastName.ToLower()).Contains(lowercaseName))
-                .ToListAsync();
+            else
+            {
+                var lowercaseName = name.ToLower();
+                users = await _userManager.Users
+                    .Where(u => (u.FirstName.ToLower() + " " + u.LastName.ToLower()).Contains(lowercaseName))
+                    .ToListAsync();
+            }
 
             if (users == null || !users.Any())
             {
-                return NotFound("No users found with the specified name.");
+                return NotFound("No users found.");
             }
-
-            var FreeLancersList = new List<GetAllFreelancer>();
 
             string wwwRootPath = _webHostEnvironment.WebRootPath;
 
             foreach (var user in users)
             {
-
-                string profilePictureFileName = user.ProfilePicture ?? "default.jpg";
-                string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
-
                 var isFreeLancer = await _userManager.IsInRoleAsync(user, "Freelancer");
                 var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
 
-
-                if (user.Age != null && user.YourTitle != null && user.Description != null && user.ZIP != null
+                if (user.Age.HasValue && user.YourTitle != null && user.Description != null && user.ZIP.HasValue
                     && isFreeLancer && !isAdmin)
                 {
+                    string profilePictureFileName = user.ProfilePicture ?? "default.jpg";
+                    string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
+
                     var freelancer = new GetAllFreelancer
                     {
                         id = user.Id,
@@ -167,19 +164,98 @@ namespace FinalProject.Controllers
                         HourlyRate = user.HourlyRate
                     };
 
-                    FreeLancersList.Add(freelancer);
+                    freeLancersList.Add(freelancer);
                 }
             }
 
-            if (FreeLancersList.Any())
+            if (freeLancersList.Any())
             {
-                return Ok(FreeLancersList);
+                return Ok(freeLancersList);
             }
             else
             {
                 return NotFound("No users found with the specified name.");
             }
         }
+
+        //[HttpGet("Get-All-Freelancer-With-The-SameName")]
+        //public async Task<IActionResult> GetAllFreelancerWithTheSameName(string name)
+        //{
+
+        //    //if (string.IsNullOrEmpty(name))
+        //    //{
+        //    //    return BadRequest("The name parameter cannot be null or empty.");
+        //    //}
+        //    //var lowercaseName = name.ToLower();
+
+        //    //var users = await _userManager.Users
+        //    //    .Where(u => (u.FirstName.ToLower() + " " + u.LastName.ToLower()).Contains(lowercaseName))
+        //    //    .ToListAsync();
+
+        //    //if (users == null || !users.Any())
+        //    //{
+        //    //    return NotFound("No users found with the specified name.");
+        //    //}
+        //    if (string.IsNullOrEmpty(name))
+        //    {
+        //        var users = await _userManager.Users
+        //            .ToListAsync();
+        //        if (users == null || !users.Any())
+        //        {
+        //            return NotFound("No users found.");
+        //        }
+        //        return Ok(users);
+        //    }
+        //    else
+        //    {
+        //        var lowercaseName = name.ToLower();
+
+        //        var users = await _userManager.Users
+        //            .Where(u => (u.FirstName.ToLower() + " " + u.LastName.ToLower()).Contains(lowercaseName))
+        //            .ToListAsync();
+        //        if (users == null || !users.Any())
+        //        {
+        //            return NotFound("No users found with the specified name.");
+        //        }
+        //    }
+        //    var FreeLancersList = new List<GetAllFreelancer>();
+        //    string wwwRootPath = _webHostEnvironment.WebRootPath;
+        //    foreach (var user in users)
+        //    {
+
+        //        string profilePictureFileName = user.ProfilePicture ?? "default.jpg";
+        //        string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
+
+        //        var isFreeLancer = await _userManager.IsInRoleAsync(user, "Freelancer");
+        //        var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+
+        //        if (user.Age != null && user.YourTitle != null && user.Description != null && user.ZIP != null
+        //            && isFreeLancer && !isAdmin)
+        //        {
+        //            var freelancer = new GetAllFreelancer
+        //            {
+        //                id = user.Id,
+        //                FullName = $"{user.FirstName} {user.LastName}",
+        //                YourTitle = user.YourTitle,
+        //                Description = user.Description,
+        //                ProfilePicture = filePath ?? " ",
+        //                HourlyRate = user.HourlyRate
+        //            };
+
+        //            FreeLancersList.Add(freelancer);
+        //        }
+        //    }
+
+        //    if (FreeLancersList.Any())
+        //    {
+        //        return Ok(FreeLancersList);
+        //    }
+        //    else
+        //    {
+        //        return NotFound("No users found with the specified name.");
+        //    }
+        //}
 
     }
 }

@@ -39,7 +39,6 @@ namespace FinalProject.DataAccess.Repository
             foreach (var favorite in favoritesList)
             {
                 var freelancerName = favorite.Freelancer.FirstName + " " + favorite.Freelancer.LastName;
-                Console.WriteLine($"Freelancer Name: {freelancerName}");
             }
 
             return favoritesList;

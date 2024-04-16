@@ -3,6 +3,7 @@ using FinalProject.Domain.DTO.Favorites;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.FavoritesTable;
 using FinalProject.Domain.Models.JobPostAndContract;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,19 @@ namespace FinalProject.DataAccess.Repository
         {
             return _context.Set<FavJobPost>().Any(predicate);
         }
-
+        public List<MyFavJobPost> FindMyFavJobPost(string Fid)
+        {
+            var favJobPostsList = _context.FavoriteJobPost
+                .Where(u => u.FreelancerId == Fid)
+                .Include(u=>u.Jobpost)
+                .Select(u => new MyFavJobPost
+                {
+                    jobPostId=u.JobpostId,
+                    jobPost = u.Jobpost.Title
+                })
+                .ToList();
+            return favJobPostsList;
+        }
 
         public FavJobPostDto Create(FavJobPostDto favJobDto, string userId)
         {
@@ -48,5 +61,14 @@ namespace FinalProject.DataAccess.Repository
             return true;
         }
 
+        public bool CreateFavJobPost(int JobId, string userId)
+        {
+            var newFav = new FavJobPost();
+            newFav.FreelancerId = userId;
+            newFav.JobpostId = JobId;
+
+            _context.FavoriteJobPost.Add(newFav);
+            return true;
+        }
     }
 }

@@ -19,9 +19,18 @@ namespace FinalProject.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+        [HttpGet("Get-My-Fav-JobPosts")]
+        public IActionResult GetMyFavJobPost()
+        {
+            var userId = User.FindFirst("uid")?.Value;
 
-        [HttpPost("New-JobPost-Fav")]
-        public async Task<IActionResult> CreateNew([FromForm] FavJobPostDto favJobPostDto)
+            var data = _unitOfWork.FavJob.FindMyFavJobPost(userId);
+            return Ok(data);
+
+        }
+
+        [HttpPost("New-And-Delete-JobPost-Fav")]
+        public async Task<IActionResult> CreateNew(int jobId)
         {
             var userId = User.FindFirst("uid")?.Value;
             if (userId == null)
@@ -32,23 +41,29 @@ namespace FinalProject.Controllers
             {
                 return BadRequest();
             }
-
-            var IsExist = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == favJobPostDto.JobpostId);
-            if(IsExist)
+            if (_unitOfWork.JobPost.GetByID(jobId) == null)
             {
-                return BadRequest("You Can't Fav jobPost Again");
+                return NotFound("No Job Post With this id");
+            }
+            var IsExist = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
+            if (IsExist)
+            {
+                _unitOfWork.FavJob.Remove(jobId);
+                _unitOfWork.Save();
+
+                return Ok("Deleted");
             }
 
-            _unitOfWork.FavJob.Create(favJobPostDto, userId);
+            _unitOfWork.FavJob.CreateFavJobPost(jobId, userId);
             _unitOfWork.Save();
-            return Ok(favJobPostDto);
+            return Ok(jobId);
         }
 
-        [HttpDelete("Delete-Fav-JobPost")]
-        public async Task<IActionResult> DeleteFavFree(int jobId)
+        [HttpDelete("Delete-Fav-JobPost-only")]
+        public async Task<IActionResult> DeleteFavFree2(int jobId)
         {
             var userId = User.FindFirst("uid")?.Value;
-            var data = _unitOfWork.FavJob.FindFavJobPost(u=>u.Id == jobId && u.FreelancerId == userId);
+            var data = _unitOfWork.FavJob.FindFavJobPost(u => u.Id == jobId && u.FreelancerId == userId);
             if (userId == null)
             {
                 return Unauthorized("You Must Login");
@@ -61,7 +76,7 @@ namespace FinalProject.Controllers
             if (data != null)
             {
 
-                var IsExist = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId );
+                var IsExist = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
                 if (IsExist)
                 {
                     _unitOfWork.FavJob.Remove(jobId);
@@ -69,9 +84,66 @@ namespace FinalProject.Controllers
 
                     return Ok("Deleted");
                 }
-                return BadRequest("You Can't Fav jobPost Again");
+                return BadRequest("You Didn't Fav This JobPost Befor");
             }
             return NotFound("Not Found To Delete");
         }
+
+        [HttpPost("New-JobPost-Fav-only")]
+        public async Task<IActionResult> CreateNew2(int jobId)
+        {
+            var userId = User.FindFirst("uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized("You Must Login");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            if (_unitOfWork.JobPost.GetByID(jobId) == null)
+            {
+                return NotFound("No Job Post With this id");
+            }
+            var IsExist = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
+            if (IsExist)
+            {
+                _unitOfWork.FavJob.Remove(jobId);
+                _unitOfWork.Save();
+
+                return Ok("Deleted");
+            }
+
+            _unitOfWork.FavJob.CreateFavJobPost(jobId, userId);
+            _unitOfWork.Save();
+            return Ok(jobId);
+        }
+
+        //[HttpPost("New-JobPost-Fav")]
+        //public async Task<IActionResult> CreateNew2([FromForm] FavJobPostDto favJobPostDto)
+        //{
+        //    var userId = User.FindFirst("uid")?.Value;
+        //    if (userId == null)
+        //    {
+        //        return Unauthorized("You Must Login");
+        //    }
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    if (_unitOfWork.JobPost.GetByID(favJobPostDto.JobpostId) == null)
+        //    {
+        //        return NotFound("No Job Post With this id");
+        //    }
+        //    var IsExist = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == favJobPostDto.JobpostId);
+        //    if (IsExist)
+        //    {
+        //        return BadRequest("You Can't Fav jobPost Again");
+        //    }
+
+        //    _unitOfWork.FavJob.Create(favJobPostDto, userId);
+        //    _unitOfWork.Save();
+        //    return Ok(favJobPostDto);
+        //}
     }
 }
