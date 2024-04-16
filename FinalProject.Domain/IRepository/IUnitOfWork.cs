@@ -12,7 +12,7 @@ namespace FinalProject.Domain.IRepository
         IRepositoryReport Report { get; }
         IRatingRepository Rating { get; }
         IFavoritesRepository Favorites { get; }
-
+        IFavJobPostRepository FavJob { get; }
         void Save();
         
     }

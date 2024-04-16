@@ -150,13 +150,25 @@ namespace FinalProject.DataAccess.Data
 
             #region Favoirtes
             modelBuilder.Entity<FavoritesFreelancer>()
-                .HasOne(f => f.Freelancer)
-                .WithMany(u => u.Favorites)
-                .HasForeignKey(f => f.FreelancerId);
-            //modelBuilder.Entity<Favorites>()
-            //    .HasOne(f => f.Jobpost)
-            //    .WithMany(j => j.Favorites)
-            //    .HasForeignKey(f => f.JobpostId);
+                .HasOne(ff => ff.Freelancer)
+                .WithMany(f => f.Favorites)
+                .HasForeignKey(ff => ff.FreelancerId);
+
+            //modelBuilder.Entity<FavoritesFreelancer>()
+            //    .HasOne(ff => ff.Client)
+            //    .WithMany(c => c.Favorites)
+            //    .HasForeignKey(ff => ff.ClientId);
+
+            modelBuilder.Entity<FavJobPost>()
+                .HasOne(fjp => fjp.Jobpost)
+                .WithMany(jp => jp.FavoritesJobPost)
+                .HasForeignKey(fjp => fjp.JobpostId);
+
+            modelBuilder.Entity<FavJobPost>()
+                .HasOne(fjp => fjp.Freelancer)
+                .WithMany(f => f.FavoritesJobPost)
+                .HasForeignKey(fjp => fjp.FreelancerId);
+
             #endregion
         }
         //public DbSet<Country> Countries { get; set; }
@@ -172,6 +184,7 @@ namespace FinalProject.DataAccess.Data
         public DbSet<ApplyTask> ApplyTasks { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<FavoritesFreelancer> Favorites { get; set; }
+        public DbSet<FavJobPost> FavoriteJobPost { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<UserPaymentInfo> UserPaymentInfo { get; set; }

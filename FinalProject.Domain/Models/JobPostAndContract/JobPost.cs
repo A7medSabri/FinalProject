@@ -55,7 +55,7 @@ namespace FinalProject.Domain.Models.JobPostAndContract
         public List<Notification> Notifications { get; set; }
 
         //Favorites
-        //public List<Favorites>? Favorites { get; set; }
+        public List<FavJobPost>? FavoritesJobPost { get; set; }
         
         // Transactions
         public List<Transaction>? Transactions { get; set; }

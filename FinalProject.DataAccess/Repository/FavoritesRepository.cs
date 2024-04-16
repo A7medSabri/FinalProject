@@ -2,6 +2,7 @@
 using FinalProject.Domain.DTO.Favorites;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.FavoritesTable;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +32,18 @@ namespace FinalProject.DataAccess.Repository
 
         public List<FavoritesFreelancer> FindAll(string userId)
         {
-            return _context.Favorites
+            var favoritesList =  _context.Favorites
+                .Include(a=>a.Freelancer)
                            .Where(c => c.ClientId == userId)
                            .ToList();
+            foreach (var favorite in favoritesList)
+            {
+                var freelancerName = favorite.Freelancer.FirstName + " " + favorite.Freelancer.LastName;
+                Console.WriteLine($"Freelancer Name: {freelancerName}");
+            }
+
+            return favoritesList;
+
         }
         public bool Remove(string Fid)
         {

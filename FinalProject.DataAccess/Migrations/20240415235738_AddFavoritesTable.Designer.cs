@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinalProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240415214203_EditFavoritesFreelanceTable")]
-    partial class EditFavoritesFreelanceTable
+    [Migration("20240415235738_AddFavoritesTable")]
+    partial class AddFavoritesTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -154,6 +154,30 @@ namespace FinalProject.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("FinalProject.Domain.Models.FavoritesTable.FavJobPost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FreelancerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("JobpostId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FreelancerId");
+
+                    b.HasIndex("JobpostId");
+
+                    b.ToTable("FavoriteJobPost");
+                });
+
             modelBuilder.Entity("FinalProject.Domain.Models.FavoritesTable.FavoritesFreelancer", b =>
                 {
                     b.Property<int>("Id")
@@ -164,13 +188,15 @@ namespace FinalProject.Migrations
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FreelancerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
 
                     b.HasIndex("FreelancerId");
 
@@ -856,13 +882,38 @@ namespace FinalProject.Migrations
                     b.Navigation("UserPaymentInfo");
                 });
 
+            modelBuilder.Entity("FinalProject.Domain.Models.FavoritesTable.FavJobPost", b =>
+                {
+                    b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Freelancer")
+                        .WithMany("FavoritesJobPost")
+                        .HasForeignKey("FreelancerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FinalProject.Domain.Models.JobPostAndContract.JobPost", "Jobpost")
+                        .WithMany("FavoritesJobPost")
+                        .HasForeignKey("JobpostId");
+
+                    b.Navigation("Freelancer");
+
+                    b.Navigation("Jobpost");
+                });
+
             modelBuilder.Entity("FinalProject.Domain.Models.FavoritesTable.FavoritesFreelancer", b =>
                 {
+                    b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Freelancer")
                         .WithMany("Favorites")
                         .HasForeignKey("FreelancerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Client");
 
                     b.Navigation("Freelancer");
                 });
@@ -1196,6 +1247,8 @@ namespace FinalProject.Migrations
 
                     b.Navigation("Favorites");
 
+                    b.Navigation("FavoritesJobPost");
+
                     b.Navigation("JobPosts");
 
                     b.Navigation("Notifications");
@@ -1224,6 +1277,8 @@ namespace FinalProject.Migrations
             modelBuilder.Entity("FinalProject.Domain.Models.JobPostAndContract.JobPost", b =>
                 {
                     b.Navigation("ApplyTasks");
+
+                    b.Navigation("FavoritesJobPost");
 
                     b.Navigation("JobPostSkill");
 

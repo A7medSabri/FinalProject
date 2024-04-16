@@ -1,6 +1,7 @@
 ﻿using FinalProject.Domain.DTO.Favorites;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.ApplicationUserModel;
+using FinalProject.Domain.Models.FavoritesTable;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -62,13 +63,18 @@ namespace FinalProject.Controllers
             {
                 return BadRequest();
             }
-            var data = _unitOfWork.Favorites.FindAll(userId);
-            if(data.Count == 0 )
+            var favoritesList = _unitOfWork.Favorites.FindAll(userId);
+            if(favoritesList.Count == 0 )
             {
                 return Ok("No Fav To Display");
             }
+            var favoriteDtos = favoritesList.Select(f => new GetAllFavFree
+            {
+                Freelancer = f.Freelancer.FirstName + " " + f.Freelancer.LastName,
+                Client = f.ClientId
+            }).ToList();
 
-            return Ok(data);
+            return Ok(favoriteDtos);
         }
 
         [HttpDelete("Delete-Fav-Free")]

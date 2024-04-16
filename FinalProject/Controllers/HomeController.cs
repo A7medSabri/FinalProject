@@ -28,43 +28,97 @@ namespace FinalProject.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [HttpGet("Get-Freelancer-By-ID")]
-        public async Task<IActionResult> GetAllFreelancerByID(string Fid)
+        [HttpGet("Get-All-Freelancers")]
+        public async Task<IActionResult> GetAllFreelancer()
         {
-            var user = _userManager.Users
-                .Include(i => i.UserLanguages)
-                    .ThenInclude(i => i.Language)
-                .Include(i => i.UserSkills)
-                    .ThenInclude(i => i.Skill)
-                 .FirstOrDefault(u => u.Id == Fid);
+            var users = await _userManager.Users
+               .ToListAsync();
 
-            var result = _unitOfWork.Rating.FreeRate(Fid);
-
-            
-            string wwwRootPath = _webHostEnvironment.WebRootPath;
-            string fileName = user.ProfilePicture;
-            string filePath = Path.Combine(wwwRootPath, @"FreeLancerProfileImage", fileName);
-
-            var freelancer = new GetFreelancer
+            if (users == null || !users.Any())
             {
-                id = user.Id,
-                FullName = user.FirstName + " " + user.LastName,
-                YourTitle = user.YourTitle,
-                Description = user.Description,
-                SelectedLanguages = user.UserLanguages?.Select(lang => lang.Language.Value).ToList(),
-                SelectedSkills = user.UserSkills?.Select(skill => skill.Skill.Name).ToList(),
-                PortfolioURl = user.PortfolioURl,
-                ProfilePicture = filePath,
-                Address =  user.State + " " + user.Address,
-                Country = user.Country,
-                HourlyRate = user.HourlyRate,
-                Rate = result
-            };
+                return NotFound("No users found with the specified name.");
+            }
 
-            return Ok(freelancer);
+            var FreeLancersList = new List<GetAllFreelancer>();
 
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+
+            foreach (var user in users)
+            {
+                if(!await _userManager.IsInRoleAsync(user, "Freelancer"))
+                {
+                    continue;
+                }
+                string profilePictureFileName = user.ProfilePicture ?? "default.jpg";
+                string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
+
+                var isFreeLancer = await _userManager.IsInRoleAsync(user, "Freelancer");
+                var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+
+                if (user.Age != null && user.YourTitle != null && user.Description != null && user.ZIP != null
+                    && isFreeLancer && !isAdmin)
+                {
+                    var freelancer = new GetAllFreelancer
+                    {
+                        id = user.Id,
+                        FullName = $"{user.FirstName} {user.LastName}",
+                        YourTitle = user.YourTitle,
+                        Description = user.Description,
+                        ProfilePicture = filePath ?? " ",
+                        HourlyRate = user.HourlyRate
+                    };
+
+                    FreeLancersList.Add(freelancer);
+                }
+            }
+            if (FreeLancersList.Any())
+            {
+                return Ok(FreeLancersList);
+            }
+            else
+            {
+                return NotFound("No users found with the specified name.");
+            }
         }
 
+        [HttpGet("Get-Freelancer-By-ID")]
+            public async Task<IActionResult> GetAllFreelancerByID(string Fid)
+            {
+                var user = _userManager.Users
+                    .Include(i => i.UserLanguages)
+                        .ThenInclude(i => i.Language)
+                    .Include(i => i.UserSkills)
+                        .ThenInclude(i => i.Skill)
+                     .FirstOrDefault(u => u.Id == Fid);
+
+                var result = _unitOfWork.Rating.FreeRate(Fid);
+
+
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                string fileName = user.ProfilePicture;
+                string filePath = Path.Combine(wwwRootPath, @"FreeLancerProfileImage", fileName);
+
+                var freelancer = new GetFreelancer
+                {
+                    id = user.Id,
+                    FullName = user.FirstName + " " + user.LastName,
+                    YourTitle = user.YourTitle,
+                    Description = user.Description,
+                    SelectedLanguages = user.UserLanguages?.Select(lang => lang.Language.Value).ToList(),
+                    SelectedSkills = user.UserSkills?.Select(skill => skill.Skill.Name).ToList(),
+                    PortfolioURl = user.PortfolioURl,
+                    ProfilePicture = filePath,
+                    Address = user.State + " " + user.Address,
+                    Country = user.Country,
+                    HourlyRate = user.HourlyRate,
+                    Rate = result
+                };
+
+                return Ok(freelancer);
+
+            }
+        
         
 
         [HttpGet("Get-All-Freelancer-With-The-SameName")]

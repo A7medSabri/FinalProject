@@ -90,6 +90,7 @@ namespace FinalProject.Domain.Models.ApplicationUserModel
         public List<Notification>? Notifications { get; set; }
         //Favorites
         public List<FavoritesFreelancer>? Favorites { get; set; }
+        public List<FavJobPost>? FavoritesJobPost { get; set; }
 
         // Transaction
         public List<Transaction>? Transactions { get; set; }

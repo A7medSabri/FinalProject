@@ -7,12 +7,10 @@ using System.Threading.Tasks;
 
 namespace FinalProject.Domain.DTO.Favorites
 {
-    public class FavFreeDto
+    public class FavJobPostDto
     {
-        //public int Id { get; set; }
+        //public string FreelancerId { get; set; }
 
-        //public string ClientId { get; set; }
-
-        public string FreelancerId { get; set; }
+        public int JobpostId { get; set; }
     }
 }
