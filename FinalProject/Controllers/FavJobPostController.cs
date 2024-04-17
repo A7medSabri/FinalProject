@@ -45,10 +45,10 @@ namespace FinalProject.Controllers
             {
                 return NotFound("No Job Post With this id");
             }
-            var IsExist = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
-            if (IsExist)
+            var favJobPost = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
+            if (favJobPost != null)
             {
-                _unitOfWork.FavJob.Remove(jobId);
+                _unitOfWork.FavJob.Delete(favJobPost);
                 _unitOfWork.Save();
 
                 return Ok("Deleted");
@@ -76,10 +76,10 @@ namespace FinalProject.Controllers
             if (data != null)
             {
 
-                var IsExist = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
-                if (IsExist)
+                var favJobPost = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
+                if (favJobPost != null)
                 {
-                    _unitOfWork.FavJob.Remove(jobId);
+                    _unitOfWork.FavJob.Delete(favJobPost);
                     _unitOfWork.Save();
 
                     return Ok("Deleted");
@@ -105,15 +105,11 @@ namespace FinalProject.Controllers
             {
                 return NotFound("No Job Post With this id");
             }
-            var IsExist = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
-            if (IsExist)
+            var favJobPost = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
+            if(favJobPost !=null)
             {
-                _unitOfWork.FavJob.Remove(jobId);
-                _unitOfWork.Save();
-
-                return Ok("Deleted");
+                return Ok("You Fav This Befor");
             }
-
             _unitOfWork.FavJob.CreateFavJobPost(jobId, userId);
             _unitOfWork.Save();
             return Ok(jobId);

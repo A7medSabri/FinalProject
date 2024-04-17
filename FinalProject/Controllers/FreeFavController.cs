@@ -23,33 +23,6 @@ namespace FinalProject.Controllers
             _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
-
-        [HttpPost("New-Freelancer-Fav")]
-        public async Task<IActionResult> CreateNew([FromForm] FavFreeDto favFreeDto)
-        {
-            var userId = User.FindFirst("uid")?.Value;
-            if (userId == null)
-            {
-                return Unauthorized("You Must Login");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            var freelancer = await _userManager.FindByIdAsync(favFreeDto.FreelancerId);
-            if (freelancer == null || !(await _userManager.IsInRoleAsync(freelancer, "Freelancer")))
-            {
-                return BadRequest("Yon Can Only Fav Freelancer");
-            }
-
-            _unitOfWork.Favorites.Create(favFreeDto, userId);
-            _unitOfWork.Save();
-
-            return Ok(favFreeDto);
-        }
-
         [HttpGet("Get-My-Fav-Free")]
         public IActionResult GetMyFavFree()
         {
@@ -77,14 +50,78 @@ namespace FinalProject.Controllers
             return Ok(favoriteDtos);
         }
 
-        [HttpDelete("Delete-Fav-Free")]
-        public async Task<IActionResult> DeleteFavFree(string Fid)
+        [HttpPost("New-Delete-Fav-Freelancer")]
+        public async Task<IActionResult> CreateAndDelete(string Fid)
         {
-            var data = _unitOfWork.Favorites.Find(c => c.FreelancerId == Fid).FirstOrDefault();
-
-            if (data != null)
+            var userId = User.FindFirst("uid")?.Value;
+            if (userId == null)
             {
-                _unitOfWork.Favorites.Remove(Fid);
+                return Unauthorized("You must log in.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid input.");
+            }
+
+            var data = _unitOfWork.Favorites.Find(c => c.FreelancerId == Fid && c.ClientId == userId).FirstOrDefault();
+            //var IsExist = _unitOfWork.Favorites.FindFavFreelancer(c => c.FreelancerId == Fid && c.ClientId == userId);
+            if (data != null /*&& IsExist*/)
+            {
+                _unitOfWork.Favorites.Delete(data);
+                _unitOfWork.Save();
+
+                return Ok("Deleted");
+            }
+
+            var freelancer = await _userManager.FindByIdAsync(Fid);
+            if (freelancer == null || !(await _userManager.IsInRoleAsync(freelancer, "Freelancer")))
+            {
+                return BadRequest("You can only fav  freelancers.");
+            }
+
+            _unitOfWork.Favorites.CreateNewFavFreelancer(Fid, userId);
+            _unitOfWork.Save();
+            return Ok("Added new favorite freelancer.");
+        }
+
+        [HttpPost("New-Freelancer-Fav")]
+        public async Task<IActionResult> CreateNew([FromForm] FavFreeDto favFreeDto)
+        {
+            var userId = User.FindFirst("uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized("You Must Login");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var freelancer = await _userManager.FindByIdAsync(favFreeDto.FreelancerId);
+            if (freelancer == null || !(await _userManager.IsInRoleAsync(freelancer, "Freelancer")))
+            {
+                return BadRequest("Yon Can Only Fav Freelancer");
+            }
+
+            _unitOfWork.Favorites.Create(favFreeDto, userId);
+            _unitOfWork.Save();
+
+            return Ok(favFreeDto);
+        }
+
+
+        [HttpDelete("Delete-Fav-Free")]
+        public IActionResult DeleteFavFree(string Fid)
+        {
+            var userId = User.FindFirst("uid")?.Value;
+
+            var data = _unitOfWork.Favorites.Find(c => c.FreelancerId == Fid && c.ClientId ==userId).FirstOrDefault();
+            //var IsExist = _unitOfWork.Favorites.FindFavFreelancer(c => c.FreelancerId == Fid && c.ClientId == userId);
+            if (data != null /*&& IsExist*/)
+            {
+                _unitOfWork.Favorites.Delete(data);
                 _unitOfWork.Save();
 
                 return Ok("Deleted");

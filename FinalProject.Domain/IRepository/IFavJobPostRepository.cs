@@ -15,7 +15,8 @@ namespace FinalProject.Domain.IRepository
         FavJobPostDto Create(FavJobPostDto favJobDto, string userId);
         bool CreateFavJobPost(int JobId, string userId);
         bool Remove(int jobPost);
-        bool FindFavJobPost(Expression<Func<FavJobPost, bool>> predicate);
+        FavJobPost FindFavJobPost(Expression<Func<FavJobPost, bool>> predicate);
         List<MyFavJobPost> FindMyFavJobPost(string Fid);
+        void Delete(FavJobPost favJobPost);
     }
 }

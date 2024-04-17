@@ -22,10 +22,11 @@ namespace FinalProject.DataAccess.Repository
             _context = context;
         }
 
-        public bool FindFavJobPost(Expression<Func<FavJobPost, bool>> predicate)
+        public FavJobPost FindFavJobPost(Expression<Func<FavJobPost, bool>> predicate)
         {
-            return _context.Set<FavJobPost>().Any(predicate);
+            return _context.Set<FavJobPost>().FirstOrDefault(predicate);
         }
+
         public List<MyFavJobPost> FindMyFavJobPost(string Fid)
         {
             var favJobPostsList = _context.FavoriteJobPost
@@ -69,6 +70,12 @@ namespace FinalProject.DataAccess.Repository
 
             _context.FavoriteJobPost.Add(newFav);
             return true;
+        }
+
+        public void Delete(FavJobPost favJobPost)
+        {
+            _context.Remove(favJobPost);
+
         }
     }
 }
