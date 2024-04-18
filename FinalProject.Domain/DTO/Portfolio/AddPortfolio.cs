@@ -23,6 +23,6 @@ namespace FinalProject.Domain.DTO.Portfolio
         public string? URL { get; set; }
         public DateTime? ProjectDate { get; set; }
 
-        public string UserId { get; set; }
+        //public string? UserId { get; set; }
     }
 }

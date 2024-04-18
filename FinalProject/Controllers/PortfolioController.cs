@@ -42,7 +42,6 @@ namespace FinalProject.Controllers
 
             var userId = User.FindFirst("uid")?.Value;
 
-            // التحقق من أن المستخدم لديه الإذن لتحرير المحفظة
             var portfolio = await _unitOfWork.Portfolio.GetByIdAsync(id);
             if (portfolio == null)
             {
@@ -81,10 +80,9 @@ namespace FinalProject.Controllers
 
                     if (userId != null)
                     {
-                        portfolioDto.UserId = userId;
-                        _unitOfWork.Portfolio.AddPortfolioAsync(portfolioDto , file);
-                    //_unitOfWork.Save();
-                        return Ok(portfolioDto);
+                        _unitOfWork.Portfolio.AddPortfolioAsync(portfolioDto , file ,userId);
+                        _unitOfWork.Save();
+                    return Ok(portfolioDto);
                     }
                     else
                     {

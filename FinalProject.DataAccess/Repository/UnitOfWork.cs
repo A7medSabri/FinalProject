@@ -15,8 +15,12 @@ namespace FinalProject.DataAccess.Repository
         public IlangauageRepository language { get; }
         public ICategoryRepository Category { get; }
         public IRepositoryReport Report { get; }
-
+        public IRatingRepository Rating { get; }
         public ISkillsRepository Skill {  get; }
+        public IFavoritesRepository Favorites { get; }
+        public IFavJobPostRepository FavJob { get; }
+
+        public IApplyTasksRepository ApplyTasks { get; }
 
         public IApplyTasksRepository ApplyTasks { get; }
 

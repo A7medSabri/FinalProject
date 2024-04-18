@@ -181,13 +181,24 @@ namespace FinalProject.Controllers
                 {
                     return BadRequest(result.Message);
                 }
-                return Ok(result.Token);
+                var roles = await _userManager.GetRolesAsync(user);
+                string role = roles.FirstOrDefault() ?? "No role assigned";
+
+                var response = new
+                {
+                    Token = result.Token,
+                    Role = role
+                };
+
+                return Ok(response);
             }
             else
             {
                 return BadRequest("Email not Sign Up");
             }
         }
+
+
 
         [HttpPost("Forgot-Password")]
         [AllowAnonymous]
