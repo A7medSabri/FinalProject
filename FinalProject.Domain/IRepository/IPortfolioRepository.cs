@@ -14,8 +14,8 @@ namespace FinalProject.Domain.IRepository
 
         List<ProtfolioGetDto> GetMyPortfolio(string userId);
         Task EditPortfolio(int id, portfolioDto portfolioDto);
-        Task<portfolioDto> GetByIdAsync(int id);
-        Task<AddPortfolio> AddPortfolioAsync(AddPortfolio portfolioDto, IFormFile file);
+        Task<ProtfolioGetDto> GetByIdAsync(int id);
+        Task<AddPortfolio> AddPortfolioAsync(AddPortfolio portfolioDto, IFormFile file, string UserId);
         Task<bool> DeletePortfolioAsync(int id);
 
 

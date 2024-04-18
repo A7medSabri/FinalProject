@@ -25,6 +25,6 @@ namespace FinalProject.Domain.DTO.Portfolio
 
         public DateTime? ProjectDate { get; set; }
 
-        public string UserId { get; set; }
+        //public string UserId { get; set; }
     }
 }

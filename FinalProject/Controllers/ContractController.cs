@@ -6,6 +6,8 @@ using FinalProject.Domain.Models.JobPostAndContract;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 
 
@@ -116,12 +118,12 @@ namespace FinalProject.Controllers
             return BadRequest();
         }
         [HttpDelete("CancelContract")]
-        public IActionResult Delete( int id)
+        public IActionResult Delete(int id)
         {
             Contract conract = _unitOfWork.Contract.GetByID(id);
-            if(conract != null && conract.IsDeleted == false)
+            if (conract != null && conract.IsDeleted == false)
             {
-                if(ModelState.IsValid)
+                if (ModelState.IsValid)
                 {
                     conract.IsDeleted = true;
                     _unitOfWork.Contract.Update(conract);
@@ -131,5 +133,6 @@ namespace FinalProject.Controllers
             }
             return NotFound("This contract already deleted.");
         }
+
     }
 }
