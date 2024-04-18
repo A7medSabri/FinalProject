@@ -18,60 +18,21 @@ namespace FinalProject.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public HomeController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment)
+
+        public HomeController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment , IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             this._webHostEnvironment = webHostEnvironment;
+            _unitOfWork = unitOfWork;
         }
 
-        [HttpGet("Get-Freelancer-By-ID")]
-        public async Task<IActionResult> GetAllFreelancerByID(string Fid)
+        [HttpGet("Get-All-Freelancers")]
+        public async Task<IActionResult> GetAllFreelancer()
         {
-            var user = _userManager.Users
-                .Include(i => i.UserLanguages)
-                    .ThenInclude(i => i.Language)
-                .Include(i => i.UserSkills)
-                    .ThenInclude(i => i.Skill)
-                 .FirstOrDefault(u => u.Id == Fid);
-
-            string wwwRootPath = _webHostEnvironment.WebRootPath;
-
-            string fileName = user.ProfilePicture;
-            string filePath = Path.Combine(wwwRootPath, @"FreeLancerProfileImage", fileName);
-
-            var freelancer = new GetFreelancer
-            {
-                id = user.Id,
-                FullName = user.FirstName + " " + user.LastName,
-                YourTitle = user.YourTitle,
-                Description = user.Description,
-                SelectedLanguages = user.UserLanguages?.Select(lang => lang.Language.Value).ToList(),
-                SelectedSkills = user.UserSkills?.Select(skill => skill.Skill.Name).ToList(),
-                PortfolioURl = user.PortfolioURl,
-                ProfilePicture = filePath,
-                Address =  user.State + " " + user.Address,
-                Country = user.Country,
-                HourlyRate = user.HourlyRate
-            };
-
-            return Ok(freelancer);
-
-        }
-
-        [HttpGet("Get-All-Freelancer-With-The-SameName")]
-        public async Task<IActionResult> GetAllFreelancerWithTheSameName(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-            {
-                return BadRequest("The name parameter cannot be null or empty.");
-            }
-
-            var lowercaseName = name.ToLower();
-
             var users = await _userManager.Users
-                .Where(u => (u.FirstName.ToLower() + " " + u.LastName.ToLower()).Contains(lowercaseName))
-                .ToListAsync();
+               .ToListAsync();
 
             if (users == null || !users.Any())
             {
@@ -84,16 +45,16 @@ namespace FinalProject.Controllers
 
             foreach (var user in users)
             {
-                if (user.ProfilePicture == null)
+                if(!await _userManager.IsInRoleAsync(user, "Freelancer"))
                 {
-                    continue; 
+                    continue;
                 }
-
-
-                string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", user.ProfilePicture);
+                string profilePictureFileName = user.ProfilePicture ?? "default.jpg";
+                string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
 
                 var isFreeLancer = await _userManager.IsInRoleAsync(user, "Freelancer");
                 var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
 
                 if (user.Age != null && user.YourTitle != null && user.Description != null && user.ZIP != null
                     && isFreeLancer && !isAdmin)
@@ -104,14 +65,13 @@ namespace FinalProject.Controllers
                         FullName = $"{user.FirstName} {user.LastName}",
                         YourTitle = user.YourTitle,
                         Description = user.Description,
-                        ProfilePicture = filePath,
+                        ProfilePicture = filePath ?? " ",
                         HourlyRate = user.HourlyRate
                     };
 
                     FreeLancersList.Add(freelancer);
                 }
             }
-
             if (FreeLancersList.Any())
             {
                 return Ok(FreeLancersList);
@@ -121,6 +81,181 @@ namespace FinalProject.Controllers
                 return NotFound("No users found with the specified name.");
             }
         }
+
+        [HttpGet("Get-Freelancer-By-ID")]
+            public async Task<IActionResult> GetAllFreelancerByID(string Fid)
+            {
+                var user = _userManager.Users
+                    .Include(i => i.UserLanguages)
+                        .ThenInclude(i => i.Language)
+                    .Include(i => i.UserSkills)
+                        .ThenInclude(i => i.Skill)
+                     .FirstOrDefault(u => u.Id == Fid);
+
+                var result = _unitOfWork.Rating.FreeRate(Fid);
+
+
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                string fileName = user.ProfilePicture;
+                string filePath = Path.Combine(wwwRootPath, @"FreeLancerProfileImage", fileName);
+
+                var freelancer = new GetFreelancer
+                {
+                    id = user.Id,
+                    FullName = user.FirstName + " " + user.LastName,
+                    YourTitle = user.YourTitle,
+                    Description = user.Description,
+                    SelectedLanguages = user.UserLanguages?.Select(lang => lang.Language.Value).ToList(),
+                    SelectedSkills = user.UserSkills?.Select(skill => skill.Skill.Name).ToList(),
+                    PortfolioURl = user.PortfolioURl,
+                    ProfilePicture = filePath,
+                    Address = user.State + " " + user.Address,
+                    Country = user.Country,
+                    HourlyRate = user.HourlyRate,
+                    Rate = result
+                };
+
+                return Ok(freelancer);
+
+            }
+        [HttpGet("Get-All-Freelancer-With-The-SameName")]
+        public async Task<IActionResult> GetAllFreelancerWithTheSameName(string? name)
+        {
+            var freeLancersList = new List<GetAllFreelancer>();
+            List<ApplicationUser> users;
+
+            if (string.IsNullOrEmpty(name))
+            {
+                users = await _userManager.Users.ToListAsync();
+            }
+            else
+            {
+                var lowercaseName = name.ToLower();
+                users = await _userManager.Users
+                    .Where(u => (u.FirstName.ToLower() + " " + u.LastName.ToLower()).Contains(lowercaseName))
+                    .ToListAsync();
+            }
+
+            if (users == null || !users.Any())
+            {
+                return NotFound("No users found.");
+            }
+
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+
+            foreach (var user in users)
+            {
+                var isFreeLancer = await _userManager.IsInRoleAsync(user, "Freelancer");
+                var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+                if (user.Age.HasValue && user.YourTitle != null && user.Description != null && user.ZIP.HasValue
+                    && isFreeLancer && !isAdmin)
+                {
+                    string profilePictureFileName = user.ProfilePicture ?? "default.jpg";
+                    string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
+
+                    var freelancer = new GetAllFreelancer
+                    {
+                        id = user.Id,
+                        FullName = $"{user.FirstName} {user.LastName}",
+                        YourTitle = user.YourTitle,
+                        Description = user.Description,
+                        ProfilePicture = filePath ?? " ",
+                        HourlyRate = user.HourlyRate
+                    };
+
+                    freeLancersList.Add(freelancer);
+                }
+            }
+
+            if (freeLancersList.Any())
+            {
+                return Ok(freeLancersList);
+            }
+            else
+            {
+                return NotFound("No users found with the specified name.");
+            }
+        }
+
+        //[HttpGet("Get-All-Freelancer-With-The-SameName")]
+        //public async Task<IActionResult> GetAllFreelancerWithTheSameName(string name)
+        //{
+
+        //    //if (string.IsNullOrEmpty(name))
+        //    //{
+        //    //    return BadRequest("The name parameter cannot be null or empty.");
+        //    //}
+        //    //var lowercaseName = name.ToLower();
+
+        //    //var users = await _userManager.Users
+        //    //    .Where(u => (u.FirstName.ToLower() + " " + u.LastName.ToLower()).Contains(lowercaseName))
+        //    //    .ToListAsync();
+
+        //    //if (users == null || !users.Any())
+        //    //{
+        //    //    return NotFound("No users found with the specified name.");
+        //    //}
+        //    if (string.IsNullOrEmpty(name))
+        //    {
+        //        var users = await _userManager.Users
+        //            .ToListAsync();
+        //        if (users == null || !users.Any())
+        //        {
+        //            return NotFound("No users found.");
+        //        }
+        //        return Ok(users);
+        //    }
+        //    else
+        //    {
+        //        var lowercaseName = name.ToLower();
+
+        //        var users = await _userManager.Users
+        //            .Where(u => (u.FirstName.ToLower() + " " + u.LastName.ToLower()).Contains(lowercaseName))
+        //            .ToListAsync();
+        //        if (users == null || !users.Any())
+        //        {
+        //            return NotFound("No users found with the specified name.");
+        //        }
+        //    }
+        //    var FreeLancersList = new List<GetAllFreelancer>();
+        //    string wwwRootPath = _webHostEnvironment.WebRootPath;
+        //    foreach (var user in users)
+        //    {
+
+        //        string profilePictureFileName = user.ProfilePicture ?? "default.jpg";
+        //        string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
+
+        //        var isFreeLancer = await _userManager.IsInRoleAsync(user, "Freelancer");
+        //        var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+
+        //        if (user.Age != null && user.YourTitle != null && user.Description != null && user.ZIP != null
+        //            && isFreeLancer && !isAdmin)
+        //        {
+        //            var freelancer = new GetAllFreelancer
+        //            {
+        //                id = user.Id,
+        //                FullName = $"{user.FirstName} {user.LastName}",
+        //                YourTitle = user.YourTitle,
+        //                Description = user.Description,
+        //                ProfilePicture = filePath ?? " ",
+        //                HourlyRate = user.HourlyRate
+        //            };
+
+        //            FreeLancersList.Add(freelancer);
+        //        }
+        //    }
+
+        //    if (FreeLancersList.Any())
+        //    {
+        //        return Ok(FreeLancersList);
+        //    }
+        //    else
+        //    {
+        //        return NotFound("No users found with the specified name.");
+        //    }
+        //}
 
     }
 }

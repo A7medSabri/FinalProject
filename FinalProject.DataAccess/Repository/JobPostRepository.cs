@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +23,12 @@ namespace FinalProject.DataAccess.Repository
             _context = context;
 
         }
+
+        public bool FindFavJobPost(Expression<Func<JobPost, bool>> predicate)
+        {
+            return _context.Set<JobPost>().Any(predicate);
+        }
+
 
 
         public GetMyJobPostDto GetjopPostWithId(int id)

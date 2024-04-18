@@ -19,6 +19,6 @@ namespace FinalProject.Domain.DTO.HomeModel
         public string? Address { get; set; }
         public string Country { get; set; }
         public decimal? HourlyRate { get; set; }
-
+        public double? Rate { get; set; }
     }
 }

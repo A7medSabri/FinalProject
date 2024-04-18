@@ -1,5 +1,6 @@
 ﻿using FinalProject.Domain.AccountModel;
 using FinalProject.Domain.DTO.AccountModel;
+using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.ApplicationUserModel;
 using FinalProject.Domain.Models.RegisterNeeded;
 using FinalProject.Domain.Models.SkillAndCat;
@@ -19,10 +20,14 @@ namespace FinalProject.Controllers
     public class AccountController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AccountController(UserManager<ApplicationUser> userManager)
+        public AccountController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment , IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
+            _webHostEnvironment = webHostEnvironment;
+            _unitOfWork = unitOfWork;
         }
         //Profile User
 
@@ -60,6 +65,7 @@ namespace FinalProject.Controllers
         {
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId2 = User.FindFirst("uid")?.Value;
 
             if (userId == null)
             {
@@ -75,18 +81,21 @@ namespace FinalProject.Controllers
                     .ThenInclude(u => u.Language)
                 .SingleOrDefaultAsync(u => u.UserName == userId);
 
+            var result = _unitOfWork.Rating.FreeRate(userId2);
+
             if (user == null)
             {
                 return NotFound("User not found");
             }
-
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
             var freelancerProfileDto = new FreelancerProfileDto
             {
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Username = user.UserName,
                 Email = user.Email,
-                SelectedLanguages = user.UserLanguages?.Select(lang => lang.Language.Value).ToList(),
+                Rate = result,
+                SelectedLanguages = user.UserLanguages?.Select(lang => lang.Language.Value).ToList() ?? new List<string>(),
                 PhoneNumber = user.PhoneNumber,
                 Age = user.Age,
                 YourTitle = user.YourTitle,
@@ -96,13 +105,16 @@ namespace FinalProject.Controllers
                 SelectedSkills = user.UserSkills?.Select(skill => skill.Skill.Name).ToList() ?? new List<string>(),
                 HourlyRate = user.HourlyRate,
                 ZIP = user.ZIP,
-                Address = user.Country + " " + user.State + " " + user.Address,
+                Address = user.Address,
+                State = user.State,
+                country = user.Country,
                 PortfolioURl = user.PortfolioURl,
-                ProfilePicture = user.ProfilePicture
+                ProfilePicture = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(wwwRootPath, "FreeLancerProfileImage", user.ProfilePicture)
             };
 
             return Ok(freelancerProfileDto);
         }
+
         //Password
         [HttpPost("ChangePassword-All")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
@@ -142,7 +154,7 @@ namespace FinalProject.Controllers
         //ProfilePhoto
         [HttpPost("ChangeProfilePicture-FreeLancer")]
         [Authorize(Roles ="Freelancer")]
-        public async Task<IActionResult> ChangeProfilePicture([FromForm] ChangeProfilePictureModel model)
+        public async Task<IActionResult> ChangeProfilePicture([FromForm] ChangeProfilePictureModel model ,IFormFile file)
         {
             if (!ModelState.IsValid)
             {
@@ -159,6 +171,20 @@ namespace FinalProject.Controllers
             var user = await _userManager.FindByIdAsync(userIdClaim.Value);
 
             // Update the profile picture URL
+            if (file != null)
+            {
+                string wwwRootPath = _webHostEnvironment.WebRootPath; // Root path for web content
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Generate a unique file name
+                string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage"); // Combine the path to the desired directory
+
+                    using (var fileStream = new FileStream(Path.Combine(filePath, fileName), FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
+
+                    model.NewProfilePictureUrl = fileName;
+            }
+
             user.ProfilePicture = model.NewProfilePictureUrl;
 
             // Save the changes to the database
@@ -200,6 +226,8 @@ namespace FinalProject.Controllers
             user.Country = model.Country;
             user.State = model.State;
             user.Address = model.Address;
+            user.Country = model.Country;
+            user.State = model.State;
             user.Experience = model.Experience;
             user.Education = model.Education;
             user.PortfolioURl = model.PortfolioURl;

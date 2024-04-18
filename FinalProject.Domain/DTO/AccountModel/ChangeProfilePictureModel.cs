@@ -4,7 +4,6 @@ namespace FinalProject.Domain.AccountModel
 {
     public class ChangeProfilePictureModel
     {
-        [Required]
-        public string NewProfilePictureUrl { get; set; }
+        public string? NewProfilePictureUrl { get; set; }
     }
 }
