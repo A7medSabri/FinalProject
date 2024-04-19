@@ -30,10 +30,12 @@ namespace FinalProject.DataAccess.Repository
         {
             var jobPosts = _context.JobPosts
                 .Where(u => u.IsDeleted == false)
+                .Include(u => u.ApplicationUser)
                 .Include(jp => jp.JobPostSkill)
                     .ThenInclude(u => u.Skill)
                 .Include(u => u.Category)
                 .ToList();
+
 
             if (jobPosts == null) return null;
 
@@ -85,15 +87,19 @@ namespace FinalProject.DataAccess.Repository
             };
             return jopPostDto;
         }
-        public List<AllJopPostDto> GetAllByName(string userId,string tilte)
+
+        // related to frelacner only
+
+        public List<AllJopPostDto> GetAllByName(string tilte)
         {
+
             var lower = tilte.ToLower();
 
             var AllJopPost = _context.JobPosts
                 .Where(u => u.IsDeleted == false)
                 .Include(u => u.Category)
                 .Include(u => u.ApplicationUser)
-                .Where(u => u.UserId == userId && u.Title.ToLower()==lower).ToList();
+                .Where(u =>  u.Title.ToLower()==lower).ToList();
 
             if (AllJopPost == null) return null;
 

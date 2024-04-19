@@ -7,12 +7,12 @@ using FinalProject.Domain.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using FinalProject.Domain.DTO.JobPost;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FinalProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User")]
     //[Authorize (Roles = "User , Freelancer")]
     public class JobPostsController : ControllerBase
     {
@@ -39,6 +39,22 @@ namespace FinalProject.Controllers
         }
 
 
+        [Authorize(Roles = "Freelancer")]
+        [HttpGet("Get-All-Project-With-Same-Title")]
+        public IActionResult GetJMyobPostsWithSameName(string title)
+        {
+            var jopPostsWithSameName = _unitOfWork.JobPost.GetAllByName(title);
+
+            if (jopPostsWithSameName == null || jopPostsWithSameName.Count == 0)
+            {
+                return Ok(GetJMyobPosts());
+            }
+
+            return Ok(jopPostsWithSameName);
+        }
+
+
+        [Authorize(Roles = "User")]
         [HttpGet("Get-All-My-Project-Post")]
         public IActionResult GetJMyobPosts()
         {
@@ -55,24 +71,10 @@ namespace FinalProject.Controllers
         }
 
 
-        [HttpGet("Get-All-Project-With-Same-Title")]
-        public IActionResult GetJMyobPostsWithSameName(string title)
-        {
-            string userId = User.FindFirst("uid")?.Value;
-
-            var jopPostsWithSameName = _unitOfWork.JobPost.GetAllByName(userId,title);
-
-            if (jopPostsWithSameName == null || jopPostsWithSameName.Count == 0)
-            {
-                return Ok(GetJMyobPosts());
-            }
-
-            return Ok(jopPostsWithSameName);
-        }
-
 
         // get jobPost by iD
         // GET: api/JobPosts/5
+        [Authorize(Roles = "User")]
         [HttpGet("Get-job-post-by-Id")]
         public IActionResult GetJobPost(int id)
         {
@@ -87,6 +89,7 @@ namespace FinalProject.Controllers
             return Ok(jobPost);
         }
 
+        [Authorize(Roles = "User")]
         [HttpPost]
         public IActionResult PostJobPost(JobPostDto jobPostDto)
         {
@@ -114,6 +117,7 @@ namespace FinalProject.Controllers
         // update jobpost
         // PUT: api/JobPosts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         public IActionResult PutJobPost(int id, JobPostDto jobPostDto)
         {
@@ -133,6 +137,7 @@ namespace FinalProject.Controllers
 
 
         // DELETE: api/JobPosts/5
+        [Authorize(Roles = "User")]
         [HttpDelete("{id}")]
         public IActionResult DeleteJobPost(int id)
         {

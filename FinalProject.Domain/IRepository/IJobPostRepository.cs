@@ -16,7 +16,7 @@ namespace FinalProject.Domain.IRepository
         public List<GetMyJobPostDto> GetAllJobPosts();
         public List<GetMyJobPostDto> GetAllJobPostsByUserId(string userId);
         void Update(int id, JobPostDto jobPostDto);
-        public List<AllJopPostDto> GetAllByName(string userId,string name);
+        public List<AllJopPostDto> GetAllByName(string name);
         public GetMyJobPostDto GetjopPostWithId(string userId,int id);
 
      //   bool FindFavJobPost(Expression<Func<JobPost, bool>> predicate);
