@@ -50,9 +50,9 @@ namespace FinalProject.Controllers
                 }
                 return NotFound("No categories found with IDs.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, "An unexpected error occurred. Please try again later.");
+                return StatusCode(500, $"An unexpected error occurred. Please try again later{ex.Message}");
             }
         }
 
