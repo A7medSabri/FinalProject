@@ -56,6 +56,7 @@ namespace FinalProject.DataAccess.Repository
                 .Include(u=>u.Category)
                 .Include(u=>u.ApplicationUser)
                 .Where(u => u.Title.ToLower().Contains(lower)).ToList();
+
             var AllJopPostDto = AllJopPost.Select(jp => new AllJopPostDto
             {
                 Title = jp.Title,

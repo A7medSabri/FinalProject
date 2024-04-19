@@ -20,7 +20,8 @@ namespace FinalProject.Controllers
         {
             this._unitOfWork = unitOfWork;
         }
-        [HttpGet("Get_All_SKills")]
+        //Done
+        [HttpGet("Get-All-SKills")]
         public ActionResult GetAll()
         {
             List<string> result = _unitOfWork.Skill.GetAll().Where(s => s.IsDeleted == false).Select(s => s.Name).ToList();
@@ -33,6 +34,8 @@ namespace FinalProject.Controllers
             }
             return NotFound();
         }
+
+        //Done
         [HttpGet("Get-All-SKills-With-Id")]
         public ActionResult GetAllWithId()
         {
@@ -46,16 +49,63 @@ namespace FinalProject.Controllers
             }
             return NotFound();
         }
-        [HttpPost("Add-New-Skill")]
-        public ActionResult Add(SkillDto skill)
-        {
-            _unitOfWork.Skill.Create(skill);
 
-            _unitOfWork.Save();
-            return Ok(skill);
+        //Done
+        [HttpPost("Add-New-Skill")]
+        public ActionResult Add([FromForm] SkillDto skill)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid input.");
+            }
+
+            try
+            {
+                var data = _unitOfWork.Skill.Find(u => u.Name == skill.name);
+                if (data != null)
+                {
+                    return BadRequest("Is Exiting");
+                }
+                var newSkill = _unitOfWork.Skill.Create(skill);
+                _unitOfWork.Save();
+                return Ok(newSkill);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred.");
+            }
         }
+
+        //Done
+        [HttpPut("Edit-Skill")]
+        public IActionResult Update(int id, [FromForm] SkillDto skill)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid input.");
+            }
+
+            var existingSkill = _unitOfWork.Skill.GetByID(id);
+            if (existingSkill == null)
+            {
+                return NotFound("Skill not found.");
+            }
+
+            try
+            {
+                var updatedSkill = _unitOfWork.Skill.Edit(id, skill);
+                _unitOfWork.Save();
+                return Ok(updatedSkill);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred.");
+            }
+        }
+
+        //Done
         [HttpDelete("Delete-Skill")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete([FromForm] int id)
         {
             var skill = _unitOfWork.Skill.GetByID(id);
             if(skill == null)
@@ -64,17 +114,18 @@ namespace FinalProject.Controllers
             _unitOfWork.Save();
             return Ok(skill);
         }
-        [HttpPut("Edit-Skill")]
-        public IActionResult Update(int id ,SkillDto skill) 
-        {
-            var oldSkill = _unitOfWork.Skill.GetByID(id);
-            if(oldSkill == null)
-                return NotFound("Not Found Any Skill With This Id");
-            
-            _unitOfWork.Skill.Edit(id, skill);
-            _unitOfWork.Save();
 
-            return Ok(skill);
-        }
+        //[HttpPut("Edit-Skill")]
+        //public IActionResult Update(int id ,SkillDto skill) 
+        //{
+        //    var oldSkill = _unitOfWork.Skill.GetByID(id);
+        //    if(oldSkill == null)
+        //        return NotFound("Not Found Any Skill With This Id");
+            
+        //    _unitOfWork.Skill.Edit(id, skill);
+        //    _unitOfWork.Save();
+
+        //    return Ok(skill);
+        //}
     }
 }

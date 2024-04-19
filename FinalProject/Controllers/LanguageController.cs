@@ -21,68 +21,99 @@ namespace FinalProject.Controllers
         {
             this._unitOfWork = unitOfWork;
         }
+
         [HttpGet("Get-All-Language")]
-        public ActionResult GetAll()
+        public IActionResult GetAll()
         {
-            List<string> result = _unitOfWork.language.GetAll().Where(s => s.IsDeleted == false).Select(s => s.Value).ToList();
-            if (!result.IsNullOrEmpty())
+            try
             {
-                if (ModelState.IsValid)
+                var result = _unitOfWork.language.GetAll()
+                    .Where(lang => lang.IsDeleted == false)
+                    .Select(lang => lang.Value)
+                    .ToList();
+
+                if (result.Any())
                 {
                     return Ok(result);
                 }
+                return NotFound("No languages found.");
             }
-            return NotFound();
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred. Please try again later.");
+            }
         }
+
         [HttpGet("Get-All-Language-With-Id")]
-        public ActionResult GetAllWithId()
+        public IActionResult GetAllWithId()
         {
-            var result = _unitOfWork.language.GetAll().Where(s=>s.IsDeleted==false).Select(s => new { s.Id, s.Value }).ToList();
-            if (!result.IsNullOrEmpty())
+            try
             {
-                if (ModelState.IsValid)
+                var result = _unitOfWork.language.GetAll()
+                    .Where(lang => lang.IsDeleted == false)
+                    .Select(lang => new { lang.Id, lang.Value })
+                    .ToList();
+
+                if (result.Any())
                 {
                     return Ok(result);
                 }
+                return NotFound("No languages found.");
             }
-            return NotFound();
-        }
-        [HttpPost("Add-New-Language")]
-        public ActionResult Add(AddNewLangDto lang)
-        {
-            var existingLanguage = _unitOfWork.language.GetByID(lang.Id);
-
-            if (existingLanguage != null)
+            catch (Exception ex)
             {
-                return BadRequest($"Language with Id already exists.");
+                return StatusCode(500, "An unexpected error occurred. Please try again later.");
             }
-            _unitOfWork.language.Create(lang);
+        }
 
-            _unitOfWork.Save();
-            return Ok(lang);
+        [HttpPost("Add-New-Language")]
+        public IActionResult Add(AddNewLangDto lang)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invalid input data.");
+                }
+
+                var existingLanguage = _unitOfWork.language.Find(u => u.Value == lang.Value);
+                if (existingLanguage != null)
+                {
+                    return BadRequest("Language already exists.");
+                }
+
+                _unitOfWork.language.Create(lang);
+                _unitOfWork.Save();
+
+                return Ok(lang);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred. Please try again later.");
+            }
         }
 
         [HttpDelete("Delete-Language")]
         public IActionResult Delete(string id)
         {
-            var lang = _unitOfWork.language.GetByID(id);
-            if (lang == null)
-                return NotFound("Not Found Any Language With This Id");
-            _unitOfWork.language.Remove(id);
-            _unitOfWork.Save();
-            return Ok(lang);
-        }
-        [HttpPut("Edit-Language")]
-        public IActionResult Update(string id, LangDto lang)
-        {
-            var oldLang = _unitOfWork.language.GetByID(id);
-            if (oldLang == null)
-                return NotFound("Not Found Any Language With This Id");
+            try
+            {
+                var lang = _unitOfWork.language.GetByID(id);
+                if (lang == null)
+                {
+                    return NotFound("Language not found with this ID.");
+                }
 
-            _unitOfWork.language.Edit(id, lang);
-            _unitOfWork.Save();
+                _unitOfWork.language.Remove(id);
+                _unitOfWork.Save();
 
-            return Ok(lang);
+                return Ok(lang);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred. Please try again later.");
+            }
         }
+
     }
 }
