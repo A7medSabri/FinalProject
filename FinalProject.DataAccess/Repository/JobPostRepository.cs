@@ -24,47 +24,96 @@ namespace FinalProject.DataAccess.Repository
 
         }
 
-        public bool FindFavJobPost(Expression<Func<JobPost, bool>> predicate)
+
+        // related to frelacner only
+        public List<GetMyJobPostDto> GetAllJobPosts()
         {
-            return _context.Set<JobPost>().Any(predicate);
+            var jobPosts = _context.JobPosts
+                .Where(u => u.IsDeleted == false)
+                .Include(u => u.ApplicationUser)
+                .Include(jp => jp.JobPostSkill)
+                    .ThenInclude(u => u.Skill)
+                .Include(u => u.Category)
+                .ToList();
+
+
+            if (jobPosts == null) return null;
+
+            var jobPostDtos = jobPosts.Select(jobPost => new GetMyJobPostDto
+            {
+
+                Id = jobPost.Id,
+                Title = jobPost.Title,
+                Description = jobPost.Description,
+                Price = jobPost.Price,
+                DurationTime = jobPost.DurationTime,
+                JobPostSkill = jobPost.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
+                CategoryName = jobPost.Category.Name,
+                Status = jobPost.Status,
+                IsDeleted = jobPost.IsDeleted,
+                UserId = jobPost.UserId,
+                UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName
+
+            }).ToList();
+
+            return jobPostDtos;
         }
 
-        public GetMyJobPostDto GetjopPostWithId(int id)
+        public GetMyJobPostDto GetjopPostWithId(string userId,int id)
         {
-            var jopPost = _context.JobPosts
+            var jobPost = _context.JobPosts
                 .Include(u => u.Category)
                 .Include(u => u.ApplicationUser)
-                .Include(u => u.JobPostSkill).ThenInclude(u => u.Skill)
+                .Include(u => u.JobPostSkill)
+                  .ThenInclude(u => u.Skill)
+                .Where(u => u.UserId == userId && u.IsDeleted == false)
                 .FirstOrDefault(u => u.Id == id);
+
+            if (jobPost == null) return null;
+
             var jopPostDto = new GetMyJobPostDto
             {
-                Title = jopPost.Title,
-                Description = jopPost.Description,
-                Price = jopPost.Price,
-                DurationTime = jopPost.DurationTime,
-                JobPostSkill = jopPost.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
-                CategoryName = jopPost.Category.Name,
-                Status = jopPost.Status,
-                UserFullName = jopPost.ApplicationUser.FirstName + " " + jopPost.ApplicationUser.LastName
+                Id = jobPost.Id,
+                Title = jobPost.Title,
+                Description = jobPost.Description,
+                Price = jobPost.Price,
+                DurationTime = jobPost.DurationTime,
+                JobPostSkill = jobPost.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
+                CategoryName = jobPost.Category.Name,
+                Status = jobPost.Status,
+                IsDeleted = jobPost.IsDeleted,
+                UserId = jobPost.UserId,
+                UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName
             };
             return jopPostDto;
         }
+
+        // related to frelacner only
+
         public List<AllJopPostDto> GetAllByName(string tilte)
         {
+
             var lower = tilte.ToLower();
+
             var AllJopPost = _context.JobPosts
-                .Include(u=>u.Category)
-                .Include(u=>u.ApplicationUser)
-                .Where(u => u.Title.ToLower().Contains(lower)).ToList();
+                .Where(u => u.IsDeleted == false)
+                .Include(u => u.Category)
+                .Include(u => u.ApplicationUser)
+                .Where(u =>  u.Title.ToLower()==lower).ToList();
+
+            if (AllJopPost == null) return null;
 
             var AllJopPostDto = AllJopPost.Select(jp => new AllJopPostDto
             {
+                Id = jp.Id,
                 Title = jp.Title,
                 Description = jp.Description,
                 Price = jp.Price,
                 DurationTime = jp.DurationTime,
                 CategoryName = jp.Category.Name,
                 Status = jp.Status,
+                IsDeleted = jp.IsDeleted,
+                UserId = jp.UserId,
                 FullNameForUser = jp.ApplicationUser.FirstName + " " + jp.ApplicationUser.LastName
             }).ToList();
 
@@ -75,23 +124,32 @@ namespace FinalProject.DataAccess.Repository
         {
             var jobPosts = _context.JobPosts
                 .Include(jp => jp.JobPostSkill)
-                    .ThenInclude(u=>u.Skill)
-                .Include(u=>u.Category)
-                .Where(jp => jp.UserId == userId).ToList();
+                    .ThenInclude(u => u.Skill)
+                .Include(u => u.Category)
+                .Include(u => u.ApplicationUser)
+                .Where(u => u.UserId == userId && u.IsDeleted == false).ToList();
+
+            if (jobPosts == null) return null;
 
             var jobPostDtos = jobPosts.Select(jp => new GetMyJobPostDto
             {
+                Id = jp.Id,
                 Title = jp.Title,
                 Description = jp.Description,
                 CategoryName = jp.Category.Name,
                 Price = jp.Price,
                 DurationTime = jp.DurationTime,
                 JobPostSkill = jp.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
+                Status = jp.Status,
+                IsDeleted = jp.IsDeleted,
+                UserId = jp.UserId,
+                UserFullName = jp.ApplicationUser.FirstName + " " + jp.ApplicationUser.LastName
 
             }).ToList();
 
             return jobPostDtos;
         }
+
         public void Update(int id, JobPostDto jobPostDto)
         {
             // jobPost always exist
@@ -103,40 +161,35 @@ namespace FinalProject.DataAccess.Repository
             NewJobPost.DurationTime = jobPostDto.DurationTime;
         }
 
-        //public void Create(JobPostDto jobPostDto)
-        //{
 
-        //    JobPost jobPost = new JobPost();
-        //    jobPost.Title = jobPostDto.Title;
-        //    jobPost.Description = jobPostDto.Description;
-        //    jobPost.Price = jobPostDto.Price;
-        //    jobPost.DurationTime = jobPostDto.DurationTime;
-        //    jobPost.Status = "Uncompleted";
-        //    jobPost.CategoryId = 3;
-        //    jobPost.UserId = "be258344-4614-4f6c-b431-e1a161b2bd26";
-        //    _context.JobPosts.Add(jobPost);
-        //    _context.SaveChanges();
-
-        //}
-
-        public void Create(JobPostDto jobPostDto)
+        public void Create(JobPostDto jobPostDto, string UserId)
         {
             JobPost jobPost = new JobPost();
 
             // Use the provided userId instead of accessing User object
-            jobPost.UserId = jobPostDto.UserId;
+            jobPost.UserId = UserId;
 
             jobPost.Title = jobPostDto.Title;
             jobPost.Description = jobPostDto.Description;
             jobPost.Price = jobPostDto.Price;
             jobPost.DurationTime = jobPostDto.DurationTime;
             jobPost.Status = "Uncompleted";
-            jobPost.JobPostSkill = jobPostDto.JobPostSkill.Select(skillId => new JobPostSkill { SkillId = skillId }).ToList();
             jobPost.CategoryId = jobPostDto.CategoryId;
 
             _context.JobPosts.Add(jobPost);
-            _context.SaveChanges();
         }
+
+
+        public JobPost GetJobPostByIdAndUserId(string userId,int id)
+        {
+            var jobPost = _context.JobPosts
+                .Include(u => u.ApplicationUser)
+                .Where(jp => jp.UserId == userId && jp.IsDeleted == false)
+                .FirstOrDefault(jp => jp.Id == id);
+
+            return jobPost;
+        }
+
 
     }
 }

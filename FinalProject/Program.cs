@@ -29,7 +29,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
             opt.UseSqlServer(builder.Configuration.GetConnectionString("DefultConnection")));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+// auto mapper 
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));

@@ -46,7 +46,7 @@ namespace FinalProject.Domain.Models.JobPostAndContract
         public Category Category { get; set; }
 
         //Skill Relation
-        public List<JobPostSkill> JobPostSkill { get; set; }
+        public List<JobPostSkill> ?JobPostSkill { get; set; }
 
         //ApplyJob
         public List<ApplyTask> ApplyTasks { get; set; }

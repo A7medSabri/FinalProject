@@ -7,59 +7,80 @@ using FinalProject.Domain.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using FinalProject.Domain.DTO.JobPost;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FinalProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "User")]
     //[Authorize (Roles = "User , Freelancer")]
-    public class JobPostsController  : ControllerBase
+    public class JobPostsController : ControllerBase
     {
 
         private readonly IUnitOfWork _unitOfWork;
 
-        public JobPostsController( IUnitOfWork unitOfWork)
+        public JobPostsController(IUnitOfWork unitOfWork)
         {
 
             _unitOfWork = unitOfWork;
         }
 
+        [Authorize(Roles = "Freelancer")]
+        [HttpGet("Get-Over-All-Project-Posts")]
+        public IActionResult GetAllobPosts()
+        {
+            if (_unitOfWork.JobPost.GetAllJobPosts() == null)
+            {
+                return Ok(new List<GetMyJobPostDto>());
+            }
+
+            var jobPosts = _unitOfWork.JobPost.GetAllJobPosts().ToList();
+            return Ok(jobPosts);
+        }
+
+
+        [Authorize(Roles = "Freelancer")]
+        [HttpGet("Get-All-Project-With-Same-Title")]
+        public IActionResult GetJMyobPostsWithSameName(string title)
+        {
+            var jopPostsWithSameName = _unitOfWork.JobPost.GetAllByName(title);
+
+            if (jopPostsWithSameName == null || jopPostsWithSameName.Count == 0)
+            {
+                return Ok(GetJMyobPosts());
+            }
+
+            return Ok(jopPostsWithSameName);
+        }
+
+
+        [Authorize(Roles = "User")]
         [HttpGet("Get-All-My-Project-Post")]
-        public List<GetMyJobPostDto> GetJMyobPosts()
+        public IActionResult GetJMyobPosts()
         {
             var userId = User.FindFirst("uid")?.Value;
-            
-            if (_unitOfWork.JobPost.GetAllJobPostsByUserId(userId) == null)
-                return new List<GetMyJobPostDto>();
-            return _unitOfWork.JobPost.GetAllJobPostsByUserId(userId).ToList();
-        }
 
-        [HttpGet("Get-All-Project-With-Same-Title")]
-        public List<AllJopPostDto> GetJMyobPostsWithSameName(string tilte)
-        {
-            if (_unitOfWork.JobPost.GetAllByName(tilte) == null)
-                return new List<AllJopPostDto>();
-            return _unitOfWork.JobPost.GetAllByName(tilte);
-        }
+            var myJobPosts = _unitOfWork.JobPost.GetAllJobPostsByUserId(userId).ToList();
 
-        // get all job posts
-        // GET: api/JobPosts
-        [HttpGet("Get-All")]
-        public IEnumerable<JobPost> GetJobPosts()
-        {
-            if (_unitOfWork.JobPost.GetAll() == null)
-                return new List<JobPost>();
-            return _unitOfWork.JobPost.GetAll();
+            if (myJobPosts == null || myJobPosts.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(myJobPosts);
         }
 
 
-        // get jobPost by id
+
+        // get jobPost by iD
         // GET: api/JobPosts/5
+        [Authorize(Roles = "User")]
         [HttpGet("Get-job-post-by-Id")]
         public IActionResult GetJobPost(int id)
         {
-            var jobPost = _unitOfWork.JobPost.GetjopPostWithId(id);
+            string userId = User.FindFirst("uid")?.Value;
+
+            var jobPost = _unitOfWork.JobPost.GetjopPostWithId(userId,id);
             if (jobPost == null)
             {
                 return NotFound();
@@ -68,57 +89,19 @@ namespace FinalProject.Controllers
             return Ok(jobPost);
         }
 
-
-        // update jobpost
-        // PUT: api/JobPosts/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public IActionResult PutJobPost(int id, JobPostDto jobPostDto)
-        {
-            if (!ModelState.IsValid) return BadRequest();
-
-            if (_unitOfWork.JobPost.GetByID(id) == null)
-                return NotFound();
-
-            // jobPost always exist
-            _unitOfWork.JobPost.Update(id, jobPostDto);
-            _unitOfWork.Save();
-            return Ok(_unitOfWork.JobPost.GetByID(id));
-        }
-
-
-        // create new jobPost
-        // POST: api/JobPosts
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public ActionResult<JobPost> PostJobPost(JobPostDto jobPostDto)
-        //{
-        // //   jobPostDto.UserId = User.FindFirst("uid").ToString();
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        _unitOfWork.JobPostRepository.Create(jobPostDto);
-        //      //  _unitOfWork.Save();
-        //        return Ok(jobPostDto);
-        //    }
-
-        //    return BadRequest();
-        //}
-
+        [Authorize(Roles = "User")]
         [HttpPost]
-        public ActionResult<JobPost> PostJobPost(JobPostDto jobPostDto)
+        public IActionResult PostJobPost(JobPostDto jobPostDto)
         {
             if (ModelState.IsValid)
             {
-                //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var userId = User.FindFirst("uid")?.Value;
+                string userId = User.FindFirst("uid")?.Value;
 
                 if (userId != null)
                 {
-                    jobPostDto.UserId = userId;
-                    Console.WriteLine(jobPostDto.UserId);
-                    _unitOfWork.JobPost.Create(jobPostDto);
-                    _unitOfWork.Save(); 
+                    Console.WriteLine(userId);
+                    _unitOfWork.JobPost.Create(jobPostDto, userId);
+                    _unitOfWork.Save();
 
                     return Ok(jobPostDto);
                 }
@@ -131,15 +114,37 @@ namespace FinalProject.Controllers
             return BadRequest(ModelState);
         }
 
+        // update jobpost
+        // PUT: api/JobPosts/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "User")]
+        [HttpPut("{id}")]
+        public IActionResult PutJobPost(int id, JobPostDto jobPostDto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            string userId = User.FindFirst("uid")?.Value;
+            if (_unitOfWork.JobPost.GetJobPostByIdAndUserId(userId,id) == null)
+                return NotFound();
+
+            // jobPost always exist
+            _unitOfWork.JobPost.Update(id, jobPostDto);
+            _unitOfWork.Save();
+            return Ok();
+        }
+
+
 
 
         // DELETE: api/JobPosts/5
+        [Authorize(Roles = "User")]
         [HttpDelete("{id}")]
         public IActionResult DeleteJobPost(int id)
         {
-            JobPost jobPost = _unitOfWork.JobPost.GetByID(id);
+            string userId = User.FindFirst("uid")?.Value;
+            JobPost jobPost = _unitOfWork.JobPost.GetJobPostByIdAndUserId(userId,id);
             if (jobPost == null) return NotFound();
-            _unitOfWork.JobPost.Delete(jobPost);
+            jobPost.IsDeleted = true;
             _unitOfWork.Save();
             return Ok();
         }
