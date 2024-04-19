@@ -25,8 +25,8 @@ namespace FinalProject.DataAccess.Repository
         }
 
 
-
-        public List<GetJobPostDto> GetAllJobPosts()
+        // related to frelacner only
+        public List<GetMyJobPostDto> GetAllJobPosts()
         {
             var jobPosts = _context.JobPosts
                 .Where(u => u.IsDeleted == false)
@@ -37,30 +37,34 @@ namespace FinalProject.DataAccess.Repository
 
             if (jobPosts == null) return null;
 
-            var jobPostDtos = jobPosts.Select(jp => new GetJobPostDto
+            var jobPostDtos = jobPosts.Select(jobPost => new GetMyJobPostDto
             {
-                Id = jp.Id,
-                Title = jp.Title,
-                Description = jp.Description,
-                CategoryName = jp.Category.Name,
-                Price = jp.Price,
-                DurationTime = jp.DurationTime,
-                JobPostSkill = jp.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
-                Status = jp.Status,
-                IsDeleted = jp.IsDeleted,
+
+                Id = jobPost.Id,
+                Title = jobPost.Title,
+                Description = jobPost.Description,
+                Price = jobPost.Price,
+                DurationTime = jobPost.DurationTime,
+                JobPostSkill = jobPost.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
+                CategoryName = jobPost.Category.Name,
+                Status = jobPost.Status,
+                IsDeleted = jobPost.IsDeleted,
+                UserId = jobPost.UserId,
+                UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName
 
             }).ToList();
 
             return jobPostDtos;
         }
 
-        public GetMyJobPostDto GetjopPostWithId(int id)
+        public GetMyJobPostDto GetjopPostWithId(string userId,int id)
         {
             var jobPost = _context.JobPosts
-                .Where(u => u.IsDeleted == false)
                 .Include(u => u.Category)
                 .Include(u => u.ApplicationUser)
-                .Include(u => u.JobPostSkill).ThenInclude(u => u.Skill)
+                .Include(u => u.JobPostSkill)
+                  .ThenInclude(u => u.Skill)
+                .Where(u => u.UserId == userId && u.IsDeleted == false)
                 .FirstOrDefault(u => u.Id == id);
 
             if (jobPost == null) return null;
@@ -81,14 +85,15 @@ namespace FinalProject.DataAccess.Repository
             };
             return jopPostDto;
         }
-        public List<AllJopPostDto> GetAllByName(string tilte)
+        public List<AllJopPostDto> GetAllByName(string userId,string tilte)
         {
             var lower = tilte.ToLower();
+
             var AllJopPost = _context.JobPosts
                 .Where(u => u.IsDeleted == false)
                 .Include(u => u.Category)
                 .Include(u => u.ApplicationUser)
-                .Where(u => u.Title.ToLower().Contains(lower)).ToList();
+                .Where(u => u.UserId == userId && u.Title.ToLower()==lower).ToList();
 
             if (AllJopPost == null) return null;
 
@@ -112,12 +117,11 @@ namespace FinalProject.DataAccess.Repository
         public List<GetMyJobPostDto> GetAllJobPostsByUserId(string userId)
         {
             var jobPosts = _context.JobPosts
-                .Where(u => u.IsDeleted == false)
                 .Include(jp => jp.JobPostSkill)
                     .ThenInclude(u => u.Skill)
                 .Include(u => u.Category)
                 .Include(u => u.ApplicationUser)
-                .Where(jp => jp.UserId == userId).ToList();
+                .Where(u => u.UserId == userId && u.IsDeleted == false).ToList();
 
             if (jobPosts == null) return null;
 
@@ -168,6 +172,18 @@ namespace FinalProject.DataAccess.Repository
 
             _context.JobPosts.Add(jobPost);
         }
+
+
+        public JobPost GetJobPostByIdAndUserId(string userId,int id)
+        {
+            var jobPost = _context.JobPosts
+                .Include(u => u.ApplicationUser)
+                .Where(jp => jp.UserId == userId && jp.IsDeleted == false)
+                .FirstOrDefault(jp => jp.Id == id);
+
+            return jobPost;
+        }
+
 
     }
 }

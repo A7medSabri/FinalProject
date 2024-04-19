@@ -12,7 +12,7 @@ namespace FinalProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "User")]
+    [Authorize(Roles = "User")]
     //[Authorize (Roles = "User , Freelancer")]
     public class JobPostsController : ControllerBase
     {
@@ -25,39 +25,49 @@ namespace FinalProject.Controllers
             _unitOfWork = unitOfWork;
         }
 
-
+        [Authorize(Roles = "Freelancer")]
         [HttpGet("Get-Over-All-Project-Posts")]
-        public List<GetJobPostDto> GetAllobPosts()
+        public IActionResult GetAllobPosts()
         {
-
-           // var userId = User.FindFirst("uid")?.Value;
-
             if (_unitOfWork.JobPost.GetAllJobPosts() == null)
-                return new List<GetJobPostDto>();
-            return _unitOfWork.JobPost.GetAllJobPosts().ToList();
+            {
+                return Ok(new List<GetMyJobPostDto>());
+            }
+
+            var jobPosts = _unitOfWork.JobPost.GetAllJobPosts().ToList();
+            return Ok(jobPosts);
         }
 
 
-
-
         [HttpGet("Get-All-My-Project-Post")]
-        public List<GetMyJobPostDto> GetJMyobPosts()
+        public IActionResult GetJMyobPosts()
         {
-
             var userId = User.FindFirst("uid")?.Value;
 
-            if (_unitOfWork.JobPost.GetAllJobPostsByUserId(userId) == null)
-                return new List<GetMyJobPostDto>();
-            return _unitOfWork.JobPost.GetAllJobPostsByUserId(userId).ToList();
+            var myJobPosts = _unitOfWork.JobPost.GetAllJobPostsByUserId(userId).ToList();
+
+            if (myJobPosts == null || myJobPosts.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(myJobPosts);
         }
 
 
         [HttpGet("Get-All-Project-With-Same-Title")]
-        public List<AllJopPostDto> GetJMyobPostsWithSameName(string tilte)
+        public IActionResult GetJMyobPostsWithSameName(string title)
         {
-            if (_unitOfWork.JobPost.GetAllByName(tilte) == null)
-                return new List<AllJopPostDto>();
-            return _unitOfWork.JobPost.GetAllByName(tilte);
+            string userId = User.FindFirst("uid")?.Value;
+
+            var jopPostsWithSameName = _unitOfWork.JobPost.GetAllByName(userId,title);
+
+            if (jopPostsWithSameName == null || jopPostsWithSameName.Count == 0)
+            {
+                return Ok(GetJMyobPosts());
+            }
+
+            return Ok(jopPostsWithSameName);
         }
 
 
@@ -66,7 +76,9 @@ namespace FinalProject.Controllers
         [HttpGet("Get-job-post-by-Id")]
         public IActionResult GetJobPost(int id)
         {
-            var jobPost = _unitOfWork.JobPost.GetjopPostWithId(id);
+            string userId = User.FindFirst("uid")?.Value;
+
+            var jobPost = _unitOfWork.JobPost.GetjopPostWithId(userId,id);
             if (jobPost == null)
             {
                 return NotFound();
@@ -76,14 +88,11 @@ namespace FinalProject.Controllers
         }
 
         [HttpPost]
-        public ActionResult<JobPost> PostJobPost(JobPostDto jobPostDto)
+        public IActionResult PostJobPost(JobPostDto jobPostDto)
         {
             if (ModelState.IsValid)
             {
                 string userId = User.FindFirst("uid")?.Value;
-
-                // delete it
-                //userId = "24626311-3a61-4b63-b711-7d760bd330fa";
 
                 if (userId != null)
                 {
@@ -110,18 +119,15 @@ namespace FinalProject.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            if (_unitOfWork.JobPost.GetByID(id) == null)
+            string userId = User.FindFirst("uid")?.Value;
+            if (_unitOfWork.JobPost.GetJobPostByIdAndUserId(userId,id) == null)
                 return NotFound();
 
             // jobPost always exist
             _unitOfWork.JobPost.Update(id, jobPostDto);
             _unitOfWork.Save();
-            return Ok(_unitOfWork.JobPost.GetByID(id));
+            return Ok();
         }
-
-
-
-
 
 
 
@@ -130,11 +136,12 @@ namespace FinalProject.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteJobPost(int id)
         {
-            JobPost jobPost = _unitOfWork.JobPost.GetByID(id);
+            string userId = User.FindFirst("uid")?.Value;
+            JobPost jobPost = _unitOfWork.JobPost.GetJobPostByIdAndUserId(userId,id);
             if (jobPost == null) return NotFound();
             jobPost.IsDeleted = true;
             _unitOfWork.Save();
-            return Content("Deletion Completed");
+            return Ok();
         }
 
     }
