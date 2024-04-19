@@ -41,13 +41,13 @@ namespace FinalProject.Controllers
 
         [Authorize(Roles = "Freelancer")]
         [HttpGet("Get-All-Project-With-Same-Title")]
-        public IActionResult GetJMyobPostsWithSameName(string title)
+        public IActionResult GetJMyobPostsWithSameName(string? title)
         {
             var jopPostsWithSameName = _unitOfWork.JobPost.GetAllByName(title);
 
             if (jopPostsWithSameName == null || jopPostsWithSameName.Count == 0)
             {
-                return Ok(GetJMyobPosts());
+                return Ok(GetAllobPosts());
             }
 
             return Ok(jopPostsWithSameName);
