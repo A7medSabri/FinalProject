@@ -77,9 +77,9 @@ namespace FinalProject.Controllers
 
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, "An unexpected error occurred. Please try again later.");
+                return StatusCode(500, $"An unexpected error occurred. Please try again later{ex.Message}");
             }
         }
 

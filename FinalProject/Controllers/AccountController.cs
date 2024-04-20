@@ -94,7 +94,7 @@ namespace FinalProject.Controllers
                 LastName = user.LastName,
                 Username = user.UserName,
                 Email = user.Email,
-                Rate = result ?? 0,
+                Rate = result,
                 SelectedLanguages = user.UserLanguages?.Select(lang => lang.Language.Value).ToList() ?? new List<string>(),
                 PhoneNumber = user.PhoneNumber,
                 Age = user.Age,
