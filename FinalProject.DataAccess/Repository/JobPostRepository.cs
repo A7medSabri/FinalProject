@@ -94,7 +94,6 @@ namespace FinalProject.DataAccess.Repository
 
         public List<AllJopPostDto> GetAllByName(string tilte)
         {
-            if (string.IsNullOrEmpty(tilte)) return null;
 
             var lower = tilte.ToLower();
 
@@ -102,7 +101,7 @@ namespace FinalProject.DataAccess.Repository
                 .Where(u => u.IsDeleted == false)
                 .Include(u => u.Category)
                 .Include(u => u.ApplicationUser)
-                .Where(u =>  u.Title.ToLower()==lower).ToList();
+                .Where(u =>  u.Title.ToLower().Contains(lower)).ToList();
 
             if (AllJopPost == null) return null;
 

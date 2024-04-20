@@ -43,11 +43,15 @@ namespace FinalProject.Controllers
         [HttpGet("Get-All-Project-With-Same-Title")]
         public IActionResult GetJMyobPostsWithSameName(string? title)
         {
+            if (string.IsNullOrEmpty(title)) {
+                return Ok(GetAllobPosts());
+            }
+
             var jopPostsWithSameName = _unitOfWork.JobPost.GetAllByName(title);
 
             if (jopPostsWithSameName == null || jopPostsWithSameName.Count == 0)
             {
-                return Ok(GetAllobPosts());
+                return NotFound(title);
             }
 
             return Ok(jopPostsWithSameName);
