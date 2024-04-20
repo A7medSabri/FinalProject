@@ -23,7 +23,7 @@ namespace FinalProject.DataAccess.Repository
             _context = context;
 
         }
-        public double FreeRate(string userId)
+        public int FreeRate(string userId)
         {
             var reviewData = _context.Reviews
                 .Where(c => c.FreelancerId == userId)
@@ -37,10 +37,10 @@ namespace FinalProject.DataAccess.Repository
 
             if (reviewData == null || reviewData.NumberOfReviews == 0)
             {
-                return 0.0;
+                return 0;
             }
 
-            double averageRate = reviewData.SumOfRates / reviewData.NumberOfReviews;
+            int averageRate = reviewData.SumOfRates / reviewData.NumberOfReviews;
 
             return averageRate;
         }
