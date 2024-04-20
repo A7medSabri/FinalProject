@@ -51,7 +51,7 @@ namespace FinalProject.Controllers
 
             if (jopPostsWithSameName == null || jopPostsWithSameName.Count == 0)
             {
-                return NotFound(title);
+                return NotFound("NO jobs found by title " + title);
             }
 
             return Ok(jopPostsWithSameName);
