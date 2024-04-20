@@ -44,7 +44,7 @@ namespace FinalProject.Controllers
         public IActionResult GetJMyobPostsWithSameName(string? title)
         {
             if (string.IsNullOrEmpty(title)) {
-                return Ok(GetAllobPosts());
+                return GetAllobPosts();
             }
 
             var jopPostsWithSameName = _unitOfWork.JobPost.GetAllByName(title);
