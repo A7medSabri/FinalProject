@@ -67,7 +67,7 @@ namespace FinalProject.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var userId2 = User.FindFirst("uid")?.Value;
 
-            if (userId == null)
+            if (userId == null || userId2 == null)
             {
                 return BadRequest("User ID not found in claims");
             }
@@ -81,7 +81,7 @@ namespace FinalProject.Controllers
                     .ThenInclude(u => u.Language)
                 .SingleOrDefaultAsync(u => u.UserName == userId);
 
-            var result = _unitOfWork.Rating.FreeRate(userId2);
+            var result = _unitOfWork.Rating?.FreeRate(userId2) ?? 0 ;
 
             if (user == null)
             {
@@ -94,7 +94,7 @@ namespace FinalProject.Controllers
                 LastName = user.LastName,
                 Username = user.UserName,
                 Email = user.Email,
-                Rate = result,
+                Rate = result ?? 0,
                 SelectedLanguages = user.UserLanguages?.Select(lang => lang.Language.Value).ToList() ?? new List<string>(),
                 PhoneNumber = user.PhoneNumber,
                 Age = user.Age,

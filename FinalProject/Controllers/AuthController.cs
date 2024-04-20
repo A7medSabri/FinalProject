@@ -4,6 +4,7 @@ using FinalProject.Identity.Login;
 using FinalProject.Identity.Password;
 using FinalProject.Identity.Role;
 using FinalProject.Identity.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -291,6 +292,22 @@ namespace FinalProject.Controllers
             else
             {
                 return BadRequest("Email not found. Please make sure the email is correct.");
+            }
+        }
+
+        [HttpPost("SignOut")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await HttpContext.SignOutAsync();
+
+                return Ok("Sign out successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error Sign out: {ex.Message}");
             }
         }
 

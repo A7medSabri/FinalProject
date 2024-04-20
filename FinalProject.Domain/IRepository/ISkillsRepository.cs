@@ -10,8 +10,8 @@ namespace FinalProject.Domain.IRepository
 {
     public interface ISkillsRepository : IRepository<Skill>
     {
-        public SkillDto Create(SkillDto skill);
-        public Skill Remove(int id);
-        public SkillDto Edit(int id, SkillDto Skill);
+         SkillDto Create(SkillDto skill);
+         Skill Remove(int id);
+         SkillDto Edit(int id, SkillDto Skill);
     }
 }
