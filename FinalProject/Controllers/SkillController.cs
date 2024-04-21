@@ -108,20 +108,42 @@ namespace FinalProject.Controllers
         public IActionResult Delete(int id)
         {
             var skill = _unitOfWork.Skill.GetByID(id);
-            if(skill == null)
+            if (skill == null)
+            {
                 return NotFound("Not Found Any Skill With This Id");
+            }
+            if (skill.IsDeleted)
+            {
+                return BadRequest("Is Already Deleted");
+            }
             _unitOfWork.Skill.Remove(id);
             _unitOfWork.Save();
             return Ok(skill);
         }
 
+        [HttpPut("Return-Delete-Skill")]
+        public IActionResult RetuenDeletedSkill(int id)
+        {
+            var skill = _unitOfWork.Skill.GetByID(id);
+            if (skill == null)
+            {
+                return NotFound("Not Found Any Skill With This Id");
+            }
+            if (skill.IsDeleted == false)
+            {
+                return BadRequest("Is Already Exist");
+            }
+            _unitOfWork.Skill.returnDeletedSkill(id);
+            _unitOfWork.Save();
+            return Ok(skill);
+        }
         //[HttpPut("Edit-Skill")]
         //public IActionResult Update(int id ,SkillDto skill) 
         //{
         //    var oldSkill = _unitOfWork.Skill.GetByID(id);
         //    if(oldSkill == null)
         //        return NotFound("Not Found Any Skill With This Id");
-            
+
         //    _unitOfWork.Skill.Edit(id, skill);
         //    _unitOfWork.Save();
 

@@ -49,6 +49,11 @@ namespace FinalProject.DataAccess.Repository
             return _context.Skills.FirstOrDefault(skill => skill.Name == name);
         }
 
-
+        public Skill returnDeletedSkill(int id)
+        {
+            var Del = _context.Skills.Find(id);
+            Del.IsDeleted = false;
+            return Del;
+        }
     }
 }

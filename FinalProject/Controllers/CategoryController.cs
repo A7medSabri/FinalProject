@@ -62,7 +62,7 @@ namespace FinalProject.Controllers
         {
             try
             {
-                var result = _unitOfWork.Category.GetAll().Select(s => new { s.Id, s.Name , s.IsDeleted}).ToList();
+                var result = _unitOfWork.Category.GetAll().Select(s => new { s.Id, s.Name, s.IsDeleted }).ToList();
                 if (!result.IsNullOrEmpty() && ModelState.IsValid)
                 {
                     return Ok(result);
@@ -106,7 +106,7 @@ namespace FinalProject.Controllers
                 }
 
                 var existingCategory = _unitOfWork.Category.FindCat(cat.name);
-                if (existingCategory != null && existingCategory.IsDeleted == false )
+                if (existingCategory != null && existingCategory.IsDeleted == false)
                 {
                     return BadRequest("Category already exists.");
                 }
@@ -156,7 +156,7 @@ namespace FinalProject.Controllers
             }
         }
 
-        [HttpDelete("Delete-Category")]
+        [HttpPut("Delete-Category")]
         public IActionResult Delete(int id)
         {
             try
@@ -166,7 +166,7 @@ namespace FinalProject.Controllers
                 {
                     return NotFound("Category not found with this ID.");
                 }
-                if(cat.IsDeleted)
+                if (cat.IsDeleted)
                 {
                     return BadRequest("Is Already deleted");
                 }
@@ -224,6 +224,6 @@ namespace FinalProject.Controllers
         //    _unitOfWork.Save();
 
         //    return Ok(cat);
-        //}
-    }
+        //}
+    }
 }

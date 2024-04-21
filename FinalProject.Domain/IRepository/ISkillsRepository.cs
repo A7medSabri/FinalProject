@@ -14,5 +14,6 @@ namespace FinalProject.Domain.IRepository
          Skill Remove(int id);
          SkillDto Edit(int id, SkillDto Skill);
          Skill FindSkill(string name);
+        Skill returnDeletedSkill(int id);
     }
 }
