@@ -53,5 +53,10 @@ namespace FinalProject.DataAccess.Repository
         {
             return _context.Languages.Find(id);
         }
+
+        public Language FindLanguage(string name)
+        {
+            return _context.Languages.FirstOrDefault(a => a.Value == name);
+        }
     }
 }

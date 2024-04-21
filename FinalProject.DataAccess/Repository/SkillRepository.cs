@@ -44,6 +44,11 @@ namespace FinalProject.DataAccess.Repository
 
             return Skill;
         }
-        
+        public Skill FindSkill(string name)
+        {
+            return _context.Skills.FirstOrDefault(skill => skill.Name == name);
+        }
+
+
     }
 }

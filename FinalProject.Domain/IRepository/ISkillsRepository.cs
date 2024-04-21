@@ -13,5 +13,6 @@ namespace FinalProject.Domain.IRepository
          SkillDto Create(SkillDto skill);
          Skill Remove(int id);
          SkillDto Edit(int id, SkillDto Skill);
+         Skill FindSkill(string name);
     }
 }
