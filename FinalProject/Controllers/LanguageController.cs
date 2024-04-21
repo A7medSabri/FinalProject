@@ -22,6 +22,7 @@ namespace FinalProject.Controllers
             this._unitOfWork = unitOfWork;
         }
 
+        [AllowAnonymous]
         [HttpGet("Get-All-Language")]
         public IActionResult GetAll()
         {
@@ -44,6 +45,7 @@ namespace FinalProject.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("Get-All-Language-With-Id")]
         public IActionResult GetAllWithId()
         {
@@ -66,6 +68,26 @@ namespace FinalProject.Controllers
             }
         }
 
+        [HttpGet("Get-All-Language-With-Id-For-Admin")]
+        public IActionResult GetAllWithIdForAdmin()
+        {
+            try
+            {
+                var result = _unitOfWork.language.GetAll()
+                    .Select(lang => new { lang.Id, lang.Value ,lang.IsDeleted})
+                    .ToList();
+
+                if (result.Any())
+                {
+                    return Ok(result);
+                }
+                return NotFound("No languages found.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An unexpected error occurred. Please try again later {ex.Message}.");
+            }
+        }
         [HttpPost("Add-New-Language")]
         public IActionResult Add(AddNewLangDto lang)
         {
@@ -75,11 +97,16 @@ namespace FinalProject.Controllers
                 {
                     return BadRequest("Invalid input data.");
                 }
-
+                var IsFounded = _unitOfWork.language.GetByID(lang.Id);
                 var existingLanguage = _unitOfWork.language.FindLanguage(lang.Value);
-                if (existingLanguage != null)
+
+                if (IsFounded != null || (existingLanguage != null && !existingLanguage.IsDeleted))
                 {
-                    return BadRequest("Language already exists.");
+                    return BadRequest("Id or Language already exists.");
+                }
+                if (existingLanguage != null && existingLanguage.IsDeleted)
+                {
+                    return BadRequest("Language already exists and Deleted.");
                 }
 
                 _unitOfWork.language.Create(lang);
@@ -89,31 +116,10 @@ namespace FinalProject.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An unexpected error occurred. Please try again later.");
+                return StatusCode(500, $"An unexpected error occurred. Please try again later {ex.Message}.");
             }
         }
 
-        [HttpDelete("Delete-Language")]
-        public IActionResult Delete(string id)
-        {
-            try
-            {
-                var lang = _unitOfWork.language.GetByID(id);
-                if (lang == null)
-                {
-                    return NotFound("Language not found with this ID.");
-                }
-
-                _unitOfWork.language.Remove(id);
-                _unitOfWork.Save();
-
-                return Ok(lang);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An unexpected error occurred. Please try again later.");
-            }
-        }
         [HttpPut("Edit-Language")]
         public IActionResult Edit(string id, LangDto langDto)
         {
@@ -128,18 +134,64 @@ namespace FinalProject.Controllers
                 var editedLang = _unitOfWork.language.Edit(id, langDto);
                 _unitOfWork.Save();
 
-                if (editedLang != null)
-                {
-                    return Ok(editedLang);
-                }
-                else
-                {
-                    return StatusCode(500, "Failed to edit language.");
-                }
+                return Ok(editedLang);
+
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An unexpected error occurred. Please try again later.");
+                return StatusCode(500, $"An unexpected error occurred. Please try again later {ex.Message}.");
+            }
+        }
+
+        [HttpPut("Delete-Language")]
+        public IActionResult Delete(string id)
+        {
+            try
+            {
+                var lang = _unitOfWork.language.GetByID(id);
+                if (lang == null)
+                {
+                    return NotFound("Language not found with this ID.");
+                }
+                if(lang.IsDeleted)
+                {
+                    return BadRequest("Language Is Deleted.");
+                }
+
+                _unitOfWork.language.Remove(id);
+                _unitOfWork.Save();
+
+                return Ok(lang);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An unexpected error occurred. Please try again later {ex.Message}.");
+            }
+        }
+
+        [HttpPut("Return-Delete-Language")]
+        public IActionResult ReturnFromDeleted(string id)
+        {
+            try
+            {
+                var lang = _unitOfWork.language.GetByID(id);
+                if (lang == null)
+                {
+                    return NotFound("Language not found with this ID.");
+                }
+                if (lang.IsDeleted == false)
+                {
+                    return BadRequest("Language Is Exist.");
+                }
+
+                _unitOfWork.language.returnDeletedLang(id);
+                _unitOfWork.Save();
+
+                return Ok(lang);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An unexpected error occurred. Please try again later {ex.Message}.");
             }
         }
 

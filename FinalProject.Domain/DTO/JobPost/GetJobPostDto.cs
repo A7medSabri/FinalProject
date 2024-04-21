@@ -17,5 +17,6 @@ namespace FinalProject.Domain.DTO.JobPost
         public List<string>? JobPostSkill { get; set; }
         public string Status { get; set; }
         public bool IsDeleted { get; set; }
+        //public bool IsFav { get; set; }
     }
 }

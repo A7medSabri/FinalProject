@@ -10,6 +10,8 @@ namespace FinalProject.Domain.DTO.ApplyTasks
     {
        
         public DateTime DeliveryDate { get; set; }
+        public DateTime OrderDate { get; set; }
+
         public decimal TotalAmount { get; set; }
         public int JobPostId { get; set; }
         public string ClientId { get; set; }
