@@ -14,6 +14,7 @@ namespace FinalProject.Domain.IRepository
         public CatDto Create(CatDto catDto);
         public Category Remove(int id);
         public CatDto Edit(int id, CatDto catDto);
-
+        Category FindCat(string name);
+        public Category returnFromDelete(int id);
     }
 }

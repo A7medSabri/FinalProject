@@ -16,5 +16,6 @@ namespace FinalProject.Domain.IRepository
         public Language Remove(string id);
         public LangDto Edit(string id, LangDto Lang);
         public Language GetByID(string id);
+        public Language FindLanguage(string name);
     }
 }
