@@ -43,5 +43,17 @@ namespace FinalProject.DataAccess.Repository
             oldCat.Name = catDto.name;
             return catDto;
         }
+
+        public Category FindCat(string name)
+        {
+            return _context.Categories.FirstOrDefault(a => a.Name == name);
+        }
+
+        public Category returnFromDelete(int id)
+        {
+            var cat = _context.Categories.Find(id);
+            cat.IsDeleted = false;
+            return cat;
+        }
     }
 }

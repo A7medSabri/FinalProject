@@ -15,7 +15,7 @@ namespace FinalProject.Domain.IRepository
         Review Create(RatingDto ratingDto, string userId);
         bool FindReview(Expression<Func<Review, bool>> predicate);
         Review EditReview(int id, EditRat ratingDto);
-        double FreeRate(string userId);
+        int FreeRate(string userId);
 
 
     }

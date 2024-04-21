@@ -10,7 +10,7 @@ namespace FinalProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
 
     public class SkillController : ControllerBase
     {
@@ -52,7 +52,7 @@ namespace FinalProject.Controllers
 
         //Done
         [HttpPost("Add-New-Skill")]
-        public ActionResult Add([FromForm] SkillDto skill)
+        public ActionResult Add( SkillDto skill)
         {
             if (!ModelState.IsValid)
             {
@@ -61,7 +61,7 @@ namespace FinalProject.Controllers
 
             try
             {
-                var data = _unitOfWork.Skill.Find(u => u.Name == skill.name);
+                var data = _unitOfWork.Skill.FindSkill(skill.name);
                 if (data != null)
                 {
                     return BadRequest("Is Exiting");
@@ -78,7 +78,7 @@ namespace FinalProject.Controllers
 
         //Done
         [HttpPut("Edit-Skill")]
-        public IActionResult Update(int id, [FromForm] SkillDto skill)
+        public IActionResult Update(int id, SkillDto skill)
         {
             if (!ModelState.IsValid)
             {
@@ -105,7 +105,7 @@ namespace FinalProject.Controllers
 
         //Done
         [HttpDelete("Delete-Skill")]
-        public IActionResult Delete([FromForm] int id)
+        public IActionResult Delete(int id)
         {
             var skill = _unitOfWork.Skill.GetByID(id);
             if(skill == null)

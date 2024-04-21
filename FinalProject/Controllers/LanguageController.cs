@@ -11,7 +11,7 @@ namespace FinalProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
 
     public class LanguageController : ControllerBase
     {
@@ -76,7 +76,7 @@ namespace FinalProject.Controllers
                     return BadRequest("Invalid input data.");
                 }
 
-                var existingLanguage = _unitOfWork.language.Find(u => u.Value == lang.Value);
+                var existingLanguage = _unitOfWork.language.FindLanguage(lang.Value);
                 if (existingLanguage != null)
                 {
                     return BadRequest("Language already exists.");
@@ -114,6 +114,35 @@ namespace FinalProject.Controllers
                 return StatusCode(500, "An unexpected error occurred. Please try again later.");
             }
         }
+        [HttpPut("Edit-Language")]
+        public IActionResult Edit(string id, LangDto langDto)
+        {
+            try
+            {
+                var existingLanguage = _unitOfWork.language.GetByID(id);
+                if (existingLanguage == null)
+                {
+                    return NotFound("Language not found with this ID.");
+                }
+
+                var editedLang = _unitOfWork.language.Edit(id, langDto);
+                _unitOfWork.Save();
+
+                if (editedLang != null)
+                {
+                    return Ok(editedLang);
+                }
+                else
+                {
+                    return StatusCode(500, "Failed to edit language.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred. Please try again later.");
+            }
+        }
+
 
     }
 }

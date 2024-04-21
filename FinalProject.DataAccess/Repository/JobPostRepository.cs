@@ -6,12 +6,14 @@ using FinalProject.Domain.Models.JobPostAndContract;
 using FinalProject.DTO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FinalProject.DataAccess.Repository
 {
@@ -99,7 +101,7 @@ namespace FinalProject.DataAccess.Repository
                 .Where(u => u.IsDeleted == false)
                 .Include(u => u.Category)
                 .Include(u => u.ApplicationUser)
-                .Where(u =>  u.Title.ToLower()==lower).ToList();
+                .Where(u =>  u.Title.ToLower().Contains(lower)).ToList();
 
             if (AllJopPost == null) return null;
 
