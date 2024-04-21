@@ -11,7 +11,7 @@ namespace FinalProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles ="Admin")]
+    [Authorize(Roles = "Admin")]
     public class CategoryController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
