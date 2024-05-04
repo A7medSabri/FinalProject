@@ -14,5 +14,6 @@ namespace FinalProject.Domain.DTO.HomeModel
         public decimal? HourlyRate { get; set; }
         public string? YourTitle { get; set; }
         public string? ProfilePicture { get; set; }
+        public bool IsFav { get; set; }
     }
 }

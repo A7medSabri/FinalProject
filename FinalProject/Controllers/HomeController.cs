@@ -35,7 +35,7 @@ namespace FinalProject.Controllers
             {
                 var freeLancersList = new List<GetAllFreelancer>();
                 var users = await _userManager.Users.ToListAsync();
-
+                var userId = User.FindFirst("uid")?.Value;
                 if (users == null || !users.Any())
                 {
                     return NotFound("No Freelancer found.");
@@ -54,6 +54,7 @@ namespace FinalProject.Controllers
                     var filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
 
                     var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+                    var IsFreelancerFav = _unitOfWork.Favorites.IsFavOrNot( userId, user.Id);
 
                     if (user.Age != null && user.YourTitle != null && user.Description != null && !isAdmin)
                     {
@@ -64,7 +65,9 @@ namespace FinalProject.Controllers
                             YourTitle = user.YourTitle ?? string.Empty,
                             Description = user.Description ?? string.Empty,
                             ProfilePicture = filePath,
-                            HourlyRate = user.HourlyRate ?? 0
+                            HourlyRate = user.HourlyRate ?? 0,
+                            IsFav = IsFreelancerFav 
+
                         };
 
                         freeLancersList.Add(freelancer);
@@ -97,6 +100,7 @@ namespace FinalProject.Controllers
             {
                 return BadRequest("Freelancer ID is required.");
             }
+            var userId = User.FindFirst("uid")?.Value;
 
             try
             {
@@ -111,7 +115,7 @@ namespace FinalProject.Controllers
                 {
                     return NotFound("We can't find this Freelancer.");
                 }
-
+                var IsFreelancerFav = _unitOfWork.Favorites.IsFavOrNot(userId, user.Id);
                 var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "FreeLancerProfileImage", user.ProfilePicture ?? "default.jpg");
 
                 var freelancer = new GetFreelancer
@@ -127,7 +131,8 @@ namespace FinalProject.Controllers
                     Address = $"{user.State} {user.Address}".Trim(),
                     Country = user.Country ?? string.Empty,
                     HourlyRate = user.HourlyRate ?? 0,
-                    Rate = _unitOfWork.Rating?.FreeRate(Fid) ?? 0
+                    Rate = _unitOfWork.Rating?.FreeRate(Fid) ?? 0,
+                    IsFav = IsFreelancerFav
                 };
 
                 return Ok(freelancer);
@@ -144,6 +149,7 @@ namespace FinalProject.Controllers
         {
             var freeLancersList = new List<GetAllFreelancer>();
             List<ApplicationUser> users;
+            var userId = User.FindFirst("uid")?.Value;
 
             if (string.IsNullOrEmpty(name))
             {
@@ -171,6 +177,7 @@ namespace FinalProject.Controllers
                     {
                         continue;
                     }
+                    var IsFreelancerFav = _unitOfWork.Favorites.IsFavOrNot(userId, user.Id);
 
                     var profilePictureFileName = user.ProfilePicture ?? "default.jpg";
                     var filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
@@ -186,7 +193,9 @@ namespace FinalProject.Controllers
                             YourTitle = user.YourTitle ?? string.Empty,
                             Description = user.Description ?? string.Empty,
                             ProfilePicture = filePath,
-                            HourlyRate = user.HourlyRate ?? 0
+                            HourlyRate = user.HourlyRate ?? 0,
+                            IsFav = IsFreelancerFav
+
                         };
 
                         freeLancersList.Add(freelancer);

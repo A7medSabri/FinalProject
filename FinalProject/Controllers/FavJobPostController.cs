@@ -51,43 +51,40 @@ namespace FinalProject.Controllers
                 _unitOfWork.FavJob.Delete(favJobPost);
                 _unitOfWork.Save();
 
-                return Ok("Deleted");
+                return Ok(new {IsFav = false});
             }
 
             _unitOfWork.FavJob.CreateFavJobPost(jobId, userId);
             _unitOfWork.Save();
-            return Ok(jobId);
+            return Ok(new {JopId= jobId , IsFav = true});
         }
 
         [HttpDelete("Delete-Fav-JobPost-only")]
-        public async Task<IActionResult> DeleteFavFree2(int jobId)
+        public async Task<IActionResult> DeleteFavJobPost(int jobId)
         {
             var userId = User.FindFirst("uid")?.Value;
-            var data = _unitOfWork.FavJob.FindFavJobPost(u => u.Id == jobId && u.FreelancerId == userId);
             if (userId == null)
             {
                 return Unauthorized("You Must Login");
             }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            if (data != null)
+            var data = _unitOfWork.FavJob.FindFavJobPost(u => u.JobpostId == jobId && u.FreelancerId == userId);
+            if (data == null)
             {
-
-                var favJobPost = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
-                if (favJobPost != null)
-                {
-                    _unitOfWork.FavJob.Delete(favJobPost);
-                    _unitOfWork.Save();
-
-                    return Ok("Deleted");
-                }
-                return BadRequest("You Didn't Fav This JobPost Befor");
+                return NotFound("Not Found To Delete");
             }
-            return NotFound("Not Found To Delete");
+
+            _unitOfWork.FavJob.Delete(data);
+            _unitOfWork.Save();
+
+            return Ok(new { IsFav = false });
         }
+
 
         [HttpPost("New-JobPost-Fav-only")]
         public async Task<IActionResult> CreateNew2(int jobId)
@@ -108,11 +105,11 @@ namespace FinalProject.Controllers
             var favJobPost = _unitOfWork.FavJob.FindFavJobPost(u => u.FreelancerId == userId && u.JobpostId == jobId);
             if(favJobPost !=null)
             {
-                return Ok("You Fav This Befor");
+                return BadRequest("You Fav This Befor");
             }
             _unitOfWork.FavJob.CreateFavJobPost(jobId, userId);
             _unitOfWork.Save();
-            return Ok(jobId);
+            return Ok(new { JopId = jobId, IsFav = true });
         }
 
         //[HttpPost("New-JobPost-Fav")]

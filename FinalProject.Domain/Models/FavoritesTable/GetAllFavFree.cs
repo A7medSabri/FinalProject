@@ -10,5 +10,6 @@ namespace FinalProject.Domain.Models.FavoritesTable
     {
         public string Client { get; set; }
         public string Freelancer { get; set; }
+        public string FreelancerID { get; set; }
     }
 }

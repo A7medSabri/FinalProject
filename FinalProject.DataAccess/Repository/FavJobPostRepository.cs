@@ -22,6 +22,7 @@ namespace FinalProject.DataAccess.Repository
             _context = context;
         }
 
+
         public FavJobPost FindFavJobPost(Expression<Func<FavJobPost, bool>> predicate)
         {
             return _context.Set<FavJobPost>().FirstOrDefault(predicate);
