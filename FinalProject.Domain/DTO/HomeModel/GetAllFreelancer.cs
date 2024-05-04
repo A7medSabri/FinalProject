@@ -15,5 +15,6 @@ namespace FinalProject.Domain.DTO.HomeModel
         public string? YourTitle { get; set; }
         public string? ProfilePicture { get; set; }
         public bool IsFav { get; set; }
+        public int Rate { get; set; }
     }
 }

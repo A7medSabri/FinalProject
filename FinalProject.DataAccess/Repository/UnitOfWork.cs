@@ -40,6 +40,7 @@ namespace FinalProject.DataAccess.Repository
             ApplyTasks = new ApplyTasksRepository(_context);
             Favorites = new FavoritesRepository(_context);
             FavJob = new FavJobPostRepository(_context);
+            Rating = new RatingRepository(_context);
         }
 
 

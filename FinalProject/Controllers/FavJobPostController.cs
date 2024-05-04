@@ -25,6 +25,7 @@ namespace FinalProject.Controllers
             var userId = User.FindFirst("uid")?.Value;
 
             var data = _unitOfWork.FavJob.FindMyFavJobPost(userId);
+            
             return Ok(data);
 
         }

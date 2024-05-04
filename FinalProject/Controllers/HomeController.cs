@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace FinalProject.Controllers
 {
@@ -66,7 +67,8 @@ namespace FinalProject.Controllers
                             Description = user.Description ?? string.Empty,
                             ProfilePicture = filePath,
                             HourlyRate = user.HourlyRate ?? 0,
-                            IsFav = IsFreelancerFav 
+                            IsFav = IsFreelancerFav ,
+                            Rate = _unitOfWork.Rating?.FreeRate(user.Id) ?? 0,
 
                         };
 
@@ -194,7 +196,9 @@ namespace FinalProject.Controllers
                             Description = user.Description ?? string.Empty,
                             ProfilePicture = filePath,
                             HourlyRate = user.HourlyRate ?? 0,
-                            IsFav = IsFreelancerFav
+                            IsFav = IsFreelancerFav,
+                            Rate = _unitOfWork.Rating?.FreeRate(user.Id) ?? 0,
+
 
                         };
 
