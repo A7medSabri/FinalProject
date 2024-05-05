@@ -16,6 +16,9 @@ namespace FinalProject.Domain.IRepository
         bool Remove(string Fid);
         bool CreateNewFavFreelancer(string Fid, string userId);
         bool FindFavFreelancer(Expression<Func<FavoritesFreelancer, bool>> predicate);
+        public FavoritesFreelancer FindByClientAndFreelancer(string clientId, string freelancerId);
+        public bool IsFavOrNot(string clientId, string freelancerId);
+
 
     }
 }

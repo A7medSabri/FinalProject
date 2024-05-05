@@ -29,12 +29,14 @@ namespace FinalProject.Controllers
         [HttpGet("Get-Over-All-Project-Posts")]
         public IActionResult GetAllobPosts()
         {
-            if (_unitOfWork.JobPost.GetAllJobPosts() == null)
+            var freelancerId = User.FindFirst("uid")?.Value;
+
+            if (_unitOfWork.JobPost.GetAllJobPosts(freelancerId) == null)
             {
                 return Ok(new List<GetMyJobPostDto>());
             }
 
-            var jobPosts = _unitOfWork.JobPost.GetAllJobPosts().ToList();
+            var jobPosts = _unitOfWork.JobPost.GetAllJobPosts(freelancerId).ToList();
             return Ok(jobPosts);
         }
 
@@ -46,8 +48,9 @@ namespace FinalProject.Controllers
             if (string.IsNullOrEmpty(title)) {
                 return GetAllobPosts();
             }
+            var freelancerId = User.FindFirst("uid")?.Value;
 
-            var jopPostsWithSameName = _unitOfWork.JobPost.GetAllByName(title);
+            var jopPostsWithSameName = _unitOfWork.JobPost.GetAllByName(freelancerId,title);
 
             if (jopPostsWithSameName == null || jopPostsWithSameName.Count == 0)
             {
