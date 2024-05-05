@@ -38,7 +38,9 @@ namespace FinalProject.DataAccess.Repository
             Category = new CategoryRepository(_context);
             Report = new RepositoryReport(_context);
             ApplyTasks = new ApplyTasksRepository(_context);
-
+            Favorites = new FavoritesRepository(_context);
+            FavJob = new FavJobPostRepository(_context);
+            Rating = new RatingRepository(_context);
         }
 
 

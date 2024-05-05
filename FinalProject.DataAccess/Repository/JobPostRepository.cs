@@ -2,6 +2,7 @@
 using FinalProject.Domain.DTO.JobPost;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.ApplicationUserModel;
+using FinalProject.Domain.Models.FavoritesTable;
 using FinalProject.Domain.Models.JobPostAndContract;
 using FinalProject.DTO;
 using Microsoft.AspNetCore.Identity;
@@ -28,7 +29,7 @@ namespace FinalProject.DataAccess.Repository
 
 
         // related to frelacner only
-        public List<GetMyJobPostDto> GetAllJobPosts()
+        public List<GetMyJobPostDto> GetAllJobPosts(string freelancerId)
         {
             var jobPosts = _context.JobPosts
                 .Where(u => u.IsDeleted == false)
@@ -38,6 +39,7 @@ namespace FinalProject.DataAccess.Repository
                 .Include(u => u.Category)
                 .ToList();
 
+            var favJobPosts = _context.FavoriteJobPost.Where(f=> f.FreelancerId == freelancerId).ToList();
 
             if (jobPosts == null) return null;
 
@@ -54,13 +56,15 @@ namespace FinalProject.DataAccess.Repository
                 Status = jobPost.Status,
                 IsDeleted = jobPost.IsDeleted,
                 UserId = jobPost.UserId,
-                UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName
+                UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName,
+                IsFav = favJobPosts.FirstOrDefault(j => j.JobpostId == jobPost.Id) != null
 
             }).ToList();
 
             return jobPostDtos;
         }
 
+        // for client
         public GetMyJobPostDto GetjopPostWithId(string userId,int id)
         {
             var jobPost = _context.JobPosts
@@ -92,7 +96,7 @@ namespace FinalProject.DataAccess.Repository
 
         // related to frelacner only
 
-        public List<AllJopPostDto> GetAllByName(string tilte)
+        public List<AllJopPostDto> GetAllByName(string freelancerId, string tilte)
         {
 
             var lower = tilte.ToLower();
@@ -105,6 +109,10 @@ namespace FinalProject.DataAccess.Repository
 
             if (AllJopPost == null) return null;
 
+            var favJobPosts = _context.FavoriteJobPost.Where(f=> f.FreelancerId == freelancerId).ToList();
+
+
+
             var AllJopPostDto = AllJopPost.Select(jp => new AllJopPostDto
             {
                 Id = jp.Id,
@@ -116,7 +124,9 @@ namespace FinalProject.DataAccess.Repository
                 Status = jp.Status,
                 IsDeleted = jp.IsDeleted,
                 UserId = jp.UserId,
-                FullNameForUser = jp.ApplicationUser.FirstName + " " + jp.ApplicationUser.LastName
+                FullNameForUser = jp.ApplicationUser.FirstName + " " + jp.ApplicationUser.LastName,
+                IsFav = favJobPosts.FirstOrDefault(j => j.JobpostId == jp.Id) != null
+
             }).ToList();
 
             return AllJopPostDto;

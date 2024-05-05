@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
+using System.Threading.Channels;
 
 namespace FinalProject.Controllers
 {
@@ -27,10 +28,11 @@ namespace FinalProject.Controllers
         }
 
 
+        //---------------------Freelancer--------------------------
 
-        [HttpPost("Apply For Task")]
-    //    [Authorize(Roles = "Freelancer")]
-        public IActionResult ApplyForTask(ApplicationDto applicationDto)
+        [HttpPost("Freelancer-Apply-For-Task")]
+        [Authorize(Roles = "Freelancer")]
+        public IActionResult ApplyForTask(int jobId)
         {
             string userId = User.FindFirst("uid")?.Value;
 
@@ -43,13 +45,16 @@ namespace FinalProject.Controllers
             {
                 return BadRequest("Login please.");
             }
-            if (_unitOfWork.JobPost.GetByID(applicationDto.JobPostId) == null)
+            if (_unitOfWork.JobPost.GetByID(jobId) == null)
             {
                 return NotFound("This job not exsist");
             }
-
-
-            _unitOfWork.ApplyTasks.Create(applicationDto,userId);
+               
+            if(!_unitOfWork.ApplyTasks.Create(jobId, userId))
+            {
+                // freelancer apply for this task before
+                return BadRequest("You applyied for this job before");
+            }
             _unitOfWork.Save();
 
             return Ok("Completed Applying");
@@ -57,8 +62,8 @@ namespace FinalProject.Controllers
 
 
 
-        [HttpGet("Applied-Tasks")]
-    //    [Authorize(Roles = "Freelancer")]
+        [HttpGet("Freelancer-Applied-Tasks")]
+        [Authorize(Roles = "Freelancer")]
         public IActionResult GetAppliedTasks()
         {
             string userId = User.FindFirst("uid")?.Value;
@@ -74,7 +79,8 @@ namespace FinalProject.Controllers
 
         // get task by id
         // GET: api/ApplyTasks/5
-        [HttpGet("Applied-Task-By-Id")]
+        [HttpGet("Freelancer-Applied-Task-By-Id")]
+        [Authorize(Roles = "Freelancer")]
         public IActionResult GetAppliedTask(int taskId)
         {
             string userId = User.FindFirst("uid")?.Value;
@@ -88,62 +94,66 @@ namespace FinalProject.Controllers
 
 
 
-        //// POST: api/ApplyTasks
-        //[HttpPost]
-        //public ActionResult<ApplyTaskDto> PostApplyTask(ApplyTaskDto applyTaskDto)
-        //{
-        //    //valid JobPostId 5 or 7
-        //    //valid ClientId 24626311-3a61-4b63-b711-7d760bd330fa
+        // put: api/ApplyTasks/5
+        [Authorize(Roles = "Freelancer")]
+        [HttpPut("Freelancer-Delete-Task")]
+        public IActionResult DeleteTask(int taskId)
+        {
+            string userId = User.FindFirst("uid")?.Value;
 
-        //    ApplyTask applyTask = _mapper.Map<ApplyTask>(applyTaskDto);
-
-
-        //    applyTask.FreelancerId = User.FindFirst("uid")?.Value;
-        //    // Set default OrderDate to DateTime.Now
-        //    applyTask.OrderDate = DateTime.Now;
-        //    applyTask.Status = "Pending";
-
-        //    _unitOfWork.ApplyTasks.Add(applyTask);
-        //    _unitOfWork.Save();
-
-        //    return Ok(applyTaskDto); 
-        //}
+            var Task = _unitOfWork.ApplyTasks.SearchForTask(userId, taskId);
+            if (Task == null) return NotFound("This task not exsist");
+            Task.IsDeleted = true;
+            _unitOfWork.Save();
+            return Ok("Deleted");
+        }
 
 
+        //---------------------Client--------------------------
+        [HttpGet("Client-Applicants")]
+        [Authorize(Roles = "User")]
+        public IActionResult GetApplicantsForTask(int jobId)
+        {
+            string userId = User.FindFirst("uid")?.Value;
+            if (userId == null)
+            {
+                return BadRequest("Login please.");
+            }
+            // TODO: Retrieve the applicants for the specified task
 
-        //// PUT: api/ApplyTasks/5
-        //[HttpPut("{id}")]
-        //public IActionResult PutApplyTask(int id, UpdateTask updateTask)
-        //{
-        //    if (!ModelState.IsValid) return BadRequest();
+           // "There are no applicants yet"
+            var applicants = _unitOfWork.ApplyTasks.Applicants(userId,jobId);
+            if (applicants == null) return NotFound("You don't post this job yet");
+           
+            return Ok(applicants);
+        }
 
-        //    ApplyTask curTask = _unitOfWork.ApplyTasks.GetByID(id);
-        //    if (curTask == null) return NotFound();
-        //    _mapper.Map(updateTask,curTask);
-        //    _unitOfWork.Save();
-        //    return Ok(GetApplyTask(id)) ;
-        //}
 
-        //// DELETE: api/ApplyTasks/5
-        //[HttpDelete("{id}")]
-        //public IActionResult DeleteApplyTask(int id)
-        //{
-        //    ApplyTask applyTask = _unitOfWork.ApplyTasks.GetByID(id);
+        [HttpPut("Client-Accept-Applicant")]
+        [Authorize(Roles = "User")]
+        public IActionResult AcceptApplicantForTask(int taskId)
+        {
+            string userId = User.FindFirst("uid")?.Value;
+            ApplyTask task = _unitOfWork.ApplyTasks.GetByID(taskId);
+            if(task == null) return NotFound();
+            // TODO: Accept the applicant for the specified task
+            task.Status = "Accepted";
+            _unitOfWork.Save();
+            return Ok("Applicant accepted successfully");
+        }
 
-        //    if (applyTask == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPut("Client-Reject-Applicant")]
+        [Authorize(Roles = "User")]
+        public IActionResult RejectApplicantForTask(int taskId)
+        {
+            string userId = User.FindFirst("uid")?.Value;
+            ApplyTask task = _unitOfWork.ApplyTasks.GetByID(taskId);
+            if (task == null) return NotFound();
+            // TODO: Reject the applicant for the specified task
+            task.Status = "Rejected";
+            _unitOfWork.Save();
+            return Ok("Applicant rejected successfully");
+        }
 
-        //    applyTask.IsDeleted = true;
-        //    _unitOfWork.Save();
-
-        //    return NoContent();
-        //}
-
-        //private bool ApplyTaskExists(int id)
-        //{
-        //    return _unitOfWork.ApplyTasks.GetByID(id)!=null;
-        //}
     }
 }

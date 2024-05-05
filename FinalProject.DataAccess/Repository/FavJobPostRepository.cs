@@ -22,24 +22,48 @@ namespace FinalProject.DataAccess.Repository
             _context = context;
         }
 
+
         public FavJobPost FindFavJobPost(Expression<Func<FavJobPost, bool>> predicate)
         {
             return _context.Set<FavJobPost>().FirstOrDefault(predicate);
         }
 
+        //public List<MyFavJobPost> FindMyFavJobPost(string Fid)
+        //{
+        //    var favJobPostsList = _context.FavoriteJobPost
+        //        .Where(u => u.FreelancerId == Fid)
+        //        .Include(u=>u.Jobpost)
+        //        .Select(u => new MyFavJobPost
+        //        {
+        //            jobPostId=u.JobpostId,
+        //            jobPostName = u.Jobpost.Title
+
+        //        })
+        //        .ToList();
+        //    return favJobPostsList;
+        //}
+
         public List<MyFavJobPost> FindMyFavJobPost(string Fid)
         {
             var favJobPostsList = _context.FavoriteJobPost
+                .Include(u => u.Jobpost)
+                    .ThenInclude(j => j.ApplicationUser)
                 .Where(u => u.FreelancerId == Fid)
-                .Include(u=>u.Jobpost)
                 .Select(u => new MyFavJobPost
                 {
-                    jobPostId=u.JobpostId,
-                    jobPost = u.Jobpost.Title
+                    jobPostId = u.JobpostId,
+                    jobPostTiilte = u.Jobpost.Title,
+                    Description = u.Jobpost.Description,
+                    Price = u.Jobpost.Price,
+                    DurationTime = u.Jobpost.DurationTime,
+                    Status = u.Jobpost.Status,
+                    UserName = u.Jobpost.ApplicationUser.FirstName + " " + u.Jobpost.ApplicationUser.LastName,
+                    IsFav = true
                 })
                 .ToList();
             return favJobPostsList;
         }
+
 
         public FavJobPostDto Create(FavJobPostDto favJobDto, string userId)
         {

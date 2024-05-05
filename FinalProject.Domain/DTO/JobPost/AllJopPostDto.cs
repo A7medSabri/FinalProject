@@ -23,5 +23,7 @@ namespace FinalProject.Domain.DTO.JobPost
         public string Status { get; set; }
 
         public bool IsDeleted { get; set; }
+        public bool IsFav { get; set; }
+
     }
 }

@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinalProject.Domain.Models.JobPostAndContract
-{
+{ 
     public class ApplyTask
     {
         [Key]
@@ -15,7 +15,7 @@ namespace FinalProject.Domain.Models.JobPostAndContract
         public DateTime OrderDate { get; set; }
         public DateTime? DeliveryDate { get; set; }
 
-        [RegularExpression("^(Pending|Complete|In progress|Cancel)$", ErrorMessage = "Status must be either 'Pending' or 'Complete' or 'In progress' or 'Cancel'.")]
+        [RegularExpression("^(Accepted|Rejected|Pending|Complete|In progress|Cancel)$", ErrorMessage = "Status must be either 'Accepted' or 'Rejected' or 'Pending' or 'Complete' or 'In progress' or 'Cancel'.")]
         public string? Status { get; set; }
         [Required]
         public decimal TotalAmount { get; set; }

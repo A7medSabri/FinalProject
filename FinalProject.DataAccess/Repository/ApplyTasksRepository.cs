@@ -22,25 +22,31 @@ namespace FinalProject.DataAccess.Repository
             _context = context;
         }
 
-        public void Create(ApplicationDto applicationDto, string UserId)
+
+        //---------------------Freelancer--------------------------
+
+        public bool Create(int jobId, string UserId)
         {
+            // freelancer apply for this task before
+            var applyTasks = _context.ApplyTasks.
+                FirstOrDefault(u => u.FreelancerId == UserId && u.JobPostId == jobId && u.IsDeleted == false);
+            if (applyTasks != null) return false;
+
+            JobPost jobPost = _context.JobPosts.FirstOrDefault(post => post.Id == jobId);
             ApplyTask applyTask = new ApplyTask
             {
-
                 OrderDate = DateTime.Now,
-                DeliveryDate = applicationDto.DeliveryDate,
+                DeliveryDate = jobPost.DurationTime,
                 Status = "Pending",
-                TotalAmount = applicationDto.TotalAmount,
+                TotalAmount = jobPost.Price,
                 IsDeleted = false,
-                JobPostId = applicationDto.JobPostId,
+                JobPostId = jobId,
                 FreelancerId = UserId,
-                ClientId = _context.JobPosts.FirstOrDefault(j => j.Id == applicationDto.JobPostId).UserId
+                ClientId = _context.JobPosts.FirstOrDefault(j => j.Id == jobId).UserId
             };
-
             _context.ApplyTasks.Add(applyTask);
+            return true;
         }
-
-
 
         public List<FreelancerTaskDto> GetAllFreelancerTasksByUserId (string userId)
         {
@@ -63,11 +69,16 @@ namespace FinalProject.DataAccess.Repository
 
             return freelancerTaskDto;
         }
-
-        public FreelancerTaskDto GetFreelancerTaskByUserIdAndTaskId(string userId,int taskId)
+        public ApplyTask SearchForTask(string userId, int taskId)
         {
             var applyTasks = _context.ApplyTasks
-                .FirstOrDefault(u => u.FreelancerId == userId && u.IsDeleted == false && u.Id == taskId);
+              .FirstOrDefault(u => u.FreelancerId == userId && u.IsDeleted == false && u.Id == taskId);
+            return applyTasks;
+
+        }
+        public FreelancerTaskDto GetFreelancerTaskByUserIdAndTaskId(string userId,int taskId)
+        {
+            var applyTasks = SearchForTask(userId, taskId);
 
             if (applyTasks == null) return null ;
 
@@ -84,6 +95,35 @@ namespace FinalProject.DataAccess.Repository
             };
 
             return freelancerTaskDto;
+        }
+
+       
+        //---------------------client--------------------------
+
+        public List<Applicant> Applicants(string userId, int jobId)
+        {
+            // check if client post this job
+            var jobPost = _context.JobPosts
+                    .Where(u => u.UserId == userId && u.IsDeleted == false)
+                    .FirstOrDefault(u => u.Id == jobId);
+
+            
+            if (jobPost == null) return null;
+
+            var applicants = _context.ApplyTasks.
+               Where(j => j.ClientId == userId && j.JobPostId == jobId && j.IsDeleted == false).ToList();
+
+            
+            var applicantsWithName = applicants.Select(applicant =>new Applicant
+            {
+                Id = applicant.FreelancerId,
+                Name = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).FirstName + " " + _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).LastName
+
+
+        }).ToList();
+
+          
+            return applicantsWithName;
         }
     }
 }
