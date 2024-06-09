@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FinalProject.Domain.Models.SkillAndCat;
 
 namespace FinalProject.Domain.DTO.ApplyTasks
 {
@@ -24,5 +25,15 @@ namespace FinalProject.Domain.DTO.ApplyTasks
         public int JobPostId { get; set; }
 
         public string ClientId { get; set; }
+
+        public string ClientFullName { get; set; }
+        public string ?title { get; set; }
+        public string ?Description { get; set; }
+
+        public string ?CategoryName { get; set; }
+        public List<string> ?skills { get; set; }
+        public bool ?isDeleted { get; set; }
+        public bool ?isFav { get; set; }
+       
     }
 }

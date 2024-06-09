@@ -63,7 +63,21 @@ namespace FinalProject.DataAccess.Repository
                 Status=jp.Status,
                 TotalAmount = jp.TotalAmount,
                 JobPostId=jp.JobPostId,
-                ClientId=jp.ClientId
+                ClientId=jp.ClientId,
+                ClientFullName = _context.Users.FirstOrDefault(user => user.Id == jp.ClientId).FirstName + " " +
+                                 _context.Users.FirstOrDefault(user => user.Id == jp.ClientId).FirstName,
+                title = _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).Title,
+                Description = _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).Description,
+                CategoryName = _context.Categories.FirstOrDefault(category=> category.Id == _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).CategoryId).Name,
+                isDeleted = jp.IsDeleted,
+                isFav = (_context.FavoriteJobPost.FirstOrDefault(job=>job.FreelancerId == userId)!=null),
+                skills = _context.JobPosts
+                          .Include(u => u.JobPostSkill)
+                            .ThenInclude(u => u.Skill)
+                          .FirstOrDefault(job => job.Id == jp.JobPostId)
+                          .JobPostSkill
+                          .Select(skill => skill.Skill.Name).ToList(),
+
 
             }).ToList();
 
@@ -117,10 +131,17 @@ namespace FinalProject.DataAccess.Repository
             var applicantsWithName = applicants.Select(applicant =>new Applicant
             {
                 Id = applicant.FreelancerId,
-                Name = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).FirstName + " " + _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).LastName
+                Name = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).FirstName + " " + _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).LastName,
+                Description = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).Description,
+                hourlyRate = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).HourlyRate,
+                ProfilePictureUrl = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).ProfilePicture,
+                Title = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).YourTitle,
+                isFavourite = (_context.Users
+                .Include(u => u.Favorites)
+                .FirstOrDefault(u => u.Id == userId)
+                .Favorites.FirstOrDefault(u=>u.FreelancerId == applicant.FreelancerId)!=null)
 
-
-        }).ToList();
+            }).ToList();
 
           
             return applicantsWithName;
