@@ -187,16 +187,17 @@ namespace FinalProject.DataAccess.Repository
 
         public List<ClientTaskDto> AccpetedApplicants(string userId)
         {
-            // check if client post this job
+            //
+                       //check if client post this job
             var jobPost = _context.JobPosts
-                    .Where(u => u.UserId == userId && u.IsDeleted == false && u.Status == "Accepted");
-         
-
-
+                    .Where(u => u.UserId == userId && u.IsDeleted == false );
+       
             if (jobPost == null) return null;
 
+            //end of jobPost role
+
             var applicants = _context.ApplyTasks.
-               Where(j => j.ClientId == userId && j.IsDeleted == false).ToList();
+               Where(j => j.ClientId == userId && j.IsDeleted == false && j.Status == "Accepted").ToList();
 
 
             var applicantsWithName = applicants.Select(applicant => new ClientTaskDto
