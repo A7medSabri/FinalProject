@@ -75,6 +75,18 @@ namespace FinalProject.Controllers
             return Ok(myTasks);
         }
 
+        [HttpGet("Freelancer-Accepted-Tasks")]
+        [Authorize(Roles = "Freelancer")]
+        public IActionResult GetAcceptedTasks()
+        {
+            string userId = User.FindFirst("uid")?.Value;
+            if (userId == null)
+            {
+                return BadRequest("Login please.");
+            }
+            var myTasks = _unitOfWork.ApplyTasks.GetAcceptedFreelancerTasksByUserId(userId);
+            return Ok(myTasks);
+        }
 
 
         // get task by id
@@ -109,6 +121,9 @@ namespace FinalProject.Controllers
         }
 
 
+
+
+
         //---------------------Client--------------------------
         [HttpGet("Client-Applicants")]
         [Authorize(Roles = "User")]
@@ -129,6 +144,24 @@ namespace FinalProject.Controllers
         }
 
 
+        [HttpGet("Get-Accept-Client- Applicants")]
+        [Authorize(Roles = "User")]
+        public IActionResult GetAcceptApplicants()
+        {
+            string userId = User.FindFirst("uid")?.Value;
+            if (userId == null)
+            {
+                return BadRequest("Login please.");
+            }
+            // TODO: Retrieve the applicants for the specified task
+
+            // "There are no applicants yet"
+            var applicants = _unitOfWork.ApplyTasks.AccpetedApplicants(userId);
+            if (applicants == null) return NotFound("There are no accpeted applicatn yet");
+
+            return Ok(applicants);
+        }
+
         [HttpPut("Client-Accept-Applicant")]
         [Authorize(Roles = "User")]
         public IActionResult AcceptApplicantForTask(int taskId)
@@ -138,6 +171,7 @@ namespace FinalProject.Controllers
             if(task == null) return NotFound();
             // TODO: Accept the applicant for the specified task
             task.Status = "Accepted";
+
             _unitOfWork.Save();
             return Ok("Applicant accepted successfully");
         }
@@ -151,6 +185,7 @@ namespace FinalProject.Controllers
             if (task == null) return NotFound();
             // TODO: Reject the applicant for the specified task
             task.Status = "Rejected";
+
             _unitOfWork.Save();
             return Ok("Applicant rejected successfully");
         }

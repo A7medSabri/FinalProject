@@ -14,7 +14,6 @@ namespace FinalProject.Domain.Mapping
         public MappingProfile() 
         { 
           CreateMap<ApplyTask,TaskDto>().ReverseMap();
-          CreateMap<ApplyTaskDto,ApplyTask>().ReverseMap();
           CreateMap<UpdateTask, ApplyTask>().ReverseMap();
 
         }

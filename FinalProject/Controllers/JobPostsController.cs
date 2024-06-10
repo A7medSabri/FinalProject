@@ -33,7 +33,7 @@ namespace FinalProject.Controllers
 
             if (_unitOfWork.JobPost.GetAllJobPosts(freelancerId) == null)
             {
-                return Ok(new List<GetMyJobPostDto>());
+                return Ok(new List<GetFreelancerJobPostDto>());
             }
 
             var jobPosts = _unitOfWork.JobPost.GetAllJobPosts(freelancerId).ToList();
@@ -50,7 +50,7 @@ namespace FinalProject.Controllers
             }
             var freelancerId = User.FindFirst("uid")?.Value;
 
-            var jopPostsWithSameName = _unitOfWork.JobPost.GetAllByName(freelancerId,title);
+            var jopPostsWithSameName = _unitOfWork.JobPost.GetFreelancerJobsByName(freelancerId,title);
 
             if (jopPostsWithSameName == null || jopPostsWithSameName.Count == 0)
             {
@@ -61,9 +61,15 @@ namespace FinalProject.Controllers
         }
 
 
+
+
+
+
+
+
         [Authorize(Roles = "User")]
         [HttpGet("Get-All-My-Project-Post")]
-        public IActionResult GetJMyobPosts()
+        public IActionResult GetClientJobPosts()
         {
             var userId = User.FindFirst("uid")?.Value;
 
@@ -122,8 +128,6 @@ namespace FinalProject.Controllers
         }
 
         // update jobpost
-        // PUT: api/JobPosts/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Roles = "User")]
         [HttpPut("{id}")]
         public IActionResult PutJobPost(int id, JobPostDto jobPostDto)
