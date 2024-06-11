@@ -213,5 +213,15 @@ namespace FinalProject.DataAccess.Repository
         }
 
 
+
+        public void DeleteJobPostRelatedTasks(int JobId) {
+           
+            var jobtasks = _context.ApplyTasks.Where(task => task.JobPostId == JobId).ToList();
+            
+            foreach (var task in jobtasks)
+            {
+                task.IsDeleted = true;
+            }
+        }
     }
 }

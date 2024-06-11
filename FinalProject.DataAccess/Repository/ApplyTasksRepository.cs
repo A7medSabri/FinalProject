@@ -59,51 +59,87 @@ namespace FinalProject.DataAccess.Repository
             var freelancerTaskDto = applyTasks.Select(jp => new FreelancerTaskDto
             {
                 TaskId = jp.Id,
+                
                 OrderDate = jp.OrderDate,
+                
                 DeliveryDate = jp.DeliveryDate,
+                
                 Status=jp.Status,
+                
                 TotalAmount = jp.TotalAmount,
+                
                 JobPostId=jp.JobPostId,
+                
                 ClientId=jp.ClientId,
+                
                 ClientFullName = _context.Users.FirstOrDefault(user => user.Id == jp.ClientId).FirstName + " " +
                                  _context.Users.FirstOrDefault(user => user.Id == jp.ClientId).FirstName,
-                Taketitle = _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).Title,
-                TakeDescription = _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).Description,
+                
+                Tasktitle = _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).Title,
+                
+                TaskDescription = _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).Description,
+                
                 CategoryName = _context.Categories.FirstOrDefault(category=> category.Id == _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).CategoryId).Name,
+                
                 isDeleted = jp.IsDeleted,
+                
                 isFav = (_context.FavoriteJobPost.FirstOrDefault(job=>job.FreelancerId == userId)!=null),
 
             }).ToList();
 
             return freelancerTaskDto;
         }
-        public List<FreelancerTaskDto> GetAcceptedFreelancerTasksByUserId(string userId)
+        public List<TaskDto> GetAcceptedFreelancerTasksByUserId(string userId)
         {
             var applyTasks = _context.ApplyTasks
                 .Where(u => u.FreelancerId == userId && u.IsDeleted == false && u.Status == "Accepted").ToList();
 
-            if (applyTasks == null) return new List<FreelancerTaskDto>();
+            if (applyTasks == null) return new List<TaskDto>();
 
-            var freelancerTaskDto = applyTasks.Select(jp => new FreelancerTaskDto
+            var freelancerTaskDto = applyTasks.Select(task => new TaskDto
             {
-                TaskId = jp.Id,
-                OrderDate = jp.OrderDate,
-                DeliveryDate = jp.DeliveryDate,
-                Status = jp.Status,
-                TotalAmount = jp.TotalAmount,
-                JobPostId = jp.JobPostId,
-                ClientId = jp.ClientId,
-                ClientFullName = _context.Users.FirstOrDefault(user => user.Id == jp.ClientId).FirstName + " " +
-                                 _context.Users.FirstOrDefault(user => user.Id == jp.ClientId).FirstName,
-                Taketitle = _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).Title,
-                TakeDescription = _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).Description,
-                CategoryName = _context.Categories.FirstOrDefault(category => category.Id == _context.JobPosts.FirstOrDefault(job => job.Id == jp.JobPostId).CategoryId).Name,
-                isDeleted = jp.IsDeleted,
-                isFav = (_context.FavoriteJobPost.FirstOrDefault(job => job.FreelancerId == userId) != null),
 
+                TaskId = task.Id,
+
+                // freelancdr data
+                FreelancerId = task.FreelancerId,
+
+                FreelancerFullName = _context.Users.FirstOrDefault(u => u.Id == task.FreelancerId).FirstName + " " +
+                                     _context.Users.FirstOrDefault(u => u.Id == task.FreelancerId).LastName,
+
+
+                // client data
+                ClientId = task.ClientId,
+
+                ClientFullName = _context.Users.FirstOrDefault(u => u.Id == task.ClientId).FirstName + " " +
+                                 _context.Users.FirstOrDefault(u => u.Id == task.ClientId).LastName,
+
+
+                // job data
+                JobPostId = task.JobPostId,
+
+                Tasktitle = _context.JobPosts.FirstOrDefault(job => job.Id == task.JobPostId).Title,
+
+                TaskDescription = _context.JobPosts.FirstOrDefault(job => job.Id == task.JobPostId).Description,
+
+                OrderDate = task.OrderDate,
+
+                DeliveryDate = task.DeliveryDate,
+
+                Status = task.Status,
+
+                TotalAmount = task.TotalAmount,
+
+                CategoryName = _context.Categories.FirstOrDefault(category => category.Id ==
+                               _context.JobPosts.FirstOrDefault(job => job.Id == task.JobPostId).CategoryId).Name,
+
+                isDeleted = task.IsDeleted
             }).ToList();
 
             return freelancerTaskDto;
+
+
+
         }
 
         public FreelancerTaskDto GetFreelancerTaskByUserIdAndTaskId(string userId,int taskId)
@@ -116,20 +152,31 @@ namespace FinalProject.DataAccess.Repository
             var freelancerTaskDto =new  FreelancerTaskDto
             {
                 TaskId = applyTask.Id,
+             
                 OrderDate = applyTask.OrderDate,
+                
                 DeliveryDate = applyTask.DeliveryDate,
+                
                 Status = applyTask.Status,
+                
                 TotalAmount = applyTask.TotalAmount,
+                
                 JobPostId = applyTask.JobPostId,
+                
                 ClientId = applyTask.ClientId,
+                
                 ClientFullName = _context.Users.FirstOrDefault(user => user.Id == applyTask.ClientId).FirstName + " " +
                                  _context.Users.FirstOrDefault(user => user.Id == applyTask.ClientId).FirstName,
-                Taketitle = _context.JobPosts.FirstOrDefault(job => job.Id == applyTask.JobPostId).Title,
-                TakeDescription = _context.JobPosts.FirstOrDefault(job => job.Id == applyTask.JobPostId).Description,
+                
+                Tasktitle = _context.JobPosts.FirstOrDefault(job => job.Id == applyTask.JobPostId).Title,
+                
+                TaskDescription = _context.JobPosts.FirstOrDefault(job => job.Id == applyTask.JobPostId).Description,
+                
                 CategoryName = _context.Categories.FirstOrDefault(category => category.Id == _context.JobPosts.FirstOrDefault(job => job.Id == applyTask.JobPostId).CategoryId).Name,
+                
                 isDeleted = applyTask.IsDeleted,
+                
                 isFav = (_context.FavoriteJobPost.FirstOrDefault(job => job.FreelancerId == userId) != null),
-
 
             };
 
@@ -166,13 +213,21 @@ namespace FinalProject.DataAccess.Repository
             var applicantsWithName = applicants.Select(applicant =>new ClientTaskDto
             {
                 TaskId = applicant.Id,
+               
                 JobPostId = applicant.JobPostId,
+                
                 FreelancerId = applicant.FreelancerId,
+                
                 FreelancerFullName = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).FirstName + " " + _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).LastName,
+                
                 FreelancerDescription = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).Description,
+                
                 FreelancerhourlyRate = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).HourlyRate,
+                
                 FreelancerProfilePictureUrl = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).ProfilePicture,
+                
                 Freelancertitle = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).YourTitle,
+                
                 isFavourite = (_context.Users
                 .Include(u => u.Favorites)
                 .FirstOrDefault(u => u.Id == userId)
@@ -185,7 +240,7 @@ namespace FinalProject.DataAccess.Repository
             return applicantsWithName;
         }
 
-        public List<ClientTaskDto> AccpetedApplicants(string userId)
+        public List<TaskDto> AccpetedApplicants(string userId)
         {
             //
                        //check if client post this job
@@ -200,21 +255,44 @@ namespace FinalProject.DataAccess.Repository
                Where(j => j.ClientId == userId && j.IsDeleted == false && j.Status == "Accepted").ToList();
 
 
-            var applicantsWithName = applicants.Select(applicant => new ClientTaskDto
+            var applicantsWithName = applicants.Select(applicant => new TaskDto
             {
                 TaskId = applicant.Id,
-                JobPostId = applicant.JobPostId,
+                
+                // freelancdr data
                 FreelancerId = applicant.FreelancerId,
-                FreelancerFullName = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).FirstName + " " + _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).LastName,
-                FreelancerDescription = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).Description,
-                FreelancerhourlyRate = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).HourlyRate,
-                FreelancerProfilePictureUrl = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).ProfilePicture,
-                Freelancertitle = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).YourTitle,
-                isFavourite = (_context.Users
-                .Include(u => u.Favorites)
-                .FirstOrDefault(u => u.Id == userId)
-                .Favorites.FirstOrDefault(u => u.FreelancerId == applicant.FreelancerId) != null)
+               
+                FreelancerFullName = _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).FirstName + " " +
+                                     _context.Users.FirstOrDefault(u => u.Id == applicant.FreelancerId).LastName,
+                
 
+                // client data
+                ClientId = applicant.ClientId,
+                
+                ClientFullName = _context.Users.FirstOrDefault(u=>u.Id == applicant.ClientId).FirstName + " " +
+                                 _context.Users.FirstOrDefault(u => u.Id == applicant.ClientId).LastName ,
+
+
+                // job data
+                JobPostId = applicant.JobPostId,
+                
+                Tasktitle = _context.JobPosts.FirstOrDefault(job=>job.Id == applicant.JobPostId).Title,
+                
+                TaskDescription = _context.JobPosts.FirstOrDefault(job=>job.Id == applicant.JobPostId).Description,
+
+                OrderDate = applicant.OrderDate,
+
+                DeliveryDate = applicant.DeliveryDate,
+
+                Status = applicant.Status,
+
+                TotalAmount = applicant.TotalAmount,
+
+                CategoryName = _context.Categories.FirstOrDefault(category=> category.Id == 
+                               _context.JobPosts.FirstOrDefault(job => job.Id == applicant.JobPostId).CategoryId).Name,
+
+                isDeleted = applicant.IsDeleted
+              
 
             }).ToList();
 

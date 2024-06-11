@@ -8,9 +8,7 @@ namespace FinalProject.Domain.DTO.ApplyTasks
 {
     public class ClientTaskDto : TaskDto
     {
-        public string FreelancerId { get; set; }
-        public string? FreelancerFullName { get; set; }
-        public string? Freelancertitle { get; set; }
+     public string? Freelancertitle { get; set; }
         public string? FreelancerDescription { get; set; }
         public string? FreelancerProfilePictureUrl { get; set; }
         public decimal? FreelancerhourlyRate { get; set; }

@@ -14,13 +14,13 @@ namespace FinalProject.Domain.IRepository
 
         public bool Create(int jobId, string UserId);
         public List<FreelancerTaskDto> GetAllFreelancerTasksByUserId(string userId);
-        public List<FreelancerTaskDto> GetAcceptedFreelancerTasksByUserId(string userId);
+        public List<TaskDto> GetAcceptedFreelancerTasksByUserId(string userId);
         public FreelancerTaskDto GetFreelancerTaskByUserIdAndTaskId(string userId, int taskId);
         public ApplyTask SearchForTask(string userId, int taskId);
 
         //---------------------client--------------------------
 
         public List<ClientTaskDto> Applicants(string userId, int jobId);
-        public List<ClientTaskDto> AccpetedApplicants(string userId);
+        public List<TaskDto> AccpetedApplicants(string userId);
     }
 }

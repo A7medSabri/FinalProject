@@ -27,5 +27,7 @@ namespace FinalProject.Domain.IRepository
 
         public JobPost GetJobPostByIdAndUserId(string userId, int id);
 
+        public void DeleteJobPostRelatedTasks(int JobId);
+
     }
 }

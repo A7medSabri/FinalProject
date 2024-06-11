@@ -14,9 +14,7 @@ namespace FinalProject.Domain.DTO.ApplyTasks
     public class FreelancerTaskDto : TaskDto
     {
 
-        public string ClientId { get; set; }
-
-        public string ClientFullName { get; set; }
+       
         public bool ?isFav { get; set; }
        
     }

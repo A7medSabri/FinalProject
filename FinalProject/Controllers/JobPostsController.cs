@@ -103,7 +103,7 @@ namespace FinalProject.Controllers
         }
 
         [Authorize(Roles = "User")]
-        [HttpPost]
+        [HttpPost("Cliend  PostJob")]
         public IActionResult PostJobPost(JobPostDto jobPostDto)
         {
             if (ModelState.IsValid)
@@ -129,7 +129,7 @@ namespace FinalProject.Controllers
 
         // update jobpost
         [Authorize(Roles = "User")]
-        [HttpPut("{id}")]
+        [HttpPut("update jobpost")]
         public IActionResult PutJobPost(int id, JobPostDto jobPostDto)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -149,14 +149,22 @@ namespace FinalProject.Controllers
 
         // DELETE: api/JobPosts/5
         [Authorize(Roles = "User")]
-        [HttpDelete("{id}")]
-        public IActionResult DeleteJobPost(int id)
+        [HttpPut ("Cliend delete job")]
+        public IActionResult DeleteJobPost(int jobId)
         {
             string userId = User.FindFirst("uid")?.Value;
-            JobPost jobPost = _unitOfWork.JobPost.GetJobPostByIdAndUserId(userId,id);
+            
+            JobPost jobPost = _unitOfWork.JobPost.GetJobPostByIdAndUserId(userId,jobId);
+            
             if (jobPost == null) return NotFound();
+            
             jobPost.IsDeleted = true;
+
+            
+            _unitOfWork.JobPost.DeleteJobPostRelatedTasks(jobId);
+            
             _unitOfWork.Save();
+            
             return Ok();
         }
 

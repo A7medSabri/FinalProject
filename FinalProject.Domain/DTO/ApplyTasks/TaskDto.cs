@@ -11,19 +11,33 @@ namespace FinalProject.Domain.DTO.ApplyTasks
     {
 
         public int TaskId { get; set; }
+
+
+
+        public string FreelancerId { get; set; }
+        public string? FreelancerFullName { get; set; }
+
+
+
+        public string ClientId { get; set; }
+        public string ClientFullName { get; set; }
+
+
+
+
+
+        public int JobPostId { get; set; }
+        public string? Tasktitle { get; set; }
+        public string? TaskDescription { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime? DeliveryDate { get; set; }
 
-        public string? Taketitle { get; set; }
-        public string? TakeDescription { get; set; }
-
+    
 
         [RegularExpression("^(Pending|Complete|In progress|Cancel)$", ErrorMessage = "Status must be either 'Pending' or 'Complete' or 'In progress' or 'Cancel'.")]
         public string? Status { get; set; }
         [Required]
         public decimal TotalAmount { get; set; }
-
-        public int JobPostId { get; set; }
 
         public string? CategoryName { get; set; }
         public bool? isDeleted { get; set; }
