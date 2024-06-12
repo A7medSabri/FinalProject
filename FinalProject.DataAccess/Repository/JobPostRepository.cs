@@ -52,7 +52,6 @@ namespace FinalProject.DataAccess.Repository
                 Description = jobPost.Description,
                 Price = jobPost.Price,
                 DurationTime = jobPost.DurationTime,
-                JobPostSkill = jobPost.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
                 CategoryName = jobPost.Category.Name,
                 Status = jobPost.Status,
                 IsDeleted = jobPost.IsDeleted,
@@ -90,22 +89,32 @@ namespace FinalProject.DataAccess.Repository
 
             var AllJopPostDto = AllJopPost.Select(jobPost => new GetFreelancerJobPostDto
             {
+              
                 Id = jobPost.Id,
+                
                 Title = jobPost.Title,
+                
                 Description = jobPost.Description,
+                
                 Price = jobPost.Price,
+                
                 DurationTime = jobPost.DurationTime,
-                JobPostSkill = jobPost.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
+                
                 CategoryName = jobPost.Category.Name,
+                
                 Status = jobPost.Status,
+                
                 IsDeleted = jobPost.IsDeleted,
+                
                 UserId = jobPost.UserId,
+                
                 UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName,
+                
                 IsFav = favJobPosts.FirstOrDefault(j => j.JobpostId == jobPost.Id) != null,
+                
                 isApplied = jobPost.Status != "Uncompleted"
 
-
-            }).ToList();
+    }).ToList();
 
             return AllJopPostDto;
 
@@ -133,7 +142,6 @@ namespace FinalProject.DataAccess.Repository
                 CategoryName = jp.Category.Name,
                 Price = jp.Price,
                 DurationTime = jp.DurationTime,
-                JobPostSkill = jp.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
                 Status = jp.Status,
                 IsDeleted = jp.IsDeleted,
             
@@ -162,7 +170,6 @@ namespace FinalProject.DataAccess.Repository
                 Description = jobPost.Description,
                 Price = jobPost.Price,
                 DurationTime = jobPost.DurationTime,
-                JobPostSkill = jobPost.JobPostSkill.Select(skill => skill.Skill.Name).ToList(),
                 CategoryName = jobPost.Category.Name,
                 Status = jobPost.Status,
                 IsDeleted = jobPost.IsDeleted,

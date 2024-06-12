@@ -14,7 +14,6 @@ namespace FinalProject.Domain.DTO.JobPost
         public decimal Price { get; set; }
         public DateTime? DurationTime { get; set; }
         public string CategoryName { get; set; }
-        public List<string>? JobPostSkill { get; set; }
         public string Status { get; set; }
         public bool IsDeleted { get; set; }
     }

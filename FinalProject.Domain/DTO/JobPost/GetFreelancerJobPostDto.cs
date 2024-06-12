@@ -11,8 +11,8 @@ namespace FinalProject.Domain.DTO.JobPost
     {
         public string UserId { get; set; }
         public string? UserFullName { get; set; }
-        public bool IsFav { get; set; }
-        public bool isApplied { get; set; }
+        public bool? IsFav { get; set; }
+        public bool? isApplied { get; set; }
 
     }
 }
