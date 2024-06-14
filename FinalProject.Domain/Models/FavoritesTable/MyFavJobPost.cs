@@ -17,5 +17,9 @@ namespace FinalProject.Domain.Models.FavoritesTable
         public string Status { get; set; }
         public string UserName { get; set; }
         public bool IsFav { get; set; }
+        public bool IsApplied { get; set; }
+        public int? TaskId { get; set; }
+
     }
+
 }

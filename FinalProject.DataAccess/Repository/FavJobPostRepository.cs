@@ -58,7 +58,14 @@ namespace FinalProject.DataAccess.Repository
                     DurationTime = u.Jobpost.DurationTime,
                     Status = u.Jobpost.Status,
                     UserName = u.Jobpost.ApplicationUser.FirstName + " " + u.Jobpost.ApplicationUser.LastName,
-                    IsFav = true
+                    IsFav = true,
+                    IsApplied = _context.ApplyTasks
+                        .Any(a => a.JobPostId == u.JobpostId && a.FreelancerId == Fid && a.IsDeleted == false),
+                    TaskId = _context.ApplyTasks
+                        .Where(a => a.JobPostId == u.JobpostId && a.FreelancerId == Fid && a.IsDeleted == false)
+                        .Select(a => a.Id)
+                        .FirstOrDefault()
+
                 })
                 .ToList();
             return favJobPostsList;
