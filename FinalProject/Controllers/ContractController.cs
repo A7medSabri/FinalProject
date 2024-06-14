@@ -3,6 +3,7 @@ using FinalProject.Domain.DTO;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.ApplicationUserModel;
 using FinalProject.Domain.Models.JobPostAndContract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ namespace FinalProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "User")]
     public class ContractController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -84,7 +86,7 @@ namespace FinalProject.Controllers
             con.EndDate = contract.EndDate;
             con.FreelancerId = contract.FreelancerId;
             con.JopPostId = contract.JopPostId;
-            con.ClientId = contract.ClientId;
+            con.ClientId = User.FindFirst("uid")?.Value;
             con.Price = contract.Price;
             con.TremsAndCondetions = contract.TremsAndCondetions;
             con.PaymentMethodId = contract.PaymentMethodId;

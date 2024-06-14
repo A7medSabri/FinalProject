@@ -62,9 +62,9 @@ namespace FinalProject.DataAccess.Repository
                 //isApplied = (_context.ApplyTasks.FirstOrDefault(task => task.FreelancerId == freelancerId && task.JobPostId == jobPost.Id)!= null && 
                 //             _context.ApplyTasks.FirstOrDefault(task => task.FreelancerId == freelancerId && task.JobPostId == jobPost.Id).Status != "Uncompleted"),
                 isApplied = _context.ApplyTasks
-                        .Any(a => a.JobPostId == jobPost.Id && a.IsDeleted == false),
+                        .Any(a => a.JobPostId == jobPost.Id && a.FreelancerId == freelancerId && a.IsDeleted == false),
                 TaskId = _context.ApplyTasks
-                        .Where(a => a.JobPostId == jobPost.Id && a.IsDeleted == false)
+                        .Where(a => a.JobPostId == jobPost.Id && a.FreelancerId == freelancerId && a.IsDeleted == false)
                         .Select(a => a.Id)
                         .FirstOrDefault()
 
@@ -93,7 +93,6 @@ namespace FinalProject.DataAccess.Repository
             var favJobPosts = _context.FavoriteJobPost.Where(f=> f.FreelancerId == freelancerId).ToList();
 
 
-
             var AllJopPostDto = AllJopPost.Select(jobPost => new GetFreelancerJobPostDto
             {
               
@@ -118,13 +117,13 @@ namespace FinalProject.DataAccess.Repository
                 UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName,
 
                 
-                IsFav = favJobPosts.FirstOrDefault(j => j.JobpostId == jobPost.Id) != null,
+                IsFav = favJobPosts.FirstOrDefault(j => j.JobpostId == jobPost.Id ) != null,
 
                 isApplied = _context.ApplyTasks
-                    .Any(a => a.JobPostId == jobPost.Id && a.IsDeleted == false),
+                    .Any(a => a.JobPostId == jobPost.Id && a.FreelancerId == freelancerId && a.IsDeleted == false),
 
                 TaskId = _context.ApplyTasks
-                    .Where(a => a.JobPostId == jobPost.Id && a.IsDeleted == false)
+                    .Where(a => a.JobPostId == jobPost.Id && a.FreelancerId == freelancerId && a.IsDeleted == false)
                     .Select(a => a.Id)
                     .FirstOrDefault()
             }).ToList();
