@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -58,8 +59,14 @@ namespace FinalProject.DataAccess.Repository
                 UserId = jobPost.UserId,
                 UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName,
                 IsFav = favJobPosts.FirstOrDefault(j => j.JobpostId == jobPost.Id) != null,
-                isApplied = (_context.ApplyTasks.FirstOrDefault(task => task.FreelancerId == freelancerId && task.JobPostId == jobPost.Id)!= null && 
-                             _context.ApplyTasks.FirstOrDefault(task => task.FreelancerId == freelancerId && task.JobPostId == jobPost.Id).Status != "Uncompleted")
+                //isApplied = (_context.ApplyTasks.FirstOrDefault(task => task.FreelancerId == freelancerId && task.JobPostId == jobPost.Id)!= null && 
+                //             _context.ApplyTasks.FirstOrDefault(task => task.FreelancerId == freelancerId && task.JobPostId == jobPost.Id).Status != "Uncompleted"),
+                isApplied = _context.ApplyTasks
+                        .Any(a => a.JobPostId == jobPost.Id && a.IsDeleted == false),
+                TaskId = _context.ApplyTasks
+                        .Where(a => a.JobPostId == jobPost.Id && a.IsDeleted == false)
+                        .Select(a => a.Id)
+                        .FirstOrDefault()
 
             }).ToList();
 
@@ -111,10 +118,15 @@ namespace FinalProject.DataAccess.Repository
                 UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName,
                 
                 IsFav = favJobPosts.FirstOrDefault(j => j.JobpostId == jobPost.Id) != null,
-                
-                isApplied = jobPost.Status != "Uncompleted"
 
-    }).ToList();
+                isApplied = _context.ApplyTasks
+                    .Any(a => a.JobPostId == jobPost.Id && a.IsDeleted == false),
+
+                TaskId = _context.ApplyTasks
+                    .Where(a => a.JobPostId == jobPost.Id && a.IsDeleted == false)
+                    .Select(a => a.Id)
+                    .FirstOrDefault()
+            }).ToList();
 
             return AllJopPostDto;
 
