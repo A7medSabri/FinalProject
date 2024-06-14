@@ -116,6 +116,7 @@ namespace FinalProject.DataAccess.Repository
                 UserId = jobPost.UserId,
                 
                 UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName,
+
                 
                 IsFav = favJobPosts.FirstOrDefault(j => j.JobpostId == jobPost.Id) != null,
 
