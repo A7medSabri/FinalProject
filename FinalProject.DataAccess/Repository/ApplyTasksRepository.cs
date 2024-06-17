@@ -25,25 +25,26 @@ namespace FinalProject.DataAccess.Repository
 
         //---------------------Freelancer--------------------------
 
-        public bool Create(int jobId, string UserId)
+        public bool Create(string UserId, offerApply offer)
         {
             // freelancer apply for this task before
             var applyTasks = _context.ApplyTasks.
-                FirstOrDefault(u => u.FreelancerId == UserId && u.JobPostId == jobId && u.IsDeleted == false);
+                FirstOrDefault(u => u.FreelancerId == UserId && u.JobPostId == offer.jobId && u.IsDeleted == false);
             if (applyTasks != null) return false;
 
-            JobPost jobPost = _context.JobPosts.FirstOrDefault(post => post.Id == jobId);
+            JobPost jobPost = _context.JobPosts.FirstOrDefault(post => post.Id == offer.jobId);
             jobPost.Status = "Pending";
             ApplyTask applyTask = new ApplyTask
             {
+                offerDescription = offer.offerDescription,
                 OrderDate = DateTime.Now,
                 DeliveryDate = jobPost.DurationTime,
                 Status = "Pending",
-                TotalAmount = jobPost.Price,
+                TotalAmount = offer.price,
                 IsDeleted = false,
-                JobPostId = jobId,
+                JobPostId = offer.jobId,
                 FreelancerId = UserId,
-                ClientId = _context.JobPosts.FirstOrDefault(j => j.Id == jobId).UserId
+                ClientId = _context.JobPosts.FirstOrDefault(j => j.Id == offer.jobId).UserId
             };
             _context.ApplyTasks.Add(applyTask);
             return true;
@@ -60,6 +61,8 @@ namespace FinalProject.DataAccess.Repository
             {
                 TaskId = jp.Id,
                 
+                offerDescription = jp.offerDescription,
+
                 OrderDate = jp.OrderDate,
                 
                 DeliveryDate = jp.DeliveryDate,
@@ -117,6 +120,8 @@ namespace FinalProject.DataAccess.Repository
 
                 // job data
                 JobPostId = task.JobPostId,
+                
+                offerDescription = task.offerDescription,
 
                 Tasktitle = _context.JobPosts.FirstOrDefault(job => job.Id == task.JobPostId).Title,
 
@@ -152,6 +157,8 @@ namespace FinalProject.DataAccess.Repository
             var freelancerTaskDto =new  FreelancerTaskDto
             {
                 TaskId = applyTask.Id,
+
+                offerDescription = applyTask.offerDescription,
              
                 OrderDate = applyTask.OrderDate,
                 
@@ -213,6 +220,8 @@ namespace FinalProject.DataAccess.Repository
             var applicantsWithName = applicants.Select(applicant =>new ClientTaskDto
             {
                 TaskId = applicant.Id,
+
+                offerDescription = applicant.offerDescription,
                
                 JobPostId = applicant.JobPostId,
 
@@ -278,6 +287,8 @@ namespace FinalProject.DataAccess.Repository
 
                 // job data
                 JobPostId = applicant.JobPostId,
+
+                offerDescription = applicant.offerDescription,
                 
                 Tasktitle = _context.JobPosts.FirstOrDefault(job=>job.Id == applicant.JobPostId).Title,
                 

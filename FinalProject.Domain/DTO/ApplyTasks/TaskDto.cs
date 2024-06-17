@@ -17,6 +17,8 @@ namespace FinalProject.Domain.DTO.ApplyTasks
         public string FreelancerId { get; set; }
         public string? FreelancerFullName { get; set; }
 
+        public string ? offerDescription { get; set; }
+
 
 
         public string ClientId { get; set; }

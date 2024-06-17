@@ -32,7 +32,7 @@ namespace FinalProject.Controllers
 
         [HttpPost("Freelancer-Apply-For-Task")]
         [Authorize(Roles = "Freelancer")]
-        public IActionResult ApplyForTask(int jobId)
+        public IActionResult ApplyForTask(offerApply offer)
         {
             string userId = User.FindFirst("uid")?.Value;
 
@@ -45,12 +45,12 @@ namespace FinalProject.Controllers
             {
                 return BadRequest("Login please.");
             }
-            if (_unitOfWork.JobPost.GetByID(jobId) == null)
+            if (_unitOfWork.JobPost.GetByID(offer.jobId) == null)
             {
                 return NotFound("This job not exsist");
             }
                
-            if(!_unitOfWork.ApplyTasks.Create(jobId, userId))
+            if(!_unitOfWork.ApplyTasks.Create(userId,offer))
             {
                 // freelancer apply for this task before
                 return BadRequest("You applyied for this job before");

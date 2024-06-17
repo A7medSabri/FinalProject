@@ -12,6 +12,8 @@ namespace FinalProject.Domain.Models.JobPostAndContract
         [Key]
         public int Id { get; set; }
         // It must has a default value DataTime.Now
+
+        public string offerDescription { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime? DeliveryDate { get; set; }
 

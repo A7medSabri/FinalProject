@@ -12,7 +12,7 @@ namespace FinalProject.Domain.IRepository
     {
         //---------------------Freelancer--------------------------
 
-        public bool Create(int jobId, string UserId);
+        public bool Create(string UserId, offerApply offer);
         public List<FreelancerTaskDto> GetAllFreelancerTasksByUserId(string userId);
         public List<TaskDto> GetAcceptedFreelancerTasksByUserId(string userId);
         public FreelancerTaskDto GetFreelancerTaskByUserIdAndTaskId(string userId, int taskId);
