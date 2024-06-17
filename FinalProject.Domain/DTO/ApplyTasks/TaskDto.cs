@@ -42,5 +42,8 @@ namespace FinalProject.Domain.DTO.ApplyTasks
         public string? CategoryName { get; set; }
         public bool? isDeleted { get; set; }
 
+
+        public bool? isContract { get; set; } = false;
+
     }
 }

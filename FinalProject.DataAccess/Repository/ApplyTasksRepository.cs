@@ -207,7 +207,7 @@ namespace FinalProject.DataAccess.Repository
             if (jobPost == null) return null;
 
             var applicants = _context.ApplyTasks.
-               Where(j => j.ClientId == userId && j.JobPostId == jobId && j.IsDeleted == false).ToList();
+               Where(j => j.ClientId == userId && j.JobPostId == jobId && j.IsDeleted == false && j.Status!= "Rejected").ToList();
 
             
             var applicantsWithName = applicants.Select(applicant =>new ClientTaskDto
@@ -215,6 +215,8 @@ namespace FinalProject.DataAccess.Repository
                 TaskId = applicant.Id,
                
                 JobPostId = applicant.JobPostId,
+
+                Status = applicant.Status,
                 
                 FreelancerId = applicant.FreelancerId,
                 
@@ -232,6 +234,7 @@ namespace FinalProject.DataAccess.Repository
                 .Include(u => u.Favorites)
                 .FirstOrDefault(u => u.Id == userId)
                 .Favorites.FirstOrDefault(u=>u.FreelancerId == applicant.FreelancerId)!=null)
+
 
 
             }).ToList();
@@ -291,8 +294,11 @@ namespace FinalProject.DataAccess.Repository
                 CategoryName = _context.Categories.FirstOrDefault(category=> category.Id == 
                                _context.JobPosts.FirstOrDefault(job => job.Id == applicant.JobPostId).CategoryId).Name,
 
-                isDeleted = applicant.IsDeleted
-              
+
+                isDeleted = applicant.IsDeleted,
+
+                
+                isContract  = _context.Contracts.FirstOrDefault(contract => contract.JopPostId == applicant.JobPostId) != null
 
             }).ToList();
 
