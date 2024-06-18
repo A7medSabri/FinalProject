@@ -222,6 +222,8 @@ namespace FinalProject.DataAccess.Repository
                 TaskId = applicant.Id,
 
                 offerDescription = applicant.offerDescription,
+
+                TotalAmount = applicant.TotalAmount,
                
                 JobPostId = applicant.JobPostId,
 
