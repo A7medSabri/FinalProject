@@ -98,6 +98,7 @@ namespace FinalProject.Controllers
             }
             return NotFound("This contract doesn't exist");
         }
+
         [HttpGet("GetMyAllContracts")]
         public async Task<IActionResult> GetMyAllContracts()
         {
@@ -195,7 +196,6 @@ namespace FinalProject.Controllers
             return BadRequest();
         }
 
-
         [HttpPut("UpdateContract")]
         public IActionResult Update([FromBody] ContractDTO contract) 
         { 
@@ -217,6 +217,7 @@ namespace FinalProject.Controllers
             }
             return BadRequest();
         }
+
         [HttpDelete("CancelContract")]
         public IActionResult Delete(int id)
         {
@@ -234,7 +235,7 @@ namespace FinalProject.Controllers
             return NotFound("This contract already deleted.");
         }
 
-        [HttpPost]
+        [HttpPost("Submit")]
         [Authorize(Roles = "Freelancer")]
         public IActionResult submit([FromForm] string email)
         {
