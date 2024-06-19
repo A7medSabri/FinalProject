@@ -224,9 +224,9 @@ namespace FinalProject.Controllers
             return NotFound("This contract already deleted.");
         }
 
-        [HttpPost]
+        [HttpPost("submitContract")]
         [Authorize(Roles = "Freelancer")]
-        public IActionResult submit([FromForm] string email)
+        public IActionResult submitContract([FromForm] string email)
         {
             var id = User.FindFirst("uid")?.Value;
             var user = _userManager.Users.FirstOrDefault(u => u.Id == id);
