@@ -21,6 +21,7 @@ namespace FinalProject.Domain.IRepository
         void Create (Contract contract);
         void Update (Contract contract);
         bool FindContract(Expression<Func<Contract, bool>> predicate);
+        List<NewContractDto> GetAll(string Id, string Role);
 
     }
 }

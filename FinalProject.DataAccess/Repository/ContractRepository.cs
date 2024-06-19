@@ -102,7 +102,57 @@ namespace FinalProject.DataAccess.Repository
 
             }
 
-        } 
+        }
+
+        public List<NewContractDto> GetAll(string Id, string Role)
+        {
+            if (Id != null && Role == "Freelancer")
+            {
+                var result = _context.Contracts.Where(c => c.FreelancerId == Id).ToList();
+                NewContractDto NewContractDto = new NewContractDto();
+                List<NewContractDto> contractDtolst = new List<NewContractDto>();
+                if (result != null)
+                {
+                    foreach (var contract in result)
+                    {
+                        NewContractDto.StartDate = contract.StartDate;
+                        NewContractDto.EndDate = contract.EndDate;
+                        NewContractDto.TremsAndCondetions = contract.TremsAndCondetions;
+                        NewContractDto.Price = contract.Price;
+                        NewContractDto.FreelancerId = contract.FreelancerId;
+                        NewContractDto.JopPostId = contract.JopPostId;
+                        contractDtolst.Add(NewContractDto);
+                    }
+
+                }
+                return contractDtolst;
+                // return Ok(_unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList());
+            }
+            else if (Id != null && Role == "User")
+            {
+                var result = _context.Contracts.Where(c => c.ClientId == Id).ToList();
+                NewContractDto NewContractDto = new NewContractDto();
+                List<NewContractDto> contractDtolst = new List<NewContractDto>();
+                if (result != null)
+                {
+                    foreach (var contract in result)
+                    {
+                        NewContractDto.StartDate = contract.StartDate;
+                        NewContractDto.EndDate = contract.EndDate;
+                        NewContractDto.TremsAndCondetions = contract.TremsAndCondetions;
+                        NewContractDto.Price = contract.Price;
+                        NewContractDto.FreelancerId = contract.FreelancerId;
+                        NewContractDto.JopPostId = contract.JopPostId;
+                        contractDtolst.Add(NewContractDto);
+                    }
+
+                }
+                return contractDtolst;
+                // return Ok(_unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList());
+                //return Ok(_unitOfWork.Contract.Find(c => c.ClientId == userId).ToList());
+            }
+            else { return null; }
+        }
         #endregion
     }
 }
