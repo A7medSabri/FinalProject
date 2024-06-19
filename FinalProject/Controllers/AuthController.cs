@@ -58,7 +58,7 @@ namespace FinalProject.Controllers
             var urlEncoder = UrlEncoder.Default;
             var encodedToken = urlEncoder.Encode(token);
             var confirmationLink = $"http://localhost:3000/congratulation?token={token}&email={user.Email}";
-            //var confirmationLink = $"http://localhost:5238/Confirm-Email?token={encodedToken}&email={user.Email}";
+            //var confirmationLink = $"http://localhost:7115/Confirm-Email?token={encodedToken}&email={user.Email}";
 
             //host 3000
             var message = new UserMangmentService.Models.Message(new string[] { user.Email! }, "Email Confirmation", confirmationLink!);
@@ -145,7 +145,7 @@ namespace FinalProject.Controllers
                 var urlEncoder = UrlEncoder.Default;
                 var encodedToken = urlEncoder.Encode(token);
                 var confirmationLink = $"http://localhost:3000/congratulation?token={token}&email={user.Email}";
-                //var confirmationLink = $"http://localhost:5238/Confirm-Email?token={token}&email={user.Email}";
+                //var confirmationLink = $"http://localhost:7115/Confirm-Email?token={token}&email={user.Email}";
 
                 var message = new UserMangmentService.Models.Message(new string[] { user.Email! }, "Email Confirmation", confirmationLink!);
                 _emailService.SendEmail(message);
