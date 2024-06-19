@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using UserMangmentService.Service;
 
 
 
@@ -21,13 +22,15 @@ namespace FinalProject.Controllers
     public class ContractController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmailServices _emailService;
 
         public UserManager<ApplicationUser> _userManager { get; }
 
-        public ContractController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+        public ContractController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager , IEmailServices emailServices)
         {
             this._unitOfWork = unitOfWork;
             _userManager = userManager;
+            _emailService = emailServices;
         }
 
 
@@ -48,6 +51,17 @@ namespace FinalProject.Controllers
             if (ModelState.IsValid)
             {
                 _unitOfWork.Save();
+
+                var freelancer = _userManager.FindByIdAsync(contract.FreelancerId).Result;
+                if (freelancer != null)
+                {
+                    //var confirmationLink = $"http://localhost:5238/api/Contract/findByJobPostId?id={contract.JopPostId}";
+                    var confirmationLink = $"http://localhost:3000/ContractDetails/id={contract.JopPostId}";
+
+                    var message = new UserMangmentService.Models.Message(new string[] { freelancer.Email! }, "New Contract Created", confirmationLink!);
+                    _emailService.SendEmail(message);
+                }
+
                 return Ok(contract);
             }
             return BadRequest();
@@ -84,9 +98,6 @@ namespace FinalProject.Controllers
             }
             return NotFound("This contract doesn't exist");
         }
-
-
-
 
         [HttpGet("GetMyAllContracts")]
         public async Task<IActionResult> GetMyAllContracts()
@@ -185,7 +196,6 @@ namespace FinalProject.Controllers
             return BadRequest();
         }
 
-
         [HttpPut("UpdateContract")]
         public IActionResult Update([FromBody] ContractDTO contract) 
         { 
@@ -207,6 +217,7 @@ namespace FinalProject.Controllers
             }
             return BadRequest();
         }
+
         [HttpDelete("CancelContract")]
         public IActionResult Delete(int id)
         {
@@ -224,7 +235,7 @@ namespace FinalProject.Controllers
             return NotFound("This contract already deleted.");
         }
 
-        [HttpPost("submitContract")]
+        [HttpPost("SubmitContract")]
         [Authorize(Roles = "Freelancer")]
         public IActionResult submitContract([FromForm] string email)
         {
