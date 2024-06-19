@@ -196,7 +196,8 @@ namespace FinalProject.DataAccess.Repository
                     jopPostDescription = jobPost?.Description,
                     FreelancerName = freelancer.FirstName + " " + freelancer.LastName,
                     ClinetName = client.FirstName + " " + client.LastName,
-                    IsDeleted = contract.IsDeleted
+                    IsDeleted = contract.IsDeleted,
+                    contractID = contract.Id,
                 };
             }).ToList();
 
@@ -229,6 +230,7 @@ namespace FinalProject.DataAccess.Repository
                 contract.FreelancerName  = freelancer.FirstName +" "+freelancer.LastName;
                 contract.ClinetName  = clinet.FirstName +" "+clinet.LastName;
                 contract.IsDeleted = con.IsDeleted;
+                contract.contractID = con.Id;
             }
             return contract;
         }

@@ -31,5 +31,6 @@ namespace FinalProject.Domain.DTO.Contract
 
         public int? PaymentMethodId { get; set; }
         public bool? IsDeleted { get; set; }
+        public int contractID { get; set; }
     }
 }
