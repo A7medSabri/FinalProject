@@ -224,5 +224,21 @@ namespace FinalProject.Controllers
             return NotFound("This contract already deleted.");
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Freelancer")]
+        public IActionResult submit(string email)
+        {
+            var id = User.FindFirst("uid")?.Value;
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == id);
+            if (user != null && user.Email == email)
+            {
+                return Ok("You have successfully submitted the Contract.");
+            }
+            else
+            {
+                return BadRequest("Please make sure that you enter a valid email address");
+            }
+        }
+
     }
 }
