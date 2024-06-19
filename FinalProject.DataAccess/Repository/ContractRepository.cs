@@ -1,4 +1,5 @@
 ﻿using FinalProject.DataAccess.Data;
+using FinalProject.Domain.DTO.Contract;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.JobPostAndContract;
 using System;
@@ -19,32 +20,52 @@ namespace FinalProject.DataAccess.Repository
             this._context = context;
         }
 
+        public Contract CreateNew(NewContractDto newContract ,string UserId)
+        {
+            var NewContract = new Contract
+            {
+                TremsAndCondetions = newContract.TremsAndCondetions,
+                ClientId = UserId,
+                FreelancerId = newContract.FreelancerId,
+                JopPostId = newContract.JopPostId,
+                PaymentMethodId = newContract.PaymentMethodId ?? null,
+                StartDate = newContract.StartDate,
+                EndDate = newContract.EndDate,
+                Price = newContract.Price,
+
+            };
+            _context.Contracts.Add(NewContract);
+            return NewContract;
+        }
+
+
+        #region SaadAllah
         public void Create(Contract contract)
         {
             Contract con = new Contract();
-            if(contract != null)
+            if (contract != null)
             {
-                if(contract.Price != null && contract.Price > 0)
+                if (contract.Price != null && contract.Price > 0)
                 {
                     con.Price = contract.Price;
                 }
-                if(contract.TremsAndCondetions != null)
+                if (contract.TremsAndCondetions != null)
                 {
                     con.TremsAndCondetions = contract.TremsAndCondetions;
                 }
-                if(contract.ClientId != null)
+                if (contract.ClientId != null)
                 {
                     con.ClientId = contract.ClientId;
                 }
                 con.EndDate = contract.EndDate;
                 con.StartDate = contract.StartDate;
                 con.JopPostId = contract.JopPostId;
-                if(contract.FreelancerId != null)
+                if (contract.FreelancerId != null)
                     con.FreelancerId = contract.FreelancerId;
                 con.PaymentMethodId = contract.PaymentMethodId;
                 con.ContractDate = DateTime.Now;
                 _context.Contracts.Add(con);
-                
+
             }
         }
 
@@ -78,9 +99,10 @@ namespace FinalProject.DataAccess.Repository
                 con.PaymentMethodId = contract.PaymentMethodId;
                 con.ContractDate = DateTime.Now;
                 _context.Contracts.Update(con);
-               
+
             }
-            
-        }
+
+        } 
+        #endregion
     }
 }

@@ -41,7 +41,7 @@ namespace FinalProject.Domain.Models.JobPostAndContract
 
         // PaymentMethod
         [ForeignKey("PaymentMethod")]
-        public int PaymentMethodId { get; set; }
+        public int? PaymentMethodId { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FinalProject.DataAccess.Repository;
 using FinalProject.Domain.DTO;
+using FinalProject.Domain.DTO.Contract;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.ApplicationUserModel;
 using FinalProject.Domain.Models.JobPostAndContract;
@@ -28,6 +29,43 @@ namespace FinalProject.Controllers
             this._unitOfWork = unitOfWork;
             _userManager = userManager;
         }
+
+
+        [HttpPost ("Create-New-Contract")]
+        public IActionResult Post([FromForm] NewContractDto contract)
+        {
+            var userId = User.FindFirst("uid")?.Value;
+            var result = _unitOfWork.Contract.Find(c => c.JopPostId == contract.JopPostId).ToList();
+            if (result != null)
+                foreach (var i in result)
+                {
+                    if (i != null && i.IsDeleted == false)
+                    {
+                        return BadRequest("This JobPost already has a Contract");
+                    }
+                }
+            _unitOfWork.Contract.CreateNew(contract, userId);
+            if (ModelState.IsValid)
+            {
+                _unitOfWork.Save();
+                return Ok(contract);
+            }
+            return BadRequest();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         [HttpGet("findByJobPostId")]
         public IActionResult Get(int id)
         {
@@ -68,7 +106,7 @@ namespace FinalProject.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] ContractDTO contract)
+        public IActionResult Post([FromForm] ContractDTO contract)
         {
             Contract con = new Contract();
             var result = _unitOfWork.Contract.Find(c => c.JopPostId == contract.JopPostId).ToList();
@@ -98,6 +136,8 @@ namespace FinalProject.Controllers
             }
             return BadRequest();
         }
+
+
         [HttpPut("UpdateContract")]
         public IActionResult Update([FromBody] ContractDTO contract) 
         { 
