@@ -16,13 +16,14 @@ namespace FinalProject.Domain.IRepository
 
         Contract CreateNew(NewContractDto newContract ,string UserId);
 
-        Contract FindByJobPostId(int id);
-
+        // Contract FindByJobPostId(int id);
+        GetContract FindByJobPostId(int id);
 
         void Create (NewContractDto newContract, string UserId);
         Contract Update (NewContractDto contract);
         bool FindContract(Expression<Func<Contract, bool>> predicate);
-        List<NewContractDto> GetAll(string Id, string Role);
+        // List<NewContractDto> GetAll(string Id, string Role);
+        List<GetContract> GetAll(string Id, string Role);
 
     }
 }

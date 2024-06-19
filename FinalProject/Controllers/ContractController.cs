@@ -80,8 +80,8 @@ namespace FinalProject.Controllers
         [HttpGet("findByJobPostId")]
         public IActionResult Get(int id)
         {
-            Contract result = _unitOfWork.Contract.Find(c => c.JopPostId == id).Where(c => c.IsDeleted == false).FirstOrDefault();
-            if (result == null)
+            GetContract result = _unitOfWork.Contract.FindByJobPostId(id);
+            if (result.JopPostId == 0)
             {
                 return BadRequest("There is no Contract to this JobPost");
             }
@@ -96,69 +96,103 @@ namespace FinalProject.Controllers
             return NotFound("This contract doesn't exist");
         }
 
-        [HttpGet("GetMyAllContracts")]
+        //[HttpGet("GetMyAllContracts")]
+        //public async Task<IActionResult> GetMyAllContracts()
+        //{
+        //    var userId = User.FindFirst("uid")?.Value;
+        //    ApplicationUser user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
+        //    var userRole = await _userManager.GetRolesAsync(user);
+        //    var Result = _unitOfWork.Contract.GetAll(userId, userRole[0]);
+        //    if(Result != null)
+        //    {
+        //        return Ok(Result);
+        //    }
+        //    #region test
+        //    //if (userId != null && userRole[0] == "Freelancer")
+        //    //{
+        //    //    var result = _unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList();
+        //    //    NewContractDto NewContractDto = new NewContractDto();
+        //    //    List<NewContractDto> contractDtolst = new List<NewContractDto>();
+        //    //    if(result != null)
+        //    //    {
+        //    //        foreach(var contract in result)
+        //    //        {
+        //    //            NewContractDto.StartDate = contract.StartDate;
+        //    //            NewContractDto.EndDate = contract.EndDate;
+        //    //            NewContractDto.TremsAndCondetions = contract.TremsAndCondetions;
+        //    //            NewContractDto.Price = contract.Price;
+        //    //            NewContractDto.FreelancerId = contract.FreelancerId;
+        //    //            NewContractDto.JopPostId = contract.JopPostId;
+        //    //            contractDtolst.Add(NewContractDto);
+        //    //        }
+
+        //    //    }
+        //    //    return Ok(NewContractDto);
+        //    //  // return Ok(_unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList());
+        //    //}
+        //    //else if(userId != null && userRole[0] == "User")
+        //    //{
+        //    //    var result = _unitOfWork.Contract.Find(c => c.ClientId == userId).ToList();
+        //    //    NewContractDto NewContractDto = new NewContractDto();
+        //    //    List<NewContractDto> contractDtolst = new List<NewContractDto>();
+        //    //    if (result != null)
+        //    //    {
+        //    //        foreach (var contract in result)
+        //    //        {
+        //    //            NewContractDto.StartDate = contract.StartDate;
+        //    //            NewContractDto.EndDate = contract.EndDate;
+        //    //            NewContractDto.TremsAndCondetions = contract.TremsAndCondetions;
+        //    //            NewContractDto.Price = contract.Price;
+        //    //            NewContractDto.FreelancerId = contract.FreelancerId;
+        //    //            NewContractDto.JopPostId = contract.JopPostId;
+        //    //            contractDtolst.Add(NewContractDto);
+        //    //        }
+
+        //    //    }
+        //    //    return Ok(NewContractDto);
+        //    //    // return Ok(_unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList());
+        //    //    //return Ok(_unitOfWork.Contract.Find(c => c.ClientId == userId).ToList());
+        //    //}
+        //    #endregion
+        //    else
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //}
+        [Authorize(Roles = "User , Freelancer")]
+        [HttpGet("Get-My-All-Contracts-User-Freelancer")]
         public async Task<IActionResult> GetMyAllContracts()
         {
             var userId = User.FindFirst("uid")?.Value;
-            ApplicationUser user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
-            var userRole = await _userManager.GetRolesAsync(user);
-            var Result = _unitOfWork.Contract.GetAll(userId, userRole[0]);
-            if(Result != null)
-            {
-                return Ok(Result);
-            }
-            #region test
-            //if (userId != null && userRole[0] == "Freelancer")
-            //{
-            //    var result = _unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList();
-            //    NewContractDto NewContractDto = new NewContractDto();
-            //    List<NewContractDto> contractDtolst = new List<NewContractDto>();
-            //    if(result != null)
-            //    {
-            //        foreach(var contract in result)
-            //        {
-            //            NewContractDto.StartDate = contract.StartDate;
-            //            NewContractDto.EndDate = contract.EndDate;
-            //            NewContractDto.TremsAndCondetions = contract.TremsAndCondetions;
-            //            NewContractDto.Price = contract.Price;
-            //            NewContractDto.FreelancerId = contract.FreelancerId;
-            //            NewContractDto.JopPostId = contract.JopPostId;
-            //            contractDtolst.Add(NewContractDto);
-            //        }
-
-            //    }
-            //    return Ok(NewContractDto);
-            //  // return Ok(_unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList());
-            //}
-            //else if(userId != null && userRole[0] == "User")
-            //{
-            //    var result = _unitOfWork.Contract.Find(c => c.ClientId == userId).ToList();
-            //    NewContractDto NewContractDto = new NewContractDto();
-            //    List<NewContractDto> contractDtolst = new List<NewContractDto>();
-            //    if (result != null)
-            //    {
-            //        foreach (var contract in result)
-            //        {
-            //            NewContractDto.StartDate = contract.StartDate;
-            //            NewContractDto.EndDate = contract.EndDate;
-            //            NewContractDto.TremsAndCondetions = contract.TremsAndCondetions;
-            //            NewContractDto.Price = contract.Price;
-            //            NewContractDto.FreelancerId = contract.FreelancerId;
-            //            NewContractDto.JopPostId = contract.JopPostId;
-            //            contractDtolst.Add(NewContractDto);
-            //        }
-
-            //    }
-            //    return Ok(NewContractDto);
-            //    // return Ok(_unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList());
-            //    //return Ok(_unitOfWork.Contract.Find(c => c.ClientId == userId).ToList());
-            //}
-            #endregion
-            else
+            if (userId == null)
             {
                 return Unauthorized();
             }
-                
+
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            if (userRoles == null || userRoles.Count == 0)
+            {
+                return Unauthorized();
+            }
+
+            var role = userRoles[0];
+            if (role == "User" || role == "Freelancer")
+            {
+                var result = _unitOfWork.Contract.GetAll(userId, role);
+                if (result != null && result.Count > 0)
+                {
+                    return Ok(result);
+                }
+            }
+
+            return NotFound("No Contract To Show");
         }
 
         //[HttpPost]

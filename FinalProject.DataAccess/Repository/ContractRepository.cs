@@ -4,6 +4,7 @@ using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.JobPostAndContract;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -101,59 +102,134 @@ namespace FinalProject.DataAccess.Repository
             return null;
         }
 
-        public List<NewContractDto> GetAll(string Id, string Role)
+        //public List<NewContractDto> GetAll(string Id, string Role)
+        //{
+        //    if (Id != null && Role == "Freelancer")
+        //    {
+        //        var result = _context.Contracts.Where(c => c.FreelancerId == Id && c.IsDeleted == false).ToList();
+        //        NewContractDto NewContractDto = new NewContractDto();
+        //        List<NewContractDto> contractDtolst = new List<NewContractDto>();
+        //        if (result != null)
+        //        {
+        //            foreach (var contract in result)
+        //            {
+        //                NewContractDto.StartDate = contract.StartDate;
+        //                NewContractDto.EndDate = contract.EndDate;
+        //                NewContractDto.TremsAndCondetions = contract.TremsAndCondetions;
+        //                NewContractDto.Price = contract.Price;
+        //                NewContractDto.FreelancerId = contract.FreelancerId;
+        //                NewContractDto.JopPostId = contract.JopPostId;
+        //                contractDtolst.Add(NewContractDto);
+        //            }
+
+        //        }
+        //        return contractDtolst;
+        //        // return Ok(_unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList());
+        //    }
+        //    else if (Id != null && Role == "User")
+        //    {
+        //        var result = _context.Contracts.Where(c => c.ClientId == Id && c.IsDeleted == false).ToList();
+        //        NewContractDto NewContractDto = new NewContractDto();
+        //        List<NewContractDto> contractDtolst = new List<NewContractDto>();
+        //        if (result != null)
+        //        {
+        //            foreach (var contract in result)
+        //            {
+        //                NewContractDto.StartDate = contract.StartDate;
+        //                NewContractDto.EndDate = contract.EndDate;
+        //                NewContractDto.TremsAndCondetions = contract.TremsAndCondetions;
+        //                NewContractDto.Price = contract.Price;
+        //                NewContractDto.FreelancerId = contract.FreelancerId;
+        //                NewContractDto.JopPostId = contract.JopPostId;
+        //                contractDtolst.Add(NewContractDto);
+        //            }
+
+        //        }
+        //        return contractDtolst;
+        //        // return Ok(_unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList());
+        //        //return Ok(_unitOfWork.Contract.Find(c => c.ClientId == userId).ToList());
+        //    }
+        //    else { return null; }
+        //}
+        public List<GetContract> GetAll(string Id, string Role)
         {
-            if (Id != null && Role == "Freelancer")
+            if (Id == null || (Role != "Freelancer" && Role != "User"))
             {
-                var result = _context.Contracts.Where(c => c.FreelancerId == Id && c.IsDeleted == false).ToList();
-                NewContractDto NewContractDto = new NewContractDto();
-                List<NewContractDto> contractDtolst = new List<NewContractDto>();
-                if (result != null)
-                {
-                    foreach (var contract in result)
-                    {
-                        NewContractDto.StartDate = contract.StartDate;
-                        NewContractDto.EndDate = contract.EndDate;
-                        NewContractDto.TremsAndCondetions = contract.TremsAndCondetions;
-                        NewContractDto.Price = contract.Price;
-                        NewContractDto.FreelancerId = contract.FreelancerId;
-                        NewContractDto.JopPostId = contract.JopPostId;
-                        contractDtolst.Add(NewContractDto);
-                    }
-
-                }
-                return contractDtolst;
-                // return Ok(_unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList());
+                return null;
             }
-            else if (Id != null && Role == "User")
+
+            List<Contract> result = new List<Contract>();
+
+            if (Role == "Freelancer")
             {
-                var result = _context.Contracts.Where(c => c.ClientId == Id && c.IsDeleted == false).ToList();
-                NewContractDto NewContractDto = new NewContractDto();
-                List<NewContractDto> contractDtolst = new List<NewContractDto>();
-                if (result != null)
-                {
-                    foreach (var contract in result)
-                    {
-                        NewContractDto.StartDate = contract.StartDate;
-                        NewContractDto.EndDate = contract.EndDate;
-                        NewContractDto.TremsAndCondetions = contract.TremsAndCondetions;
-                        NewContractDto.Price = contract.Price;
-                        NewContractDto.FreelancerId = contract.FreelancerId;
-                        NewContractDto.JopPostId = contract.JopPostId;
-                        contractDtolst.Add(NewContractDto);
-                    }
-
-                }
-                return contractDtolst;
-                // return Ok(_unitOfWork.Contract.Find(c => c.FreelancerId == userId).ToList());
-                //return Ok(_unitOfWork.Contract.Find(c => c.ClientId == userId).ToList());
+                result = _context.Contracts.Where(c => c.FreelancerId == Id && c.IsDeleted == false).ToList();
             }
-            else { return null; }
+            else if (Role == "User")
+            {
+                result = _context.Contracts.Where(c => c.ClientId == Id && c.IsDeleted == false).ToList();
+            }
+
+            var contractsWithJobPostDetails = result.Select(contract => {
+                var jobPost = _context.JobPosts
+                                .Where(j => j.Id == contract.JopPostId)
+                                .Select(j => new { j.Title, j.Description })
+                                .FirstOrDefault();
+
+                var freelancer = _context.Users
+                                    .Where(f => f.Id == (Role == "Freelancer" ? contract.ClientId : contract.FreelancerId))
+                                    .Select(f => new { f.FirstName, f.LastName })
+                                    .FirstOrDefault();
+                var client = _context.Users
+                                    .Where(f => f.Id == (Role == "User" ? contract.ClientId : contract.FreelancerId))
+                                    .Select(f => new { f.FirstName, f.LastName })
+                                    .FirstOrDefault();
+
+                return new GetContract
+                {
+                    StartDate = contract.StartDate,
+                    EndDate = contract.EndDate,
+                    TremsAndCondetions = contract.TremsAndCondetions,
+                    Price = contract.Price,
+                    FreelancerId = contract.FreelancerId,
+                    JopPostId = contract.JopPostId,
+                    jopPostName = jobPost?.Title,
+                    jopPostDescription = jobPost?.Description,
+                    FreelancerName = freelancer.FirstName + " " + freelancer.LastName,
+                    ClinetName = client.FirstName + " " + client.LastName,
+                    IsDeleted = contract.IsDeleted
+                };
+            }).ToList();
+
+            return contractsWithJobPostDetails;
         }
 
-        public Contract FindByJobPostId(int id)
+        public GetContract FindByJobPostId(int id)
         {
-           Contract contract = _context.Contracts.FirstOrDefault(c => c.JopPostId == id && c.IsDeleted == false);
+            GetContract contract = new GetContract();
+            Contract con = _context.Contracts.FirstOrDefault(c => c.JopPostId == id && c.IsDeleted == false);
+
+            if (con != null)
+            {
+                var jobPost = _context.JobPosts
+                                .Where(j => j.Id == con.JopPostId)
+                                .Select(j => new { j.Title, j.Description })
+                                .FirstOrDefault();
+
+                var freelancer = _context.Users
+                                    .Find(con.FreelancerId);
+                var clinet = _context.Users
+                                    .Find(con.ClientId);
+                contract.StartDate = con.StartDate;
+                contract.EndDate = con.EndDate;
+                contract.TremsAndCondetions = con.TremsAndCondetions;
+                contract.Price = con.Price;
+                contract.FreelancerId = con.FreelancerId;
+                contract.JopPostId = con.JopPostId;
+                contract.jopPostDescription = jobPost.Description;
+                contract.FreelancerName  = freelancer.FirstName +" "+freelancer.LastName;
+                contract.ClinetName  = clinet.FirstName +" "+clinet.LastName;
+                contract.IsDeleted = con.IsDeleted;
+            }
             return contract;
         }
         #endregion
