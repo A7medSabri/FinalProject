@@ -40,7 +40,7 @@ namespace FinalProject.DataAccess.Repository
 
 
         #region SaadAllah
-        public void Create(Contract contract)
+        public void Create(NewContractDto contract, string UserId)
         {
             Contract con = new Contract();
             if (contract != null)
@@ -53,9 +53,9 @@ namespace FinalProject.DataAccess.Repository
                 {
                     con.TremsAndCondetions = contract.TremsAndCondetions;
                 }
-                if (contract.ClientId != null)
+                if (UserId != null)
                 {
-                    con.ClientId = contract.ClientId;
+                    con.ClientId = UserId;
                 }
                 con.EndDate = contract.EndDate;
                 con.StartDate = contract.StartDate;
@@ -64,6 +64,7 @@ namespace FinalProject.DataAccess.Repository
                     con.FreelancerId = contract.FreelancerId;
                 con.PaymentMethodId = contract.PaymentMethodId;
                 con.ContractDate = DateTime.Now;
+                con.IsDeleted = false;
                 _context.Contracts.Add(con);
 
             }
@@ -74,34 +75,30 @@ namespace FinalProject.DataAccess.Repository
             return _context.Set<Contract>().Any(predicate);
         }
 
-        public void Update(Contract contract)
+        public Contract Update(NewContractDto contract)
         {
-            Contract con = _context.Contracts.FirstOrDefault(c => c.Id == contract.Id);
+            Contract con = _context.Contracts.Where(c => c.IsDeleted == false).FirstOrDefault(c => c.JopPostId == contract.JopPostId);
             if (con != null)
             {
+                con.StartDate = contract.StartDate;
+                con.EndDate = contract.EndDate;
+                con.JopPostId = contract.JopPostId;
+                if (contract.FreelancerId != null)
+                    con.FreelancerId = contract.FreelancerId;
+               
                 if (contract.Price != null && contract.Price > 0)
                 {
                     con.Price = contract.Price;
                 }
+                con.PaymentMethodId = contract.PaymentMethodId;
                 if (contract.TremsAndCondetions != null)
                 {
                     con.TremsAndCondetions = contract.TremsAndCondetions;
                 }
-                if (contract.ClientId != null)
-                {
-                    con.ClientId = contract.ClientId;
-                }
-                if (contract.FreelancerId != null)
-                    con.FreelancerId = contract.FreelancerId;
-                con.EndDate = contract.EndDate;
-                con.StartDate = contract.StartDate;
-                con.JopPostId = contract.JopPostId;
-                con.PaymentMethodId = contract.PaymentMethodId;
-                con.ContractDate = DateTime.Now;
                 _context.Contracts.Update(con);
-
+                return con;
             }
-
+            return null;
         }
 
         public List<NewContractDto> GetAll(string Id, string Role)
@@ -152,6 +149,12 @@ namespace FinalProject.DataAccess.Repository
                 //return Ok(_unitOfWork.Contract.Find(c => c.ClientId == userId).ToList());
             }
             else { return null; }
+        }
+
+        public Contract FindByJobPostId(int id)
+        {
+           Contract contract = _context.Contracts.FirstOrDefault(c => c.JopPostId == id && c.IsDeleted == false);
+            return contract;
         }
         #endregion
     }

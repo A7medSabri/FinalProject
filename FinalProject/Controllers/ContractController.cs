@@ -18,7 +18,7 @@ namespace FinalProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User")]
+    
     public class ContractController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -35,19 +35,16 @@ namespace FinalProject.Controllers
 
 
         [HttpPost ("Create-New-Contract")]
+        [Authorize(Roles = "User")]
         public IActionResult Post([FromForm] NewContractDto contract)
         {
             var userId = User.FindFirst("uid")?.Value;
-            var result = _unitOfWork.Contract.Find(c => c.JopPostId == contract.JopPostId).ToList();
-            if (result != null)
-                foreach (var i in result)
-                {
-                    if (i != null && i.IsDeleted == false)
-                    {
-                        return BadRequest("This JobPost already has a Contract");
-                    }
-                }
-            _unitOfWork.Contract.CreateNew(contract, userId);
+            var result = _unitOfWork.Contract.FindByJobPostId(contract.JopPostId);
+            if (result != null && result.IsDeleted == false)
+                return BadRequest("This JobPost already has a Contract");
+                    
+                
+            _unitOfWork.Contract.Create(contract, userId);
             if (ModelState.IsValid)
             {
                 _unitOfWork.Save();
@@ -164,56 +161,62 @@ namespace FinalProject.Controllers
                 
         }
 
-        [HttpPost]
-        public IActionResult Post([FromForm] ContractDTO contract)
-        {
-            Contract con = new Contract();
-            var result = _unitOfWork.Contract.Find(c => c.JopPostId == contract.JopPostId).ToList();
-            if (result != null) 
-            foreach (var i in result)
-            {
-                if (i != null && i.IsDeleted == false)
-                {
-                    return BadRequest("This JobPost already has a Contract");
-                }
-            }
+        //[HttpPost]
+        //[Authorize(Roles = "User")]
+        //public IActionResult Post([FromForm] ContractDTO contract)
+        //{
+        //    Contract con = new Contract();
+        //    var result = _unitOfWork.Contract.Find(c => c.JopPostId == contract.JopPostId).ToList();
+        //    if (result != null) 
+        //    foreach (var i in result)
+        //    {
+        //        if (i != null && i.IsDeleted == false)
+        //        {
+        //            return BadRequest("This JobPost already has a Contract");
+        //        }
+        //    }
 
 
-            con.StartDate = contract.StartDate;
-            con.EndDate = contract.EndDate;
-            con.FreelancerId = contract.FreelancerId;
-            con.JopPostId = contract.JopPostId;
-            con.ClientId = User.FindFirst("uid")?.Value;
-            con.Price = contract.Price;
-            con.TremsAndCondetions = contract.TremsAndCondetions;
-            con.PaymentMethodId = contract.PaymentMethodId;
-            if (ModelState.IsValid)
-            {
-                _unitOfWork.Contract.Create(con);
-                _unitOfWork.Save();
-                return Ok(con);
-            }
-            return BadRequest();
-        }
+        //    con.StartDate = contract.StartDate;
+        //    con.EndDate = contract.EndDate;
+        //    con.FreelancerId = contract.FreelancerId;
+        //    con.JopPostId = contract.JopPostId;
+        //    con.ClientId = User.FindFirst("uid")?.Value;
+        //    con.Price = contract.Price;
+        //    con.TremsAndCondetions = contract.TremsAndCondetions;
+        //    con.PaymentMethodId = contract.PaymentMethodId;
+        //    if (ModelState.IsValid)
+        //    {
+        //        _unitOfWork.Contract.Create(con);
+        //        _unitOfWork.Save();
+        //        return Ok(con);
+        //    }
+        //    return BadRequest();
+        //}
 
         [HttpPut("UpdateContract")]
-        public IActionResult Update([FromBody] ContractDTO contract) 
-        { 
-            Contract con = _unitOfWork.Contract.Find(c => c.JopPostId == contract.JopPostId).Where(c => c.IsDeleted == false).FirstOrDefault();
-            con.StartDate = contract.StartDate;
-            con.EndDate = contract.EndDate;
-            con.FreelancerId = contract.FreelancerId;
-            con.JopPostId = contract.JopPostId;
-            con.ClientId = contract.ClientId;
-            con.Price = contract.Price;
-            con.PaymentMethodId = contract.PaymentMethodId;
-            con.TremsAndCondetions = contract.TremsAndCondetions;
+        [Authorize(Roles = "User")]
+        public IActionResult Update([FromForm] NewContractDto contract) 
+        {
+
+            //Contract con = _unitOfWork.Contract.Find(c => c.JopPostId == contract.JopPostId).Where(c => c.IsDeleted == false).FirstOrDefault();
+            //con.StartDate = contract.StartDate;
+            //con.EndDate = contract.EndDate;
+            //con.FreelancerId = contract.FreelancerId;
+            //con.JopPostId = contract.JopPostId;
+            //con.ClientId = contract.ClientId;
+            //con.Price = contract.Price;
+            //con.PaymentMethodId = contract.PaymentMethodId;
+            //con.TremsAndCondetions = contract.TremsAndCondetions;
             if (ModelState.IsValid)
             {
 
-                _unitOfWork.Contract.Update(con);
-                _unitOfWork.Save();
-                return Ok(con);
+                var result = _unitOfWork.Contract.Update(contract);
+                if (result != null)
+                {
+                    _unitOfWork.Save();
+                    return Ok(result);
+                }
             }
             return BadRequest();
         }
@@ -227,7 +230,6 @@ namespace FinalProject.Controllers
                 if (ModelState.IsValid)
                 {
                     conract.IsDeleted = true;
-                    _unitOfWork.Contract.Update(conract);
                     _unitOfWork.Save();
                     return Ok(conract);
                 }

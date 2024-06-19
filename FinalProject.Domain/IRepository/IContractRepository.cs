@@ -1,4 +1,5 @@
-﻿using FinalProject.Domain.DTO.Contract;
+﻿using FinalProject.Domain.DTO;
+using FinalProject.Domain.DTO.Contract;
 using FinalProject.Domain.Models.JobPostAndContract;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,11 @@ namespace FinalProject.Domain.IRepository
 
         Contract CreateNew(NewContractDto newContract ,string UserId);
 
+        Contract FindByJobPostId(int id);
 
 
-
-        void Create (Contract contract);
-        void Update (Contract contract);
+        void Create (NewContractDto newContract, string UserId);
+        Contract Update (NewContractDto contract);
         bool FindContract(Expression<Func<Contract, bool>> predicate);
         List<NewContractDto> GetAll(string Id, string Role);
 
