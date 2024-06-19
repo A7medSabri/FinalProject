@@ -226,7 +226,7 @@ namespace FinalProject.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Freelancer")]
-        public IActionResult submit(string email)
+        public IActionResult submit([FromForm] string email)
         {
             var id = User.FindFirst("uid")?.Value;
             var user = _userManager.Users.FirstOrDefault(u => u.Id == id);
