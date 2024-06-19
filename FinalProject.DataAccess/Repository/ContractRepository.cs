@@ -105,7 +105,7 @@ namespace FinalProject.DataAccess.Repository
         {
             if (Id != null && Role == "Freelancer")
             {
-                var result = _context.Contracts.Where(c => c.FreelancerId == Id).ToList();
+                var result = _context.Contracts.Where(c => c.FreelancerId == Id && c.IsDeleted == false).ToList();
                 NewContractDto NewContractDto = new NewContractDto();
                 List<NewContractDto> contractDtolst = new List<NewContractDto>();
                 if (result != null)
@@ -127,7 +127,7 @@ namespace FinalProject.DataAccess.Repository
             }
             else if (Id != null && Role == "User")
             {
-                var result = _context.Contracts.Where(c => c.ClientId == Id).ToList();
+                var result = _context.Contracts.Where(c => c.ClientId == Id && c.IsDeleted == false).ToList();
                 NewContractDto NewContractDto = new NewContractDto();
                 List<NewContractDto> contractDtolst = new List<NewContractDto>();
                 if (result != null)
