@@ -4,6 +4,7 @@ using FinalProject.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinalProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240621095912_addingChat")]
+    partial class addingChat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,20 +162,20 @@ namespace FinalProject.Migrations
                     b.Property<DateTime>("DateAndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ReceiverrId")
+                    b.Property<string>("FreeLancerId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("SenderId")
+                    b.Property<string>("ClientId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.HasKey("Message", "DateAndTime", "ReceiverrId", "SenderId");
+                    b.HasKey("Message", "DateAndTime", "FreeLancerId", "ClientId");
 
-                    b.HasIndex("ReceiverrId");
+                    b.HasIndex("ClientId");
 
-                    b.HasIndex("SenderId");
+                    b.HasIndex("FreeLancerId");
 
                     b.ToTable("Chats");
                 });
@@ -908,20 +911,20 @@ namespace FinalProject.Migrations
 
             modelBuilder.Entity("FinalProject.Domain.Models.Chat", b =>
                 {
-                    b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Receiver")
+                    b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Client")
+                        .WithMany("Chats")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Freelancer")
                         .WithMany()
-                        .HasForeignKey("ReceiverrId")
+                        .HasForeignKey("FreeLancerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Sender")
-                        .WithMany("Chats")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                    b.Navigation("Client");
 
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
+                    b.Navigation("Freelancer");
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.FavoritesTable.FavJobPost", b =>

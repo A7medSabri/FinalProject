@@ -1,4 +1,5 @@
 ﻿
+using FinalProject.Domain.Models;
 using FinalProject.Domain.Models.ApplicationUserModel;
 using FinalProject.Domain.Models.FavoritesTable;
 using FinalProject.Domain.Models.JobPostAndContract;
@@ -170,6 +171,19 @@ namespace FinalProject.DataAccess.Data
                 .HasForeignKey(fjp => fjp.FreelancerId);
 
             #endregion
+
+            // Chat
+            modelBuilder.Entity<Chat>(e => {
+                e.HasKey(k => new { k.Message, k.DateAndTime, k.ReceiverrId, k.SenderId });
+
+                e.HasOne(c => c.Sender)
+                    .WithMany(u => u.Chats)
+                    .HasForeignKey(c => c.SenderId)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+              
+            });
         }
         //public DbSet<Country> Countries { get; set; }
         public DbSet<Language> Languages { get; set; }
@@ -189,5 +203,6 @@ namespace FinalProject.DataAccess.Data
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<UserPaymentInfo> UserPaymentInfo { get; set; }
         public DbSet<UserSkill> UserSkills { get; set; }
+        public DbSet<Chat> Chats { get; set; }
     }
 }

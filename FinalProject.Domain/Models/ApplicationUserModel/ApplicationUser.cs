@@ -12,6 +12,7 @@ using FinalProject.Domain.Models.ProtfolioModle;
 using FinalProject.Domain.Models.SkillAndCat;
 using FinalProject.Domain.Models.RegisterNeeded;
 using FinalProject.Domain.Models.Payment;
+using AutoMapper.Configuration.Annotations;
 
 
 namespace FinalProject.Domain.Models.ApplicationUserModel
@@ -94,5 +95,8 @@ namespace FinalProject.Domain.Models.ApplicationUserModel
 
         // Transaction
         public List<Transaction>? Transactions { get; set; }
+
+        // Chat
+        public ICollection<Chat>? Chats { get; set; }
     }
 }

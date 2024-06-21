@@ -22,7 +22,9 @@ namespace FinalProject.DataAccess.Repository
 
         public IApplyTasksRepository ApplyTasks { get; }
 
-     //   public IApplyTasksRepository ApplyTasks { get; }
+        public IChatRepository Chat { get; }
+
+        //   public IApplyTasksRepository ApplyTasks { get; }
 
         public UnitOfWork(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -41,6 +43,7 @@ namespace FinalProject.DataAccess.Repository
             Favorites = new FavoritesRepository(_context);
             FavJob = new FavJobPostRepository(_context);
             Rating = new RatingRepository(_context);
+            Chat = new ChatRepository(_context);
         }
 
 
