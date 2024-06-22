@@ -10,6 +10,8 @@ namespace UserMangmentService.Service
     public interface IEmailServices
     {
         void SendEmail(Message messag);
+        void SendContractEmail(Message message);
+        void SendChatEmail(Message message);
 
     }
 }

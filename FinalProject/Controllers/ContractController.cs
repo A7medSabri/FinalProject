@@ -56,7 +56,7 @@ namespace FinalProject.Controllers
                     var confirmationLink = $"http://localhost:3000/ContractDetails/id={contract.JopPostId}";
 
                     var message = new UserMangmentService.Models.Message(new string[] { freelancer.Email! }, "New Contract Created", confirmationLink!);
-                    _emailService.SendEmail(message);
+                    _emailService.SendContractEmail(message);
                 }
 
                 return Ok(contract);

@@ -8,25 +8,30 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
+using UserMangmentService.Service;
 
 namespace FinalProject.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ChatController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHubContext<ChatHub> _chatHubContext;
+        private readonly IEmailServices _emailService;
 
-        public ChatController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IHubContext<ChatHub> chatHubContext)
+
+        public ChatController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IHubContext<ChatHub> chatHubContext ,IEmailServices emailServices)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _chatHubContext = chatHubContext;
+            _emailService = emailServices;
         }
         [HttpGet("GetAllMyMessage")]
-        [Authorize(Roles = "User , Freelancer")]
         public async Task<IActionResult> GetAllMyMessage(string id)
         {
             var userId = User.FindFirst("uid")?.Value;
@@ -50,7 +55,6 @@ namespace FinalProject.Controllers
 
 
         [HttpPost("SendMessage")]
-        [Authorize(Roles = "User , Freelancer")]
         public async Task<IActionResult> SendMessage([FromForm] string id,[FromForm] string message)
         {
             var userId = User.FindFirst("uid")?.Value;
@@ -68,8 +72,17 @@ namespace FinalProject.Controllers
             {
                 if (userId == id)
                     return BadRequest("You Can't Send To YourSelf");
+
                 _unitOfWork.Chat.SendMessage(userId, id, user.UserName, message);
                 _unitOfWork.Save();
+                var UserEmail = _userManager.FindByIdAsync(id).Result;
+                if (UserEmail != null)
+                {
+                    var confirmationLink = $"http://localhost:3000/";
+
+                    var MessageToGmail = new UserMangmentService.Models.Message(new string[] { UserEmail.Email! }, "Check Inbox", confirmationLink!);
+                    _emailService.SendChatEmail(MessageToGmail);
+                }
                 await _chatHubContext.Clients.User(id).SendAsync("ReceiveMessage", userId, message);
             }
             return Ok(_unitOfWork.Chat.GetMessages(id, userId));
