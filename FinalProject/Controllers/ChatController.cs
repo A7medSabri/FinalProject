@@ -64,6 +64,8 @@ namespace FinalProject.Controllers
             }
             if (message != null)
             {
+                if (userId == id)
+                    return BadRequest("You Can't Send To YourSelf");
                 _unitOfWork.Chat.SendMessage(userId, id, user.UserName, message);
                 _unitOfWork.Save();
                 await _chatHubContext.Clients.User(id).SendAsync("ReceiveMessage", userId, message);

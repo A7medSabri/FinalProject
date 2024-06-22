@@ -20,6 +20,7 @@ namespace FinalProject.Domain.Models
         [ForeignKey("Sender")]
         public string SenderId { get; set; }
         public ApplicationUser Sender { get; set; }
+
         // Client
         [ForeignKey("Receiver")]
         public string ReceiverrId { get; set; }
