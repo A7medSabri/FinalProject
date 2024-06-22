@@ -31,7 +31,6 @@ namespace FinalProject.Controllers
             _chatHubContext = chatHubContext;
             _emailService = emailServices;
         }
-
         [HttpGet("GetAllMyMessage")]
         public async Task<IActionResult> GetAllMyMessage(string id)
         {
@@ -40,22 +39,20 @@ namespace FinalProject.Controllers
             {
                 return Unauthorized();
             }
-
-            var user = await _userManager.FindByIdAsync(userId);
-            var recipient = await _userManager.FindByIdAsync(id);
-            if (user == null || recipient == null)
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
+            var id2 = _userManager.Users.FirstOrDefault(u => u.Id == id);
+            if (user == null || id2 == null)
             {
-                return NotFound("User not found.");
+                return NotFound("User not founded.");
             }
-
             var messages = _unitOfWork.Chat.GetMessages(id, userId);
-            if (messages == null || !messages.Any())
+            if (messages.IsNullOrEmpty())
             {
-                return NotFound("There are no messages.");
+                return NotFound("There are no messages");
             }
-
             return Ok(messages);
         }
+
 
         [HttpPost("SendMessage")]
         public async Task<IActionResult> SendMessage([FromForm] string id, [FromForm] string message)
@@ -65,26 +62,23 @@ namespace FinalProject.Controllers
             {
                 return Unauthorized();
             }
-
-            var user = await _userManager.FindByIdAsync(userId);
-            var recipient = await _userManager.FindByIdAsync(id);
-            if (user == null || recipient == null)
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
+            var id2 = _userManager.Users.FirstOrDefault(u => u.Id == id);
+            if (user == null || id2 == null)
             {
-                return NotFound("User not found.");
+                return NotFound("User not founded.");
             }
-
-            if (message == null)
+            if (message != null)
             {
-                return BadRequest("Message cannot be null.");
-            }
+                if (userId == id)
+                    return BadRequest("You Can't Send To YourSelf");
 
-            if (userId == id)
-            {
-                return BadRequest("You can't send to yourself.");
-            }
-
-            _unitOfWork.Chat.SendMessage(userId, id, user.UserName, message);
-            _unitOfWork.Save();
+                _unitOfWork.Chat.SendMessage(userId, id, user.UserName, message);
+                _unitOfWork.Save();
+                var UserEmail = _userManager.FindByIdAsync(id).Result;
+                if (UserEmail != null)
+                {
+                    var confirmationLink = $"http://localhost:3000/";
 
                     var MessageToGmail = new UserMangmentService.Models.Message(new string[] { UserEmail.Email! }, "Check Inbox", confirmationLink!);
                     _emailService.SendChatEmail(MessageToGmail);
@@ -96,11 +90,9 @@ namespace FinalProject.Controllers
             }
             return Ok(_unitOfWork.Chat.GetMessages(id, userId));
 
-        //} 
-        #endregion
+        }
 
 
-        #region Comment
 
 
         //[HttpGet("GetAllMyMessage")]
@@ -181,6 +173,5 @@ namespace FinalProject.Controllers
 
 
 
-        #endregion
     }
 }
