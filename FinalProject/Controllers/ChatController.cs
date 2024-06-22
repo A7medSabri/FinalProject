@@ -35,7 +35,8 @@ namespace FinalProject.Controllers
                 return Unauthorized();
             }
             var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
-            if (user == null)
+            var id2 = _userManager.Users.FirstOrDefault(u => u.Id == id);
+            if (user == null || id2 == null)
             {
                 return NotFound("User not founded.");
             }
@@ -58,7 +59,8 @@ namespace FinalProject.Controllers
                 return Unauthorized();
             }
             var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
-            if (user == null)
+            var id2 = _userManager.Users.FirstOrDefault(u => u.Id == id);
+            if (user == null || id2 == null)
             {
                 return NotFound("User not founded.");
             }
