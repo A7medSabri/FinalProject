@@ -23,7 +23,7 @@ namespace FinalProject.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IUnitOfWork _unitOfWork;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment , IUnitOfWork unitOfWork)
+        public AccountController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
@@ -81,7 +81,7 @@ namespace FinalProject.Controllers
                     .ThenInclude(u => u.Language)
                 .SingleOrDefaultAsync(u => u.UserName == userId);
 
-            var result = _unitOfWork.Rating?.FreeRate(userId2) ?? 0 ;
+            var result = _unitOfWork.Rating?.FreeRate(userId2) ?? 0;
 
             if (user == null)
             {
@@ -153,8 +153,8 @@ namespace FinalProject.Controllers
         }
         //ProfilePhoto
         [HttpPost("ChangeProfilePicture-FreeLancer")]
-        [Authorize(Roles ="Freelancer")]
-        public async Task<IActionResult> ChangeProfilePicture([FromForm] ChangeProfilePictureModel model ,IFormFile file)
+        [Authorize(Roles = "Freelancer")]
+        public async Task<IActionResult> ChangeProfilePicture([FromForm] ChangeProfilePictureModel model, IFormFile file)
         {
             if (!ModelState.IsValid)
             {
@@ -177,12 +177,12 @@ namespace FinalProject.Controllers
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Generate a unique file name
                 string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage"); // Combine the path to the desired directory
 
-                    using (var fileStream = new FileStream(Path.Combine(filePath, fileName), FileMode.Create))
-                    {
-                        await file.CopyToAsync(fileStream);
-                    }
+                using (var fileStream = new FileStream(Path.Combine(filePath, fileName), FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
 
-                    model.NewProfilePictureUrl = fileName;
+                model.NewProfilePictureUrl = fileName;
             }
 
             user.ProfilePicture = model.NewProfilePictureUrl;
@@ -282,24 +282,146 @@ namespace FinalProject.Controllers
                 return BadRequest("failed to change your country");
             }
         }
+        [HttpPost("Change-Skills-Only")]
+        [Authorize(Roles = "Freelancer, Admin")]
+        public async Task<IActionResult> ChangeSkillsOnly([FromForm] ChangeSkillOnly model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid model");
+            }
+
+            var userIdClaim = User.FindFirst("uid");
+
+            if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+            {
+                return BadRequest("User ID not found in claims");
+            }
+
+            var user = await _userManager.Users
+                .Include(u => u.UserSkills)
+                .FirstOrDefaultAsync(u => u.Id == userIdClaim.Value);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // الحصول على قائمة المهارات الحالية
+            var existingSkills = user.UserSkills.Select(us => us.SkillId).ToList();
+
+            // التحقق من المهارات الجديدة
+            var newSkills = model.SelectedSkills.Where(skillId => !existingSkills.Contains(skillId)).ToList();
+
+            if (newSkills.Count == 0)
+            {
+                return BadRequest("Cannot add duplicate skills");
+            }
+
+            // التحقق من أن جميع المهارات الجديدة موجودة في قاعدة البيانات
+            var allSkillsInDb =  _unitOfWork.Skill.GetAll();
+
+            var invalidSkills = newSkills.Where(skillId => !allSkillsInDb.Any(s => s.Id == skillId)).ToList();
+
+            if (invalidSkills.Any())
+            {
+                return BadRequest($"The following skills are not valid: {string.Join(", ", invalidSkills)}");
+            }
+
+            // إضافة المهارات الجديدة
+            user.UserSkills.AddRange(newSkills.Select(skillId => new UserSkill { SkillId = skillId }));
+
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (updateResult.Succeeded)
+            {
+                return Ok("Your skills changed successfully");
+            }
+            else
+            {
+                return BadRequest("Failed to change your skills");
+            }
+        }
+
+        [HttpPost("Change-Languages-Only")]
+        [Authorize(Roles = "Freelancer, Admin")]
+        public async Task<IActionResult> ChangeLanguagesOnly([FromForm] ChangeLanguageOnly model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid model");
+            }
+
+            var userIdClaim = User.FindFirst("uid");
+
+            if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+            {
+                return BadRequest("User ID not found in claims");
+            }
+
+            var user = await _userManager.Users
+                .Include(u => u.UserLanguages)
+                .FirstOrDefaultAsync(u => u.Id == userIdClaim.Value);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // الحصول على قائمة اللغات الحالية
+            var existingLanguages = user.UserLanguages.Select(ul => ul.LanguageValue).ToList();
+
+            // التحقق من اللغات الجديدة
+            var newLanguages = model.SelectedLanguages.Where(language => !existingLanguages.Contains(language)).ToList();
+
+            if (newLanguages.Count == 0)
+            {
+                return BadRequest("Cannot add duplicate languages");
+            }
+
+            // التحقق من أن جميع اللغات الجديدة موجودة في قاعدة البيانات
+            var allLanguagesInDb =  _unitOfWork.language.GetAll();
+
+            var invalidLanguages = newLanguages.Where(language => !allLanguagesInDb.Any(l => l.Value == language)).ToList();
+
+            if (invalidLanguages.Any())
+            {
+                return BadRequest($"The following languages are not valid: {string.Join(", ", invalidLanguages)}");
+            }
+
+            // إضافة اللغات الجديدة
+            user.UserLanguages.AddRange(newLanguages.Select(language => new ApplicationUserLanguage { LanguageValue = language }));
+
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (updateResult.Succeeded)
+            {
+                return Ok("Your languages changed successfully");
+            }
+            else
+            {
+                return BadRequest("Failed to change your languages");
+            }
+        }
+
         //Shills
         [HttpPost("ChangeSkilles-Freelancer")]
         [Authorize(Roles = "Freelancer , Admin")]
         public async Task<IActionResult> ChangeSkilles([FromForm] ChangeSkillesModel model)
         {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest("Invalid model");
-                }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid model");
+            }
 
-                var userIdClaim = User.FindFirst("uid");
+            var userIdClaim = User.FindFirst("uid");
 
-                if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
-                {
-                    return BadRequest("User ID not found in claims");
-                }
+            if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+            {
+                return BadRequest("User ID not found in claims");
+            }
 
-                var user = await _userManager.FindByIdAsync(userIdClaim.Value);
+            var user = await _userManager.FindByIdAsync(userIdClaim.Value);
 
             user.UserSkills = model.SelectedSkills
                 .Select(skillId => new UserSkill { SkillId = skillId })
@@ -310,17 +432,16 @@ namespace FinalProject.Controllers
 
             var updateResult = await _userManager.UpdateAsync(user);
 
-                if (updateResult.Succeeded)
-                {
-                    return Ok("Your skills changed successfully");
-                }
-                else
-                {
-                    return BadRequest("Failed to change your skills");
-                }
+            if (updateResult.Succeeded)
+            {
+                return Ok("Your skills changed successfully");
+            }
+            else
+            {
+                return BadRequest("Failed to change your skills");
+            }
         }
 
-        
         //AboutYou  Experience  Education  PortfolioURl  Description  YourTitle  HourlyRate
         //[HttpPost("ChangeAboutYou")]
         //[Authorize(Roles = "Freelancer , Admin")]
@@ -433,8 +554,8 @@ namespace FinalProject.Controllers
         //}
 
         //country
-        
-        
+
+
 
     }
 }
