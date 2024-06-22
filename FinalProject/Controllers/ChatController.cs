@@ -83,7 +83,10 @@ namespace FinalProject.Controllers
                     var MessageToGmail = new UserMangmentService.Models.Message(new string[] { UserEmail.Email! }, "Check Inbox", confirmationLink!);
                     _emailService.SendChatEmail(MessageToGmail);
                 }
-                await _chatHubContext.Clients.User(id).SendAsync("ReceiveMessage", userId, message);
+                var chatHub = (IHubContext<ChatHub>)HttpContext.RequestServices.GetService(typeof(IHubContext<ChatHub>));
+                await chatHub.Clients.All.SendAsync("ReceiveMessage", userId, message);
+
+                //  await _chatHubContext.Clients.User(id).SendAsync("ReceiveMessage", userId, message);
             }
             return Ok(_unitOfWork.Chat.GetMessages(id, userId));
 
