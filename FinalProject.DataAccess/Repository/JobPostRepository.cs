@@ -1,4 +1,5 @@
 ﻿using FinalProject.DataAccess.Data;
+using FinalProject.Domain.DTO.HomeModel;
 using FinalProject.Domain.DTO.JobPost;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.ApplicationUserModel;
@@ -28,7 +29,26 @@ namespace FinalProject.DataAccess.Repository
 
         }
 
+        public List<JopPostHomePage> GetAllForHome()
+        {
+            var jobPosts = _context.JobPosts
+                .Where(u => u.IsDeleted == false)
+                .Include(u => u.Category)
+                .ToList();
+            if (jobPosts == null) 
+                return null;
+            var jobPostDtos = jobPosts.Select(jobPost => new JopPostHomePage
+            {
+                id = jobPost.Id,
+                Title = jobPost.Title,
+                Description = jobPost.Description,
+                Category = jobPost.Category.Name,
+                Price = jobPost.Price
 
+            }).ToList();
+
+            return jobPostDtos;
+        }
         // related to frelacner only
         public List<GetFreelancerJobPostDto> GetAllJobPosts(string freelancerId)
         {

@@ -1,4 +1,5 @@
-﻿using FinalProject.Domain.DTO.JobPost;
+﻿using FinalProject.Domain.DTO.HomeModel;
+using FinalProject.Domain.DTO.JobPost;
 using FinalProject.Domain.Models.JobPostAndContract;
 using FinalProject.DTO;
 using System;
@@ -12,6 +13,7 @@ namespace FinalProject.Domain.IRepository
 {
     public interface IJobPostRepository : IRepository<JobPost>
     {
+        List<JopPostHomePage> GetAllForHome();
         // Freelancer
         public List<GetFreelancerJobPostDto> GetAllJobPosts(string freelancerId);
         public List<GetFreelancerJobPostDto> GetFreelancerJobsByName(string freelancerId, string name);

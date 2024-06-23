@@ -1,5 +1,6 @@
 ﻿using FinalProject.Domain.DTO.AccountModel;
 using FinalProject.Domain.DTO.HomeModel;
+using FinalProject.Domain.DTO.JobPost;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.ApplicationUserModel;
 using Microsoft.AspNetCore.Authorization;
@@ -21,7 +22,7 @@ namespace FinalProject.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IUnitOfWork _unitOfWork;
 
-        public HomeController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment , IUnitOfWork unitOfWork)
+        public HomeController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             this._webHostEnvironment = webHostEnvironment;
@@ -55,7 +56,7 @@ namespace FinalProject.Controllers
                     var filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
 
                     var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
-                    var IsFreelancerFav = _unitOfWork.Favorites.IsFavOrNot( userId, user.Id);
+                    var IsFreelancerFav = _unitOfWork.Favorites.IsFavOrNot(userId, user.Id);
 
                     if (user.Age != null && user.YourTitle != null && user.Description != null && !isAdmin)
                     {
@@ -67,7 +68,7 @@ namespace FinalProject.Controllers
                             Description = user.Description ?? string.Empty,
                             ProfilePicture = filePath,
                             HourlyRate = user.HourlyRate ?? 0,
-                            IsFav = IsFreelancerFav ,
+                            IsFav = IsFreelancerFav,
                             Rate = _unitOfWork.Rating?.FreeRate(user.Id) ?? 0,
 
                         };
@@ -223,6 +224,87 @@ namespace FinalProject.Controllers
             }
         }
 
+        //Done
+        [AllowAnonymous]
+        [HttpGet("Get-All-Freelancers-For-Home-Page")]
+        public async Task<IActionResult> GetAllFreelancerForHomePage()
+        {
+            try
+            {
+                var freeLancersList = new List<GetAllFreelancer>();
+                var users = await _userManager.Users.ToListAsync();
+                //var userId = User.FindFirst("uid")?.Value;
+                if (users == null || !users.Any())
+                {
+                    return NotFound("No Freelancer found.");
+                }
+
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+
+                foreach (var user in users)
+                {
+                    if (!await _userManager.IsInRoleAsync(user, "Freelancer"))
+                    {
+                        continue;
+                    }
+
+                    var profilePictureFileName = user.ProfilePicture ?? "default.jpg";
+                    var filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
+
+                    var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+                    //var IsFreelancerFav = _unitOfWork.Favorites.IsFavOrNot(userId, user.Id);
+
+                    if (user.Age != null && user.YourTitle != null && user.Description != null && !isAdmin)
+                    {
+                        var freelancer = new GetAllFreelancer
+                        {
+                            id = user.Id,
+                            FullName = $"{user.FirstName} {user.LastName}",
+                            YourTitle = user.YourTitle ?? string.Empty,
+                            Description = user.Description ?? string.Empty,
+                            ProfilePicture = filePath,
+                            HourlyRate = user.HourlyRate ?? 0,
+                            //IsFav = IsFreelancerFav,
+                            Rate = _unitOfWork.Rating?.FreeRate(user.Id) ?? 0,
+
+                        };
+
+                        freeLancersList.Add(freelancer);
+                    }
+                }
+
+                if (freeLancersList.Any())
+                {
+                    return Ok(freeLancersList);
+                }
+                else
+                {
+                    return NotFound("No Freelancer found.");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                // _logger.LogError(ex, "An error occurred while retrieving freelancers.");
+
+                return StatusCode(500, $"An unexpected error occurred. Please try again later {ex.Message}.");
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("Get-All-JopPost-For-Home-Page")]
+        public IActionResult GettAllJopPost()
+        {
+            
+            if (_unitOfWork.JobPost.GetAllForHome == null)
+            {
+                return Ok(new List<JopPostHomePage>());
+            }
+
+            var jobPosts = _unitOfWork.JobPost.GetAllForHome().ToList();
+            return Ok(jobPosts);
+
+        }
         #region Fun
         //[HttpGet("Get-All-Freelancer-With-The-SameName")]
         //public async Task<IActionResult> GetAllFreelancerWithTheSameName(string name)
