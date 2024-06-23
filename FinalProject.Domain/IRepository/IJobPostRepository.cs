@@ -14,6 +14,7 @@ namespace FinalProject.Domain.IRepository
     public interface IJobPostRepository : IRepository<JobPost>
     {
         List<JopPostHomePage> GetAllForHome();
+        List<GetFreelancerJobPostDto> GetAllJobPosts();
         // Freelancer
         public List<GetFreelancerJobPostDto> GetAllJobPosts(string freelancerId);
         public List<GetFreelancerJobPostDto> GetFreelancerJobsByName(string freelancerId, string name);

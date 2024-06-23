@@ -24,6 +24,20 @@ namespace FinalProject.Controllers
 
             _unitOfWork = unitOfWork;
         }
+        [Authorize(Roles = "Freelancer , Admin")]
+        [HttpGet("Get-All-Project-Posts")]
+        public IActionResult GetAlljobPosts()
+        {
+
+            if (_unitOfWork.JobPost.GetAllJobPosts() == null)
+            {
+                return Ok(new List<GetFreelancerJobPostDto>());
+            }
+
+            var jobPosts = _unitOfWork.JobPost.GetAllJobPosts().ToList();
+            return Ok(jobPosts);
+        }
+
 
         [Authorize(Roles = "Freelancer")]
         [HttpGet("Get-Over-All-Project-Posts")]

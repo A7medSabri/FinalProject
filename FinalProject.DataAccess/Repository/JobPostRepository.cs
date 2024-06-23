@@ -28,6 +28,38 @@ namespace FinalProject.DataAccess.Repository
             _context = context;
 
         }
+        public List<GetFreelancerJobPostDto> GetAllJobPosts()
+        {
+            var jobPosts = _context.JobPosts
+                .Where(u => u.IsDeleted == false)
+                .Include(u => u.ApplicationUser)
+                .Include(jp => jp.JobPostSkill)
+                    .ThenInclude(u => u.Skill)
+                .Include(u => u.Category)
+                .ToList();
+
+
+            if (jobPosts == null) return null;
+
+            var jobPostDtos = jobPosts.Select(jobPost => new GetFreelancerJobPostDto
+            {
+
+                Id = jobPost.Id,
+                Title = jobPost.Title,
+                Description = jobPost.Description,
+                Price = jobPost.Price,
+                DurationTime = jobPost.DurationTime,
+                CategoryName = jobPost.Category.Name,
+                Status = jobPost.Status,
+                IsDeleted = jobPost.IsDeleted,
+                UserId = jobPost.UserId,
+                UserFullName = jobPost.ApplicationUser.FirstName + " " + jobPost.ApplicationUser.LastName
+
+            }).ToList();
+
+            return jobPostDtos;
+        }
+
 
         public List<JopPostHomePage> GetAllForHome()
         {
@@ -35,7 +67,7 @@ namespace FinalProject.DataAccess.Repository
                 .Where(u => u.IsDeleted == false)
                 .Include(u => u.Category)
                 .ToList();
-            if (jobPosts == null) 
+            if (jobPosts == null)
                 return null;
             var jobPostDtos = jobPosts.Select(jobPost => new JopPostHomePage
             {
@@ -49,6 +81,7 @@ namespace FinalProject.DataAccess.Repository
 
             return jobPostDtos;
         }
+
         // related to frelacner only
         public List<GetFreelancerJobPostDto> GetAllJobPosts(string freelancerId)
         {
@@ -92,8 +125,6 @@ namespace FinalProject.DataAccess.Repository
 
             return jobPostDtos;
         }
-
-
 
         // related to frelacner only
 
@@ -151,7 +182,6 @@ namespace FinalProject.DataAccess.Repository
             return AllJopPostDto;
 
         }
-
 
         // for client
 
