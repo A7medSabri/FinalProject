@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -319,7 +320,7 @@ namespace FinalProject.Controllers
             }
 
             // التحقق من أن جميع المهارات الجديدة موجودة في قاعدة البيانات
-            var allSkillsInDb =  _unitOfWork.Skill.GetAll();
+            var allSkillsInDb = _unitOfWork.Skill.GetAll();
 
             var invalidSkills = newSkills.Where(skillId => !allSkillsInDb.Any(s => s.Id == skillId)).ToList();
 
@@ -380,7 +381,7 @@ namespace FinalProject.Controllers
             }
 
             // التحقق من أن جميع اللغات الجديدة موجودة في قاعدة البيانات
-            var allLanguagesInDb =  _unitOfWork.language.GetAll();
+            var allLanguagesInDb = _unitOfWork.language.GetAll();
 
             var invalidLanguages = newLanguages.Where(language => !allLanguagesInDb.Any(l => l.Value == language)).ToList();
 
@@ -440,6 +441,68 @@ namespace FinalProject.Controllers
             {
                 return BadRequest("Failed to change your skills");
             }
+        }
+
+        [HttpGet("Get-User-Skills")]
+        [Authorize(Roles = "Freelancer, Admin")]
+        public async Task<IActionResult> GetUserSkills()
+        {
+            string userId = User.FindFirst("uid")?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID not found in claims");
+            }
+
+            var user = await _userManager.Users
+                .Include(u => u.UserSkills)
+                .ThenInclude(us => us.Skill)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var userSkills = user.UserSkills.Select(us => new { us.Skill.Id, us.Skill.Name }).ToList();
+
+            if (userSkills.Any())
+            {
+                return Ok(userSkills);
+            }
+
+            return NotFound("No skills found for this user");
+        }
+
+        [HttpGet("Get-User-Languages")]
+        [Authorize]
+        public async Task<IActionResult> GetUserLanguages()
+        {
+            string userId = User.FindFirst("uid")?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID not found in claims");
+            }
+
+            var user = await _userManager.Users
+                .Include(u => u.UserLanguages)
+                .ThenInclude(ul => ul.Language)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var userLanguages = user.UserLanguages.Select(ul => new { ul.Language.Id, ul.Language.Value }).ToList();
+
+            if (userLanguages.Any())
+            {
+                return Ok(userLanguages);
+            }
+
+            return NotFound("No languages found for this user");
         }
 
         //AboutYou  Experience  Education  PortfolioURl  Description  YourTitle  HourlyRate
