@@ -37,13 +37,13 @@ namespace FinalProject.DataAccess.Repository
             return messagesDictionary;
         }
 
-        public void SendMessage(string senderId, string receiverId, string userName, string Message)
+        public void SendMessage(string senderId, string receiverId, string Message)
         {
             _context.Chats.Add(new Chat 
             {
                 SenderId = senderId,
                 ReceiverrId = receiverId,
-                Message = userName + ": " + Message,
+                Message = senderId + ": " + Message,
                 DateAndTime = DateTime.Now
             });
         }

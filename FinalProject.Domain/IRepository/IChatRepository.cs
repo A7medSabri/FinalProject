@@ -11,6 +11,6 @@ namespace FinalProject.Domain.IRepository
     public interface IChatRepository : IRepository<Chat>
     {
         Dictionary<DateTime, string> GetMessages(string senderId, string receiverId);
-        void SendMessage(string senderId, string receiverId, string userName, string Message);
+        void SendMessage(string senderId, string receiverId, string Message);
     }
 }

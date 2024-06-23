@@ -73,7 +73,7 @@ namespace FinalProject.Controllers
                 if (userId == id)
                     return BadRequest("You Can't Send To YourSelf");
 
-                _unitOfWork.Chat.SendMessage(userId, id, user.UserName, message);
+                _unitOfWork.Chat.SendMessage(userId, id, message);
                 _unitOfWork.Save();
                 var UserEmail = _userManager.FindByIdAsync(id).Result;
                 if (UserEmail != null)
