@@ -55,5 +55,5 @@ namespace FinalProject.DataAccess.Repository
             cat.IsDeleted = false;
             return cat;
         }
-    }
+}
 }

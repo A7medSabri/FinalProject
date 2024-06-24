@@ -295,7 +295,7 @@ namespace FinalProject.Controllers
         [HttpGet("Get-All-JopPost-For-Home-Page")]
         public IActionResult GettAllJopPost()
         {
-            
+
             if (_unitOfWork.JobPost.GetAllForHome == null)
             {
                 return Ok(new List<JopPostHomePage>());
@@ -305,6 +305,40 @@ namespace FinalProject.Controllers
             return Ok(jobPosts);
 
         }
+
+        [HttpGet("Category-Search")]
+        [AllowAnonymous]
+        public IActionResult SearchInCategory(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return BadRequest("Category name cannot be empty");
+            }
+
+            try
+            {
+                var CategoryList = _unitOfWork.Category.GetAll()
+                    .Where(p => p.IsDeleted == false && p.Name.ToLower().Contains(name.ToLower()))
+                    .Select(s => new
+                    {
+                        s.Id,
+                        s.Name
+                    })
+                    .ToList();
+
+                if (CategoryList == null || !CategoryList.Any())
+                {
+                    return NotFound("No categories found matching the criteria");
+                }
+
+                return Ok(CategoryList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         #region Fun
         //[HttpGet("Get-All-Freelancer-With-The-SameName")]
         //public async Task<IActionResult> GetAllFreelancerWithTheSameName(string name)
