@@ -183,7 +183,8 @@ namespace FinalProject.Controllers
                     return BadRequest(result.Message);
                 }
                 var roles = await _userManager.GetRolesAsync(user);
-                string role = roles.FirstOrDefault() ?? "No role assigned";
+
+                string role = roles[0] ?? "No role assigned";
 
                 var response = new
                 {
