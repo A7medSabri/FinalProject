@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -88,7 +89,10 @@ namespace FinalProject.Controllers
             {
                 return NotFound("User not found");
             }
+            Assembly assembly = Assembly.GetExecutingAssembly();
             string wwwRootPath = _webHostEnvironment.WebRootPath;
+            string finalPath = assembly.GetName().Name;
+            int index = wwwRootPath.IndexOf(finalPath);
             var freelancerProfileDto = new FreelancerProfileDto
             {
                 FirstName = user.FirstName,
@@ -110,7 +114,7 @@ namespace FinalProject.Controllers
                 State = user.State,
                 country = user.Country,
                 PortfolioURl = user.PortfolioURl,
-                ProfilePicture = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(wwwRootPath, "FreeLancerProfileImage", user.ProfilePicture)
+                ProfilePicture = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture)
             };
 
             return Ok(freelancerProfileDto);
@@ -174,9 +178,12 @@ namespace FinalProject.Controllers
             // Update the profile picture URL
             if (file != null)
             {
-                string wwwRootPath = _webHostEnvironment.WebRootPath; // Root path for web content
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                string finalPath = assembly.GetName().Name;
+                int index = wwwRootPath.IndexOf(finalPath); // Root path for web content
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Generate a unique file name
-                string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage"); // Combine the path to the desired directory
+                string filePath = Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage"); // Combine the path to the desired directory
 
                 using (var fileStream = new FileStream(Path.Combine(filePath, fileName), FileMode.Create))
                 {
