@@ -63,7 +63,7 @@ namespace FinalProject.Controllers
                 Assembly assembly = Assembly.GetExecutingAssembly();
                 string finalPath = assembly.GetName().Name;
                 int index = wwwRootPath.IndexOf(finalPath);
-                var filePath = string.IsNullOrEmpty(freelancer.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture);
+                var filePath = string.IsNullOrEmpty(freelancer.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", freelancer.ProfilePicture);
 
                 var result = _unitOfWork.Rating.FreeRate(FreeRateId);
 
