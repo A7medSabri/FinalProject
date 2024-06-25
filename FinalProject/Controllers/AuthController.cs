@@ -1,4 +1,8 @@
-﻿using FinalProject.Domain.Models.ApplicationUserModel;
+﻿using FinalProject.Domain.AccountModel;
+using FinalProject.Domain.DTO.AccountModel;
+using FinalProject.Domain.Models.ApplicationUserModel;
+using FinalProject.Domain.Models.RegisterNeeded;
+using FinalProject.Domain.Models.SkillAndCat;
 using FinalProject.Identity.DtoUserAndFreelancerRegister;
 using FinalProject.Identity.Login;
 using FinalProject.Identity.Password;
@@ -38,13 +42,13 @@ namespace FinalProject.Controllers
 
         [HttpPost("Register-Freelance")]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterFreelancerAsync([FromForm] RegisterFreelanceModel model, IFormFile file )
+        public async Task<IActionResult> RegisterFreelancerAsync([FromForm] RegisterFreelanceModel model, IFormFile file)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var result = await _authService.RegisterFreelancerAsync(model,file , "Freelancer" );
+            var result = await _authService.RegisterFreelancerAsync(model, file, "Freelancer");
 
             if (!result.IsAuthenticated)
             {
@@ -332,4 +336,5 @@ namespace FinalProject.Controllers
 
 
     }
-}
+
+   }

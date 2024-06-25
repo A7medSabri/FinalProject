@@ -440,7 +440,7 @@ namespace FinalProject.Controllers
             var existingLanguages = user.UserLanguages.Select(ul => ul.LanguageValue).ToList();
 
             // التحقق من اللغات الجديدة
-            var newLanguages = model.SelectedLanguages.Where(language => !existingLanguages.Contains(language)).ToList();
+            var newLanguages = model.SelectedLanguages.Where(languageValue => !existingLanguages.Contains(languageValue)).ToList();
 
             if (newLanguages.Count == 0)
             {
@@ -448,9 +448,9 @@ namespace FinalProject.Controllers
             }
 
             // التحقق من أن جميع اللغات الجديدة موجودة في قاعدة البيانات
-            var allLanguagesInDb = _unitOfWork.language.GetAll();
+            var allLanguagesInDb =  _unitOfWork.language.GetAll();
 
-            var invalidLanguages = newLanguages.Where(language => !allLanguagesInDb.Any(l => l.Value == language)).ToList();
+            var invalidLanguages = newLanguages.Where(languageValue => !allLanguagesInDb.Any(l => l.Id == languageValue)).ToList();
 
             if (invalidLanguages.Any())
             {
@@ -458,7 +458,7 @@ namespace FinalProject.Controllers
             }
 
             // إضافة اللغات الجديدة
-            user.UserLanguages.AddRange(newLanguages.Select(language => new ApplicationUserLanguage { LanguageValue = language }));
+            user.UserLanguages.AddRange(newLanguages.Select(languageValue => new ApplicationUserLanguage { LanguageValue = languageValue, ApplicationUserId = user.Id }));
 
             var updateResult = await _userManager.UpdateAsync(user);
 
