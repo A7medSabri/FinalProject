@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 using System.Security.Cryptography;
 
 namespace FinalProject.Controllers
@@ -57,9 +58,13 @@ namespace FinalProject.Controllers
             {
                 var FreeRateId = favorite.FreelancerId;
                 var freelancer = favorite.Freelancer;
+
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
-                var profilePictureFileName = freelancer.ProfilePicture ?? "default.jpg";
-                var filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                string finalPath = assembly.GetName().Name;
+                int index = wwwRootPath.IndexOf(finalPath);
+                var filePath = string.IsNullOrEmpty(freelancer.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture);
+
                 var result = _unitOfWork.Rating.FreeRate(FreeRateId);
 
                 var favoriteDto = new GetAllFavFree
