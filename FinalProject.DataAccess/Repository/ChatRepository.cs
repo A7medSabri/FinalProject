@@ -37,6 +37,8 @@ namespace FinalProject.DataAccess.Repository
             return messagesDictionary;
         }
 
+       
+
         public void SendMessage(string senderId, string receiverId, string Message)
         {
             _context.Chats.Add(new Chat 
@@ -47,7 +49,20 @@ namespace FinalProject.DataAccess.Repository
                 DateAndTime = DateTime.Now
             });
         }
-
+        public Dictionary<DateTime, string> GetNewMessages(string senderId, string receiverId , DateTime date)
+        {
+            var lastMessages = _context.Chats
+                .Where(c => c.IsDeleted == false && (c.SenderId == senderId || c.ReceiverrId == senderId) && (c.ReceiverrId == receiverId || c.SenderId == receiverId) && c.DateAndTime > date)
+                .OrderBy(c => c.DateAndTime)
+                .Select(c => new { DateAndTime = c.DateAndTime, Message = c.Message })
+                .ToList();
+            Dictionary<DateTime, string> newMessages = new Dictionary<DateTime, string>();
+            foreach (var message in lastMessages)
+            {
+                newMessages.Add(message.DateAndTime, message.Message);
+            }
+            return newMessages;
+        }
         //public void SendMessage(string freelancerId, string clientId, string role, string Message)
         //{
         //    if (role == "Freelancer")

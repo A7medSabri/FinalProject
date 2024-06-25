@@ -1,4 +1,5 @@
-﻿using FinalProject.Domain.Models;
+﻿using AutoMapper.Configuration.Annotations;
+using FinalProject.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace FinalProject.Domain.IRepository
     {
         Dictionary<DateTime, string> GetMessages(string senderId, string receiverId);
         void SendMessage(string senderId, string receiverId, string Message);
+        Dictionary<DateTime, string> GetNewMessages(string senderId, string receiverId, DateTime date);
     }
 }

@@ -92,7 +92,25 @@ namespace FinalProject.Controllers
 
         }
 
-
+        [HttpGet("GetNewMessages")]
+        public async Task<IActionResult> GetNewMessages(string id, DateTime date)
+        {
+            var userId = User.FindFirst("uid")?.Value;
+            if (userId == null)
+                return Unauthorized();
+            var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
+            var user2 = _userManager.Users.FirstOrDefault(u => u.Id == id);
+            if (user == null || user2 == null)
+            {
+                return NotFound();
+            }
+            var newMessages = _unitOfWork.Chat.GetNewMessages(id, userId, date);
+            if (newMessages == null) 
+            { 
+                return NotFound("There is no new messages");
+            }
+            return Ok(newMessages);
+        }
 
 
         //[HttpGet("GetAllMyMessage")]
