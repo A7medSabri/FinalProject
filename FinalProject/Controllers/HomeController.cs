@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
@@ -52,8 +53,10 @@ namespace FinalProject.Controllers
                         continue;
                     }
 
-                    var profilePictureFileName = user.ProfilePicture ?? "default.jpg";
-                    var filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
+                    Assembly assembly = Assembly.GetExecutingAssembly();
+                    string finalPath = assembly.GetName().Name;
+                    int index = wwwRootPath.IndexOf(finalPath);
+                    var filePath = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture);
 
                     var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
                     var IsFreelancerFav = _unitOfWork.Favorites.IsFavOrNot(userId, user.Id);
@@ -96,6 +99,7 @@ namespace FinalProject.Controllers
         }
 
         //Done
+        [AllowAnonymous]
         [HttpGet("Get-Freelancer-By-ID")]
         public async Task<IActionResult> GetAllFreelancerByID(string Fid)
         {
@@ -118,8 +122,13 @@ namespace FinalProject.Controllers
                 {
                     return NotFound("We can't find this Freelancer.");
                 }
+
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
                 var IsFreelancerFav = _unitOfWork.Favorites.IsFavOrNot(userId, user.Id);
-                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "FreeLancerProfileImage", user.ProfilePicture ?? "default.jpg");
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                string finalPath = assembly.GetName().Name;
+                int index = wwwRootPath.IndexOf(finalPath);
+                var filePath = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture);
 
                 var freelancer = new GetFreelancer
                 {
@@ -182,8 +191,12 @@ namespace FinalProject.Controllers
                     }
                     var IsFreelancerFav = _unitOfWork.Favorites.IsFavOrNot(userId, user.Id);
 
-                    var profilePictureFileName = user.ProfilePicture ?? "default.jpg";
-                    var filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
+
+                    Assembly assembly = Assembly.GetExecutingAssembly();
+                    string finalPath = assembly.GetName().Name;
+                    int index = wwwRootPath.IndexOf(finalPath);
+                    var filePath = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture);
+
 
                     var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
 
@@ -248,8 +261,11 @@ namespace FinalProject.Controllers
                         continue;
                     }
 
-                    var profilePictureFileName = user.ProfilePicture ?? "default.jpg";
-                    var filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage", profilePictureFileName);
+                    Assembly assembly = Assembly.GetExecutingAssembly();
+                    string finalPath = assembly.GetName().Name;
+                    int index = wwwRootPath.IndexOf(finalPath);
+                    var filePath = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture);
+
 
                     var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
                     //var IsFreelancerFav = _unitOfWork.Favorites.IsFavOrNot(userId, user.Id);

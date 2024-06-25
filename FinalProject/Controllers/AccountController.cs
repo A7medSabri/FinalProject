@@ -178,14 +178,19 @@ namespace FinalProject.Controllers
             // Update the profile picture URL
             if (file != null)
             {
-                Assembly assembly = Assembly.GetExecutingAssembly();
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
-                string finalPath = assembly.GetName().Name;
-                int index = wwwRootPath.IndexOf(finalPath); // Root path for web content
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Generate a unique file name
-                string filePath = Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage"); // Combine the path to the desired directory
+                string directoryPath = Path.Combine(wwwRootPath, "FreeLancerProfileImage");
 
-                using (var fileStream = new FileStream(Path.Combine(filePath, fileName), FileMode.Create))
+                // Ensure the directory exists
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Generate a unique file name
+                string filePath = Path.Combine(directoryPath, fileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(fileStream);
                 }
@@ -207,6 +212,61 @@ namespace FinalProject.Controllers
                 return BadRequest("Failed to change profile picture");
             }
         }
+
+        //[HttpPost("ChangeProfilePicture-FreeLancer")]
+        //[Authorize(Roles = "Freelancer")]
+        //public async Task<IActionResult> ChangeProfilePicture([FromForm] ChangeProfilePictureModel model, IFormFile file)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest("Invalid model");
+        //    }
+
+        //    var userIdClaim = User.FindFirst("uid");
+
+        //    if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+        //    {
+        //        return BadRequest("User ID not found in claims");
+        //    }
+
+        //    var user = await _userManager.FindByIdAsync(userIdClaim.Value);
+
+        //    // Update the profile picture URL
+        //    if (file != null)
+        //    {
+        //        Assembly assembly = Assembly.GetExecutingAssembly();
+        //        string wwwRootPath = _webHostEnvironment.WebRootPath;
+        //        string finalPath = assembly.GetName().Name;
+        //        int index = wwwRootPath.IndexOf(finalPath); // Root path for web content
+        //        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Generate a unique file name
+        //        //string filePath = Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage"); // Combine the path to the desired directory
+        //        string filePath = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture);
+
+        //         /*
+        //                  string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture)  
+        //         */
+        //        using (var fileStream = new FileStream(Path.Combine(filePath, fileName), FileMode.Create))
+        //        {
+        //            await file.CopyToAsync(fileStream);
+        //        }
+
+        //        model.NewProfilePictureUrl = fileName;
+        //    }
+
+        //    user.ProfilePicture = model.NewProfilePictureUrl;
+
+        //    // Save the changes to the database
+        //    var updateResult = await _userManager.UpdateAsync(user);
+
+        //    if (updateResult.Succeeded)
+        //    {
+        //        return Ok("Profile picture changed successfully");
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Failed to change profile picture");
+        //    }
+        //}
         //Change-Name-Phone-Age-Language-ZIP-Address-Experience-Education-PortfolioURl-Description-YourTitle-HourlyRate
         [HttpPost("Change-Name-Phone-Age-Language-ZIP-Address-Experience-Education-PortfolioURl-Description-YourTitle-HourlyRate-Freelancer")]
         [Authorize(Roles = "Freelancer , Admin")]
