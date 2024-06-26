@@ -1,4 +1,5 @@
 ﻿
+using FinalProject.DataAccess.Repository;
 using FinalProject.Domain.Models;
 using FinalProject.Domain.Models.ApplicationUserModel;
 using FinalProject.Domain.Models.FavoritesTable;
@@ -204,5 +205,6 @@ namespace FinalProject.DataAccess.Data
         public DbSet<UserPaymentInfo> UserPaymentInfo { get; set; }
         public DbSet<UserSkill> UserSkills { get; set; }
         public DbSet<Chat> Chats { get; set; }
+        public DbSet<paymentTest> PaymentTests { get; set; }
     }
 }
