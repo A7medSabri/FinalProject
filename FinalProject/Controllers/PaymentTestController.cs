@@ -1,5 +1,6 @@
 ﻿using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.Payment;
+using Microsoft.AspNet.SignalR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace FinalProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class PaymentTestController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -17,6 +19,7 @@ namespace FinalProject.Controllers
 
         [HttpPost]
         [Route("Add-New-Payment")]
+        [Authorize(Roles = "User , Admin")]
         public IActionResult CreatePaymentTest([FromForm] PaymentTestDto paymentTestDto)
         {
             if (!ModelState.IsValid)
@@ -37,5 +40,20 @@ namespace FinalProject.Controllers
 
             return Ok(result);
         }
+
+        [Authorize(Roles = "Freelancer , Admin")]
+        [HttpGet("Get-Freelancer-Money")]
+        public IActionResult GetMoney()
+        {
+            var userId = User.FindFirst("uid")?.Value;
+            var money = _unitOfWork.PayTest.GetMyMoney(userId);
+
+            return Ok(money);
+
+        }
+
+
+
+
     }
 }

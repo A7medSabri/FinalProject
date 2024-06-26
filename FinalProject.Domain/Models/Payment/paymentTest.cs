@@ -24,7 +24,7 @@ namespace FinalProject.Domain.Models.Payment
         [MinLength(3)]
         [MaxLength(3)]
         public string CVV { get; set; }
-
+        public int price { get; set; }
         // Client
         [ForeignKey("Client")]
         public string ClientId { get; set; }

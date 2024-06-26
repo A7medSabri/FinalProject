@@ -5,5 +5,6 @@ namespace FinalProject.Domain.IRepository
     public interface IPaymentTestRepository
     {
         PaymentTestDto create(string UserId, PaymentTestDto payDto);
+        double GetMyMoney(string UserId);
     }
 }
