@@ -18,7 +18,7 @@ namespace FinalProject.Controllers
     public class ApplyTasksController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly IMapper _mapper; 
 
         public ApplyTasksController(IUnitOfWork unitOfWork,IMapper mapper)
         {
