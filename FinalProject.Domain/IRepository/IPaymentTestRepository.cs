@@ -6,5 +6,7 @@ namespace FinalProject.Domain.IRepository
     {
         PaymentTestDto create(string UserId, PaymentTestDto payDto);
         double GetMyMoney(string UserId);
+
+        List<AdminPaymentTest> AllPayment();
     }
 }

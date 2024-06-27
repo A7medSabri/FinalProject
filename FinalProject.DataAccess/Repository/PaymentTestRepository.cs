@@ -1,6 +1,7 @@
 ﻿using FinalProject.DataAccess.Data;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.Payment;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinalProject.DataAccess.Repository
 {
@@ -13,7 +14,25 @@ namespace FinalProject.DataAccess.Repository
             _context = context;
         }
 
-        public PaymentTestDto create(string UserId, PaymentTestDto payDto)
+        public List<AdminPaymentTest> AllPayment()
+        {
+            var data =  _context.PaymentTests
+                .Include(a=>a.Freelancer)
+            .Select(p => new AdminPaymentTest
+            {
+                price = p.price,
+                PayTime = p.PayTime,
+                FreelancerId = $"{p.Freelancer.FirstName} {p.Freelancer.LastName}",
+                ClientId = $"{p.Client.FirstName} {p.Client.LastName}"
+            }).ToList();
+
+            return data;
+            
+        }
+
+    
+
+    public PaymentTestDto create(string UserId, PaymentTestDto payDto)
         {
             var NewPaymentTest = new paymentTest // Corrected class name to match your convention
             {
@@ -24,7 +43,9 @@ namespace FinalProject.DataAccess.Repository
                 price = payDto.price,
                 FreelancerId = payDto.FreelancerId,
                 MM = payDto.MM,
-                YY = payDto.YY
+                YY = payDto.YY,
+                PayTime = DateTime.Now
+                
             };
 
             _context.PaymentTests.Add(NewPaymentTest);

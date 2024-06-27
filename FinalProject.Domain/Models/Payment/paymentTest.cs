@@ -25,6 +25,7 @@ namespace FinalProject.Domain.Models.Payment
         [MaxLength(3)]
         public string CVV { get; set; }
         public int price { get; set; }
+        public DateTime PayTime { get; set; }
         // Client
         [ForeignKey("Client")]
         public string ClientId { get; set; }
