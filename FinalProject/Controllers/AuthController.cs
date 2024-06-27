@@ -188,7 +188,7 @@ namespace FinalProject.Controllers
                 }
                 var roles = await _userManager.GetRolesAsync(user);
 
-                string role = roles[0] ?? "No role assigned";
+                string role = roles.Contains("Admin") ? "Admin" : (roles.Count > 0 ? roles[0] : "No role assigned");
 
                 var response = new
                 {
@@ -197,6 +197,7 @@ namespace FinalProject.Controllers
                 };
 
                 return Ok(response);
+
             }
             else
             {
