@@ -1,4 +1,5 @@
 ﻿using FinalProject.Domain.Models.ApplicationUserModel;
+using FinalProject.Domain.Models.JobPostAndContract;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -35,5 +36,9 @@ namespace FinalProject.Domain.Models.Payment
         [ForeignKey("Freelancer")]
         public string FreelancerId { get; set; }
         public ApplicationUser Freelancer { get; set; }
+
+        [ForeignKey("jobPost")]
+        public int jobId { get; set; }
+        public JobPost jobPost { get; set; }
     }
 }

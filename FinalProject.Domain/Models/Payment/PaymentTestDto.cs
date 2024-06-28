@@ -22,11 +22,14 @@ namespace FinalProject.Domain.Models.Payment
         [MaxLength(3)]
         public string CVV { get; set; }
         public int price { get; set; }
-        public DateTime PayTime { get; set; }
 
 
         // Freelancer
         [ForeignKey("Freelancer")]
         public string FreelancerId { get; set; }
+
+
+        public int jobId { get; set; }
+
     }
 }

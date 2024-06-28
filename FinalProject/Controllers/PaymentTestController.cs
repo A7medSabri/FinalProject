@@ -32,17 +32,10 @@ namespace FinalProject.Controllers
                 return Unauthorized("User ID is not found.");
             }
 
-            try
-            {
                 var result =  _unitOfWork.PayTest.create(userId, paymentTestDto);
                  _unitOfWork.Save();
                 return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (ex)
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
-            }
+           
         }
 
         [Authorize(Roles = "Freelancer,Admin")]

@@ -30,11 +30,10 @@ namespace FinalProject.DataAccess.Repository
             
         }
 
-    
 
-    public PaymentTestDto create(string UserId, PaymentTestDto payDto)
+        public PaymentTestDto create(string UserId, PaymentTestDto payDto)
         {
-            var NewPaymentTest = new paymentTest // Corrected class name to match your convention
+            var NewPaymentTest = new paymentTest
             {
                 Owner = payDto.Owner,
                 ClientId = UserId,
@@ -44,14 +43,22 @@ namespace FinalProject.DataAccess.Repository
                 FreelancerId = payDto.FreelancerId,
                 MM = payDto.MM,
                 YY = payDto.YY,
-                PayTime = DateTime.Now
-                
+                PayTime = DateTime.Now,
+                jobId = payDto.jobId
             };
 
+            var data = _context.JobPosts.FirstOrDefault(a => a.Id == payDto.jobId);
+            if (data != null)
+            {
+                data.IsDeleted = true;
+            }
+
             _context.PaymentTests.Add(NewPaymentTest);
+            _context.SaveChanges();
 
             return payDto;
         }
+
 
         public double GetMyMoney(string UserId)
         {
