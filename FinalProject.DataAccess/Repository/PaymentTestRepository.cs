@@ -19,6 +19,7 @@ namespace FinalProject.DataAccess.Repository
             var data =  _context.PaymentTests
                 .Include(a=>a.Freelancer)
                 .Include(a=>a.jobPost)
+            
             .Select(p => new AdminPaymentTest
             {
                 price = p.price,
@@ -49,10 +50,15 @@ namespace FinalProject.DataAccess.Repository
                 jobId = payDto.jobId
             };
 
+            var ContractData = _context.Contracts.FirstOrDefault(a => a.JopPostId == payDto.jobId);
             var data = _context.JobPosts.FirstOrDefault(a => a.Id == payDto.jobId);
             if (data != null)
             {
                 data.IsDeleted = true;
+            }
+            if (ContractData != null)
+            {
+                ContractData.IsDeleted = true;
             }
 
             _context.PaymentTests.Add(NewPaymentTest);
