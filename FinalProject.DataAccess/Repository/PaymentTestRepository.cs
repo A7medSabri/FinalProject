@@ -18,12 +18,14 @@ namespace FinalProject.DataAccess.Repository
         {
             var data =  _context.PaymentTests
                 .Include(a=>a.Freelancer)
+                .Include(a=>a.jobPost)
             .Select(p => new AdminPaymentTest
             {
                 price = p.price,
                 PayTime = p.PayTime,
                 FreelancerId = $"{p.Freelancer.FirstName} {p.Freelancer.LastName}",
-                ClientId = $"{p.Client.FirstName} {p.Client.LastName}"
+                ClientId = $"{p.Client.FirstName} {p.Client.LastName}",
+                JopName = p.jobPost.Title
             }).ToList();
 
             return data;

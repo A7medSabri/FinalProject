@@ -20,5 +20,6 @@ namespace FinalProject.Domain.Models.Payment
         [ForeignKey("Freelancer")]
         public string FreelancerId { get; set; }
         public string ClientId { get; set; }
+        public string JopName { get; set; }
     }
 }
