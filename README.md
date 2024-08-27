@@ -38,8 +38,7 @@ The growing trend of remote work has increased the demand for freelance platform
 2. **Profile Creation:** Freelancers showcase their expertise, experience, and rates in their profiles. Clients can review these profiles and make hiring decisions.
 3. **Job Posting:** Clients post job listings with project details, budget, and timeline. Freelancers submit proposals based on these listings.
 4. **Project Management:** Tools for communication, file sharing, and progress tracking are provided to manage projects effectively.
-5. **Payment Processing:** A secure system for processing payments between clients and freelancers.
-6. **Feedback and Ratings:** Clients provide feedback and ratings to help build the reputation of freelancers.
+5. **Feedback and Ratings:** Clients provide feedback and ratings to help build the reputation of freelancers.
 
 ## Database and Relations
 
