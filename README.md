@@ -168,3 +168,23 @@ Common issues include:
      ![Ask AI](https://github.com/user-attachments/assets/dcd8651a-dec9-4c47-a4ec-f60c2db843d8)
 
 
+
+# Freelance Platform Documentation
+
+## 1. Registration
+
+- **[Registration](https://drive.google.com/open?id=1KXni0lwx8swaqfkntT2JBUfDDXqOgHSp&usp=drive_copy)**
+- **[Client and Freelancer](https://drive.google.com/open?id=15KMzVU6WIvSTFVBm5zOazSXNuDm2ZIth&usp=drive_copy)**
+
+## 2. Contract Management, Chat, and Ratings
+
+- **[Contract Management, Chat, and Ratings](https://drive.google.com/open?id=124oSQtH3LYdvnZmkk4iGle3Ls8dB1COD&usp=drive_copy)**
+
+## 3. Admin Interface
+
+- **[Admin Interface](https://drive.google.com/open?id=1NLDc2f4awanjTESoBS9kZO-mEEse9khx&usp=drive_copy)**
+
+---
+
+For detailed UI designs and further documentation, refer to the links provided above.
+
