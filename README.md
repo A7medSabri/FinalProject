@@ -1,12 +1,4 @@
-Sure! Here's a clean and structured README file for your GitHub repository based on the content you provided:
-
----
-
 # Task Sync
-
-## Overview
-
-Thank you for downloading the PowerPoint presentations provided on the SlidesDocs platform. To respect the rights of the original authors and SlidesDocs, please do not copy or disseminate these materials without proper permission.
 
 ## Table of Contents
 
