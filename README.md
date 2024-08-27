@@ -1,4 +1,4 @@
-# Freelance Platform ReadMe
+![Freelancers 4](https://github.com/user-attachments/assets/63369527-f4cd-4722-909f-9218a5ed8929)![Popular category 2](https://github.com/user-attachments/assets/0fee3fe7-ef08-42c4-9d04-bb942f8301bf)# Freelance Platform ReadMe
 
 ## Introduction
 
@@ -15,9 +15,6 @@ Freelance platforms are crucial for modern work, offering substantial benefits a
 
 Freelance platforms enable remote service offerings and have grown with the rise of remote work. They enhance flexibility, communication, and work-life balance. Machine learning is increasingly used to manage projects and match freelancers to jobs, boosting success in the evolving digital marketplace.
 
-## Motivation
-
-Freelance platforms connect freelancers and clients but face issues such as quality control, trust, and security. They empower individuals to work on their own terms while allowing employers to access global talent.
 
 ## Problem Description
 
@@ -43,3 +40,73 @@ Common issues include:
 4. **Project Management**: Tools for managing projects and communication.
 5. **Feedback and Ratings**: Post-project feedback to enhance credibility and assist future decisions.
 6. **Chat AI**: Enhances communication, automates tasks, and improves efficiency.
+
+
+
+
+# Freelance Platform Implementation
+
+
+## Tools & Technologies
+
+**Front-end Design:**
+- **Visual Studio Code**: Code editor.
+- **React.js**: Framework for building user interfaces.
+
+**Back-end Design:**
+- **Microsoft SQL Server**: Relational database management system.
+- **.NET Core**: Framework for backend services and web applications.
+- **Swagger**: Tool for API development, testing, and debugging.
+- **Microsoft Visual Studio**: IDE for writing and managing .NET code.
+
+## UI Designs
+
+**Home Page**
+   - Overview of the main interface and navigation.
+     ![Uploading Welcom 1.png…]()
+     ![Popular category 2](https://github.com/user-attachments/assets/6c890cfc-8e9b-40d3-beba-7b73f12d5ade)
+     ![jobs 3](https://github.com/user-attachments/assets/2abad39b-66a0-4e81-8510-1bdf9fac7a7b)
+     ![Uploading Why choose us 5.png…]()
+     ![Freelancers 4](https://github.com/user-attachments/assets/833d8a66-0f7e-4da2-9182-fc087c35527d)
+
+
+** Registration**
+   - **Freelancer Registration**: Process for freelancer account creation.
+   - **Client Registration**: Process for client account creation.
+
+**Sign In**
+   - Login interface and authentication process.
+
+**Forget Password and Reconfirm Email**
+   - Procedures for password recovery and email verification.
+
+**Change Password**
+   - Interface for updating passwords.
+
+**Account Management**
+   - **Freelancer Account**: Management features for freelancer profiles.
+   - **Update Freelancer Account**: Options for updating freelancer profiles.
+   - **User Account**: General user account management.
+
+**Job Posts**
+   - **All Job Posts**: View of all job postings.
+   - **Upload Job**: Interface for clients to post new jobs.
+   - **Client Job Posts**: View of jobs posted by clients.
+   - **Applicants for a Job**: List of freelancers applying for jobs.
+   - **Edit Job Post**: Option to modify job postings.
+   - **Search for Job**: Search functionality for job listings.
+   - **Freelancer Favorite Jobs**: Jobs favorited by freelancers.
+
+**Apply for Task**
+   - **Freelancer Applied Tasks**: Tasks applied for by freelancers.
+   - **Freelancer Accepted Tasks**: Tasks accepted by freelancers.
+   - **Client Offers for a Job**: Job offers from clients.
+
+**4.3.9 Contract Management**
+   - **All Contracts**: View of active contracts.
+   - **Create Contract**: Interface to create contracts.
+   - **Confirm the Contract**: Process for confirming contracts.
+   - **Update Contract**: Options for updating contracts.
+
+**Chat**
+   - Messaging system for freelancer-client communication.
