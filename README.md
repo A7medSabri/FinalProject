@@ -1,5 +1,3 @@
-![Freelancers 4](https://github.com/user-attachments/assets/63369527-f4cd-4722-909f-9218a5ed8929)![Popular category 2](https://github.com/user-attachments/assets/0fee3fe7-ef08-42c4-9d04-bb942f8301bf)# Freelance Platform ReadMe
-
 ## Introduction
 
 This website connects users with qualified freelancers. Key considerations in our design include:
@@ -63,10 +61,10 @@ Common issues include:
 
 **Home Page**
    - Overview of the main interface and navigation.
-     ![Uploading Welcom 1.png…]()
+    ![Welcom 1](https://github.com/user-attachments/assets/c44d463c-3b00-4a74-a58b-50fabbb0d4c8)
      ![Popular category 2](https://github.com/user-attachments/assets/6c890cfc-8e9b-40d3-beba-7b73f12d5ade)
      ![jobs 3](https://github.com/user-attachments/assets/2abad39b-66a0-4e81-8510-1bdf9fac7a7b)
-     ![Uploading Why choose us 5.png…]()
+    ![Why choose us 5](https://github.com/user-attachments/assets/cd272acd-cadd-4735-96aa-7691fe60ad0b)
      ![Freelancers 4](https://github.com/user-attachments/assets/833d8a66-0f7e-4da2-9182-fc087c35527d)
 
 
