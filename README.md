@@ -1,4 +1,4 @@
-![User Registration](https://github.com/user-attachments/assets/b39f9a0f-ed9a-4347-81cc-a3aeafa5da16)## Introduction
+## Introduction
 
 This website connects users with qualified freelancers. Key considerations in our design include:
 
