@@ -68,7 +68,7 @@ Common issues include:
      ![Freelancers 4](https://github.com/user-attachments/assets/833d8a66-0f7e-4da2-9182-fc087c35527d)
 
 
-** Registration**
+**Registration**
 ![Choose](https://github.com/user-attachments/assets/f262de73-6c33-4c63-951c-59086d870c76)
 
 
