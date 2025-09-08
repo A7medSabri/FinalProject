@@ -14,7 +14,8 @@ namespace FinalProject.Domain.IRepository
         IFavoritesRepository Favorites { get; }
         IFavJobPostRepository FavJob { get; }
         IApplyTasksRepository ApplyTasks { get; }
-
+        IChatRepository Chat { get; }
+        IPaymentTestRepository PayTest { get; }
         void Save();
         
     }

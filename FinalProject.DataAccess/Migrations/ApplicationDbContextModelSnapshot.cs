@@ -151,6 +151,32 @@ namespace FinalProject.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("FinalProject.Domain.Models.Chat", b =>
+                {
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateAndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReceiverrId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Message", "DateAndTime", "ReceiverrId", "SenderId");
+
+                    b.HasIndex("ReceiverrId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Chats");
+                });
+
             modelBuilder.Entity("FinalProject.Domain.Models.FavoritesTable.FavJobPost", b =>
                 {
                     b.Property<int>("Id")
@@ -240,6 +266,10 @@ namespace FinalProject.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("offerDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
@@ -284,7 +314,7 @@ namespace FinalProject.Migrations
                     b.Property<int>("JopPostId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PaymentMethodId")
+                    b.Property<int?>("PaymentMethodId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
@@ -496,6 +526,62 @@ namespace FinalProject.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserPaymentInfo");
+                });
+
+            modelBuilder.Entity("FinalProject.Domain.Models.Payment.paymentTest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CVV")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<string>("CardNumber")
+                        .IsRequired()
+                        .HasMaxLength(18)
+                        .HasColumnType("nvarchar(18)");
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FreelancerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("MM")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Owner")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PayTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("YY")
+                        .HasColumnType("int");
+
+                    b.Property<int>("jobId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("price")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("FreelancerId");
+
+                    b.HasIndex("jobId");
+
+                    b.ToTable("PaymentTests");
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.ProtfolioModle.Protfolio", b =>
@@ -876,6 +962,24 @@ namespace FinalProject.Migrations
                     b.Navigation("UserPaymentInfo");
                 });
 
+            modelBuilder.Entity("FinalProject.Domain.Models.Chat", b =>
+                {
+                    b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverrId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Sender")
+                        .WithMany("Chats")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("FinalProject.Domain.Models.FavoritesTable.FavJobPost", b =>
                 {
                     b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Freelancer")
@@ -969,9 +1073,7 @@ namespace FinalProject.Migrations
 
                     b.HasOne("FinalProject.Domain.Models.Payment.PaymentMethod", "PaymentMethod")
                         .WithMany()
-                        .HasForeignKey("PaymentMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PaymentMethodId");
 
                     b.Navigation("Client");
 
@@ -1068,6 +1170,33 @@ namespace FinalProject.Migrations
                     b.Navigation("JobPost");
 
                     b.Navigation("PaymentMethod");
+                });
+
+            modelBuilder.Entity("FinalProject.Domain.Models.Payment.paymentTest", b =>
+                {
+                    b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", "Freelancer")
+                        .WithMany()
+                        .HasForeignKey("FreelancerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FinalProject.Domain.Models.JobPostAndContract.JobPost", "jobPost")
+                        .WithMany()
+                        .HasForeignKey("jobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Freelancer");
+
+                    b.Navigation("jobPost");
                 });
 
             modelBuilder.Entity("FinalProject.Domain.Models.ProtfolioModle.Protfolio", b =>
@@ -1236,6 +1365,8 @@ namespace FinalProject.Migrations
             modelBuilder.Entity("FinalProject.Domain.Models.ApplicationUserModel.ApplicationUser", b =>
                 {
                     b.Navigation("ApplyTasks");
+
+                    b.Navigation("Chats");
 
                     b.Navigation("Contracts");
 

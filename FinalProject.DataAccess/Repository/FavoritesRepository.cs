@@ -71,5 +71,16 @@ namespace FinalProject.DataAccess.Repository
             }
             return true;
         }
+
+        public FavoritesFreelancer FindByClientAndFreelancer(string clientId, string freelancerId)
+        {
+            return _context.Favorites.FirstOrDefault(f => f.ClientId == clientId && f.FreelancerId == freelancerId);
+        }
+
+        public bool IsFavOrNot(string clientId, string freelancerId)
+        {
+            
+                return _context.Favorites.Any(f => f.ClientId == clientId && f.FreelancerId == freelancerId);
+        }
     }
 }

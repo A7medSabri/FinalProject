@@ -18,6 +18,8 @@ using FinalProject.DataAccess.Data;
 using FinalProject.Domain.IRepository;
 using FinalProject.Domain.Models.ApplicationUserModel;
 using FinalProject.DataAccess.Repository;
+using FinalProject.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 //C:\Users\Ahmed Sabry\Desktop\FinalProject-master\FinalProject\FinalProject.csproj
@@ -103,6 +105,9 @@ builder.Services.AddAuthentication(options =>
             };
         });
 
+// Chat
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -124,6 +129,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<ChatHub>("/Chat");
 
 app.Run();
 

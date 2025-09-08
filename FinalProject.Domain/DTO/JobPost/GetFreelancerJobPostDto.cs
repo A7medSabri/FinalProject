@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace FinalProject.Domain.DTO.JobPost
 {
-    public class GetMyJobPostDto : GetJobPostDto
+    public class GetFreelancerJobPostDto  : GetJobPostDto
     {
         public string UserId { get; set; }
         public string? UserFullName { get; set; }
-
+        public bool IsFav { get; set; }
+        public bool isApplied { get; set; }
+        public int? TaskId { get; set; }
     }
 }

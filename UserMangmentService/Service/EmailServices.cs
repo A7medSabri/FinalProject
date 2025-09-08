@@ -15,6 +15,82 @@ namespace UserMangmentService.Service
             _emailConfig = emailConfig ?? throw new ArgumentNullException(nameof(emailConfig));
         }
 
+
+
+
+
+        public void SendContractEmail(Message message)
+        {
+            var emailMessage = CreateCoratctlMessage(message);
+            Send(emailMessage);
+        }
+
+        private MimeMessage CreateCoratctlMessage(Message message)
+        {
+
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress("TaskAsync", _emailConfig.From));
+            emailMessage.To.AddRange(message.To);
+            emailMessage.Subject = message.Subject;
+
+            var builder = new BodyBuilder();
+            builder.HtmlBody = $@"
+                   <div style=""background-color: #f0f0f0; font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);"">
+            <div style=""background-color: #007bff; color: #ffffff; padding: 10px; text-align: center; border-top-left-radius: 10px; border-top-right-radius: 10px; font-size: 18px;"">TaskAsync</div>
+            <div style=""color: black; padding: 20px; font-size: 16px;"">
+                <p>Hello,</p>
+                <p>We are pleased to inform you that a new contract has been created.</p>
+                <p>To review and confirm the contract, please visit our website using the link below:</p>
+                <p style=""text-align: center;""><a href=""{message.Content}"" style=""background-color: #007bff; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px;"">Visit TaskAsync</a></p>
+                <p>Please ensure to complete the necessary steps to confirm the contract.</p>
+                <p>Thank you for your cooperation,</p>
+                <p>The TaskAsync Team</p>
+            </div>
+        </div>";
+
+            emailMessage.Body = builder.ToMessageBody();
+
+            return emailMessage;
+        }
+
+
+
+        public void SendChatEmail(Message message)
+        {
+            var emailMessage = CreateChatMessage(message);
+            Send(emailMessage);
+        }
+        
+        private MimeMessage CreateChatMessage(Message message)
+        {
+
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress("TaskAsync", _emailConfig.From));
+            emailMessage.To.AddRange(message.To);
+            emailMessage.Subject = message.Subject;
+
+            var builder = new BodyBuilder();
+            builder.HtmlBody = $@"
+                            <div style=""background-color: #f0f0f0; font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);"">
+            <div style=""background-color: #007bff; color: #ffffff; padding: 10px; text-align: center; border-top-left-radius: 10px; border-top-right-radius: 10px; font-size: 18px;"">TaskAsync</div>
+            <div style=""color: black; padding: 20px; font-size: 16px;"">
+                <p>Hello,</p>
+                <p>We wanted to let you know that you have received a new message on TaskAsync.</p>
+                <p>To read the message, Vist Your profile:</p>
+                <p style=""text-align: center;""><a href=""{message.Content}"" style=""background-color: #007bff; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px;"">Read Message</a></p>
+                <p>Thank you for using TaskAsync!</p>
+                <p>Best regards,</p>
+                <p>The TaskAsync Team</p>
+            </div>
+        </div>";
+
+            emailMessage.Body = builder.ToMessageBody();
+
+            return emailMessage;
+        }
+
+
+
         public void SendEmail(Message messag)
         {
             var emailMessage = CreateEmailMessage(messag);
@@ -77,6 +153,7 @@ namespace UserMangmentService.Service
                 }
             }
         }
+
 
     }
 }

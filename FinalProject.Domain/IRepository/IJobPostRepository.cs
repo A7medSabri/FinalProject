@@ -1,4 +1,5 @@
-﻿using FinalProject.Domain.DTO.JobPost;
+﻿using FinalProject.Domain.DTO.HomeModel;
+using FinalProject.Domain.DTO.JobPost;
 using FinalProject.Domain.Models.JobPostAndContract;
 using FinalProject.DTO;
 using System;
@@ -12,18 +13,24 @@ namespace FinalProject.Domain.IRepository
 {
     public interface IJobPostRepository : IRepository<JobPost>
     {
+        List<JopPostHomePage> GetAllForHome();
+        List<GetFreelancerJobPostDto> GetAllJobPosts();
+        // Freelancer
+        public List<GetFreelancerJobPostDto> GetAllJobPosts(string freelancerId);
+        public List<GetFreelancerJobPostDto> GetFreelancerJobsByName(string freelancerId, string name);
 
-        public List<GetMyJobPostDto> GetAllJobPosts();
-        public List<GetMyJobPostDto> GetAllJobPostsByUserId(string userId);
+
+        // client
+        public List<GetClientJobPostDto> GetAllJobPostsByUserId(string userId);
         void Update(int id, JobPostDto jobPostDto);
-        public List<AllJopPostDto> GetAllByName(string name);
-        public GetMyJobPostDto GetjopPostWithId(string userId,int id);
+        public GetClientJobPostDto GetjopPostWithId(string userId,int id);
 
-     //   bool FindFavJobPost(Expression<Func<JobPost, bool>> predicate);
-        //void Create(JobPostDto jobPostDto);
+
         void Create(JobPostDto jobPostDto,string UserId);
 
         public JobPost GetJobPostByIdAndUserId(string userId, int id);
+
+        public void DeleteJobPostRelatedTasks(int JobId);
 
     }
 }

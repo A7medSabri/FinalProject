@@ -58,5 +58,12 @@ namespace FinalProject.DataAccess.Repository
         {
             return _context.Languages.FirstOrDefault(a => a.Value == name);
         }
+
+        public Language returnDeletedLang(string id)
+        {
+            var Del = _context.Languages.Find(id);
+            Del.IsDeleted = false;
+            return Del;
+        }
     }
 }

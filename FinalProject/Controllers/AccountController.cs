@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -23,7 +25,7 @@ namespace FinalProject.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IUnitOfWork _unitOfWork;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment , IUnitOfWork unitOfWork)
+        public AccountController(UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
@@ -81,13 +83,16 @@ namespace FinalProject.Controllers
                     .ThenInclude(u => u.Language)
                 .SingleOrDefaultAsync(u => u.UserName == userId);
 
-            var result = _unitOfWork.Rating?.FreeRate(userId2) ?? 0 ;
+            var result = _unitOfWork.Rating?.FreeRate(userId2) ?? 0;
 
             if (user == null)
             {
                 return NotFound("User not found");
             }
+            Assembly assembly = Assembly.GetExecutingAssembly();
             string wwwRootPath = _webHostEnvironment.WebRootPath;
+            string finalPath = assembly.GetName().Name;
+            int index = wwwRootPath.IndexOf(finalPath);
             var freelancerProfileDto = new FreelancerProfileDto
             {
                 FirstName = user.FirstName,
@@ -109,7 +114,7 @@ namespace FinalProject.Controllers
                 State = user.State,
                 country = user.Country,
                 PortfolioURl = user.PortfolioURl,
-                ProfilePicture = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(wwwRootPath, "FreeLancerProfileImage", user.ProfilePicture)
+                ProfilePicture = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture)
             };
 
             return Ok(freelancerProfileDto);
@@ -153,8 +158,8 @@ namespace FinalProject.Controllers
         }
         //ProfilePhoto
         [HttpPost("ChangeProfilePicture-FreeLancer")]
-        [Authorize(Roles ="Freelancer")]
-        public async Task<IActionResult> ChangeProfilePicture([FromForm] ChangeProfilePictureModel model ,IFormFile file)
+        [Authorize(Roles = "Freelancer")]
+        public async Task<IActionResult> ChangeProfilePicture([FromForm] ChangeProfilePictureModel model, IFormFile file)
         {
             if (!ModelState.IsValid)
             {
@@ -173,16 +178,24 @@ namespace FinalProject.Controllers
             // Update the profile picture URL
             if (file != null)
             {
-                string wwwRootPath = _webHostEnvironment.WebRootPath; // Root path for web content
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                string directoryPath = Path.Combine(wwwRootPath, "FreeLancerProfileImage");
+
+                // Ensure the directory exists
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Generate a unique file name
-                string filePath = Path.Combine(wwwRootPath, "FreeLancerProfileImage"); // Combine the path to the desired directory
+                string filePath = Path.Combine(directoryPath, fileName);
 
-                    using (var fileStream = new FileStream(Path.Combine(filePath, fileName), FileMode.Create))
-                    {
-                        await file.CopyToAsync(fileStream);
-                    }
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
 
-                    model.NewProfilePictureUrl = fileName;
+                model.NewProfilePictureUrl = fileName;
             }
 
             user.ProfilePicture = model.NewProfilePictureUrl;
@@ -199,6 +212,61 @@ namespace FinalProject.Controllers
                 return BadRequest("Failed to change profile picture");
             }
         }
+
+        //[HttpPost("ChangeProfilePicture-FreeLancer")]
+        //[Authorize(Roles = "Freelancer")]
+        //public async Task<IActionResult> ChangeProfilePicture([FromForm] ChangeProfilePictureModel model, IFormFile file)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest("Invalid model");
+        //    }
+
+        //    var userIdClaim = User.FindFirst("uid");
+
+        //    if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+        //    {
+        //        return BadRequest("User ID not found in claims");
+        //    }
+
+        //    var user = await _userManager.FindByIdAsync(userIdClaim.Value);
+
+        //    // Update the profile picture URL
+        //    if (file != null)
+        //    {
+        //        Assembly assembly = Assembly.GetExecutingAssembly();
+        //        string wwwRootPath = _webHostEnvironment.WebRootPath;
+        //        string finalPath = assembly.GetName().Name;
+        //        int index = wwwRootPath.IndexOf(finalPath); // Root path for web content
+        //        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName); // Generate a unique file name
+        //        //string filePath = Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage"); // Combine the path to the desired directory
+        //        string filePath = string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture);
+
+        //         /*
+        //                  string.IsNullOrEmpty(user.ProfilePicture) ? "" : Path.Combine(index >= 0 ? wwwRootPath.Substring(index) : "", "FreeLancerProfileImage", user.ProfilePicture)  
+        //         */
+        //        using (var fileStream = new FileStream(Path.Combine(filePath, fileName), FileMode.Create))
+        //        {
+        //            await file.CopyToAsync(fileStream);
+        //        }
+
+        //        model.NewProfilePictureUrl = fileName;
+        //    }
+
+        //    user.ProfilePicture = model.NewProfilePictureUrl;
+
+        //    // Save the changes to the database
+        //    var updateResult = await _userManager.UpdateAsync(user);
+
+        //    if (updateResult.Succeeded)
+        //    {
+        //        return Ok("Profile picture changed successfully");
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Failed to change profile picture");
+        //    }
+        //}
         //Change-Name-Phone-Age-Language-ZIP-Address-Experience-Education-PortfolioURl-Description-YourTitle-HourlyRate
         [HttpPost("Change-Name-Phone-Age-Language-ZIP-Address-Experience-Education-PortfolioURl-Description-YourTitle-HourlyRate-Freelancer")]
         [Authorize(Roles = "Freelancer , Admin")]
@@ -282,24 +350,146 @@ namespace FinalProject.Controllers
                 return BadRequest("failed to change your country");
             }
         }
+        [HttpPost("Change-Skills-Only")]
+        [Authorize(Roles = "Freelancer, Admin")]
+        public async Task<IActionResult> ChangeSkillsOnly([FromForm] ChangeSkillOnly model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid model");
+            }
+
+            var userIdClaim = User.FindFirst("uid");
+
+            if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+            {
+                return BadRequest("User ID not found in claims");
+            }
+
+            var user = await _userManager.Users
+                .Include(u => u.UserSkills)
+                .FirstOrDefaultAsync(u => u.Id == userIdClaim.Value);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // الحصول على قائمة المهارات الحالية
+            var existingSkills = user.UserSkills.Select(us => us.SkillId).ToList();
+
+            // التحقق من المهارات الجديدة
+            var newSkills = model.SelectedSkills.Where(skillId => !existingSkills.Contains(skillId)).ToList();
+
+            if (newSkills.Count == 0)
+            {
+                return BadRequest("Cannot add duplicate skills");
+            }
+
+            // التحقق من أن جميع المهارات الجديدة موجودة في قاعدة البيانات
+            var allSkillsInDb = _unitOfWork.Skill.GetAll();
+
+            var invalidSkills = newSkills.Where(skillId => !allSkillsInDb.Any(s => s.Id == skillId)).ToList();
+
+            if (invalidSkills.Any())
+            {
+                return BadRequest($"The following skills are not valid: {string.Join(", ", invalidSkills)}");
+            }
+
+            // إضافة المهارات الجديدة
+            user.UserSkills.AddRange(newSkills.Select(skillId => new UserSkill { SkillId = skillId }));
+
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (updateResult.Succeeded)
+            {
+                return Ok("Your skills changed successfully");
+            }
+            else
+            {
+                return BadRequest("Failed to change your skills");
+            }
+        }
+
+        [HttpPost("Change-Languages-Only")]
+        [Authorize(Roles = "Freelancer, Admin")]
+        public async Task<IActionResult> ChangeLanguagesOnly([FromForm] ChangeLanguageOnly model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid model");
+            }
+
+            var userIdClaim = User.FindFirst("uid");
+
+            if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+            {
+                return BadRequest("User ID not found in claims");
+            }
+
+            var user = await _userManager.Users
+                .Include(u => u.UserLanguages)
+                .FirstOrDefaultAsync(u => u.Id == userIdClaim.Value);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // الحصول على قائمة اللغات الحالية
+            var existingLanguages = user.UserLanguages.Select(ul => ul.LanguageValue).ToList();
+
+            // التحقق من اللغات الجديدة
+            var newLanguages = model.SelectedLanguages.Where(languageValue => !existingLanguages.Contains(languageValue)).ToList();
+
+            if (newLanguages.Count == 0)
+            {
+                return BadRequest("Cannot add duplicate languages");
+            }
+
+            // التحقق من أن جميع اللغات الجديدة موجودة في قاعدة البيانات
+            var allLanguagesInDb =  _unitOfWork.language.GetAll();
+
+            var invalidLanguages = newLanguages.Where(languageValue => !allLanguagesInDb.Any(l => l.Id == languageValue)).ToList();
+
+            if (invalidLanguages.Any())
+            {
+                return BadRequest($"The following languages are not valid: {string.Join(", ", invalidLanguages)}");
+            }
+
+            // إضافة اللغات الجديدة
+            user.UserLanguages.AddRange(newLanguages.Select(languageValue => new ApplicationUserLanguage { LanguageValue = languageValue, ApplicationUserId = user.Id }));
+
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (updateResult.Succeeded)
+            {
+                return Ok("Your languages changed successfully");
+            }
+            else
+            {
+                return BadRequest("Failed to change your languages");
+            }
+        }
+
         //Shills
         [HttpPost("ChangeSkilles-Freelancer")]
         [Authorize(Roles = "Freelancer , Admin")]
         public async Task<IActionResult> ChangeSkilles([FromForm] ChangeSkillesModel model)
         {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest("Invalid model");
-                }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid model");
+            }
 
-                var userIdClaim = User.FindFirst("uid");
+            var userIdClaim = User.FindFirst("uid");
 
-                if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
-                {
-                    return BadRequest("User ID not found in claims");
-                }
+            if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+            {
+                return BadRequest("User ID not found in claims");
+            }
 
-                var user = await _userManager.FindByIdAsync(userIdClaim.Value);
+            var user = await _userManager.FindByIdAsync(userIdClaim.Value);
 
             user.UserSkills = model.SelectedSkills
                 .Select(skillId => new UserSkill { SkillId = skillId })
@@ -310,17 +500,78 @@ namespace FinalProject.Controllers
 
             var updateResult = await _userManager.UpdateAsync(user);
 
-                if (updateResult.Succeeded)
-                {
-                    return Ok("Your skills changed successfully");
-                }
-                else
-                {
-                    return BadRequest("Failed to change your skills");
-                }
+            if (updateResult.Succeeded)
+            {
+                return Ok("Your skills changed successfully");
+            }
+            else
+            {
+                return BadRequest("Failed to change your skills");
+            }
         }
 
-        
+        [HttpGet("Get-User-Skills")]
+        [Authorize(Roles = "Freelancer, Admin")]
+        public async Task<IActionResult> GetUserSkills()
+        {
+            string userId = User.FindFirst("uid")?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID not found in claims");
+            }
+
+            var user = await _userManager.Users
+                .Include(u => u.UserSkills)
+                .ThenInclude(us => us.Skill)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var userSkills = user.UserSkills.Select(us => new { us.Skill.Id, us.Skill.Name }).ToList();
+
+            if (userSkills.Any())
+            {
+                return Ok(userSkills);
+            }
+
+            return NotFound("No skills found for this user");
+        }
+
+        [HttpGet("Get-User-Languages")]
+        [Authorize]
+        public async Task<IActionResult> GetUserLanguages()
+        {
+            string userId = User.FindFirst("uid")?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID not found in claims");
+            }
+
+            var user = await _userManager.Users
+                .Include(u => u.UserLanguages)
+                .ThenInclude(ul => ul.Language)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var userLanguages = user.UserLanguages.Select(ul => new { ul.Language.Id, ul.Language.Value }).ToList();
+
+            if (userLanguages.Any())
+            {
+                return Ok(userLanguages);
+            }
+
+            return NotFound("No languages found for this user");
+        }
+
         //AboutYou  Experience  Education  PortfolioURl  Description  YourTitle  HourlyRate
         //[HttpPost("ChangeAboutYou")]
         //[Authorize(Roles = "Freelancer , Admin")]
@@ -433,8 +684,8 @@ namespace FinalProject.Controllers
         //}
 
         //country
-        
-        
+
+
 
     }
 }

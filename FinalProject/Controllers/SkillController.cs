@@ -21,6 +21,7 @@ namespace FinalProject.Controllers
             this._unitOfWork = unitOfWork;
         }
         //Done
+        [AllowAnonymous]
         [HttpGet("Get-All-SKills")]
         public ActionResult GetAll()
         {
@@ -36,6 +37,7 @@ namespace FinalProject.Controllers
         }
 
         //Done
+        [AllowAnonymous]
         [HttpGet("Get-All-SKills-With-Id")]
         public ActionResult GetAllWithId()
         {
@@ -50,6 +52,33 @@ namespace FinalProject.Controllers
             return NotFound();
         }
 
+        [HttpGet("Get-All-SKills-With-Id-For-Admin")]
+        public ActionResult GetAllWithIdForAdmin()
+        {
+            var result = _unitOfWork.Skill.GetAll().Select(s => new { s.Id, s.Name ,s.IsDeleted}).ToList();
+            if (!result.IsNullOrEmpty())
+            {
+                if (ModelState.IsValid)
+                {
+                    return Ok(result);
+                }
+            }
+            return NotFound();
+        }
+        [HttpGet("Get-Skill-By-Id")]
+        public IActionResult GetSkillById(int id)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest("Not Vaild");
+            }
+            var data = _unitOfWork.Skill.GetByID(id);
+            if(data == null)
+            {
+                return BadRequest("Not Found");
+            }
+            return Ok(data);
+        }
         //Done
         [HttpPost("Add-New-Skill")]
         public ActionResult Add( SkillDto skill)
@@ -62,9 +91,13 @@ namespace FinalProject.Controllers
             try
             {
                 var data = _unitOfWork.Skill.FindSkill(skill.name);
-                if (data != null)
+                if (data != null && data.IsDeleted == false)
                 {
                     return BadRequest("Is Exiting");
+                }
+                if (data != null && data.IsDeleted)
+                {
+                    return BadRequest("Is Exiting and Deleted");
                 }
                 var newSkill = _unitOfWork.Skill.Create(skill);
                 _unitOfWork.Save();
@@ -72,7 +105,7 @@ namespace FinalProject.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An unexpected error occurred.");
+                return StatusCode(500, $"An unexpected error occurred {ex.Message}.");
             }
         }
 
@@ -99,29 +132,51 @@ namespace FinalProject.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An unexpected error occurred.");
+                return StatusCode(500, $"An unexpected error occurred {ex.Message}.");
             }
         }
 
         //Done
-        [HttpDelete("Delete-Skill")]
+        [HttpPut("Delete-Skill")]
         public IActionResult Delete(int id)
         {
             var skill = _unitOfWork.Skill.GetByID(id);
-            if(skill == null)
+            if (skill == null)
+            {
                 return NotFound("Not Found Any Skill With This Id");
+            }
+            if (skill.IsDeleted)
+            {
+                return BadRequest("Is Already Deleted");
+            }
             _unitOfWork.Skill.Remove(id);
             _unitOfWork.Save();
             return Ok(skill);
         }
 
+        [HttpPut("Return-Delete-Skill")]
+        public IActionResult RetuenDeletedSkill(int id)
+        {
+            var skill = _unitOfWork.Skill.GetByID(id);
+            if (skill == null)
+            {
+                return NotFound("Not Found Any Skill With This Id");
+            }
+            if (skill.IsDeleted == false)
+            {
+                return BadRequest("Is Already Exist");
+            }
+            _unitOfWork.Skill.returnDeletedSkill(id);
+            _unitOfWork.Save();
+            return Ok(skill);
+        }
         //[HttpPut("Edit-Skill")]
         //public IActionResult Update(int id ,SkillDto skill) 
         //{
         //    var oldSkill = _unitOfWork.Skill.GetByID(id);
         //    if(oldSkill == null)
         //        return NotFound("Not Found Any Skill With This Id");
-            
+
         //    _unitOfWork.Skill.Edit(id, skill);
         //    _unitOfWork.Save();
 
