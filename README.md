@@ -1,49 +1,40 @@
-## Introduction
+# TaskSync — Freelance Platform
 
-This website connects users with qualified freelancers. Key considerations in our design include:
+## Project Overview
 
-- **Freelance Market Growth**: The sector has expanded rapidly, with many choosing freelance work over traditional jobs. Platforms facilitate communication and transactions between clients and freelancers.
-- **Challenges and Opportunities**: Platforms face challenges like competition and lack of benefits (e.g., health insurance) but offer diverse work, flexibility, and extra income.
-- **Security and Trust**: Essential for platform success, requiring robust identity verification, dispute resolution, and secure financial transactions.
-- **Innovation**: Platforms must innovate with technologies like AI and machine learning to enhance user experience and service diversity.
+TaskSync is a freelance marketplace that connects clients with freelancers. The platform provides account management, job posting and application flows, project management tools, messaging, and ratings/feedback. It also includes an AI-assisted chat to help streamline communication and automate simple tasks.
 
-Freelance platforms are crucial for modern work, offering substantial benefits and adapting to market changes.
+## Key Features
 
-## Background
+* **User Registration & Authentication**: Separate flows for freelancers and clients, with password recovery and email reconfirmation.
+* **Profiles**: Detailed freelancer profiles to showcase skills, portfolio, and ratings.
+* **Job Posting & Search**: Clients can create and manage jobs; freelancers can search, favorite, and apply to job posts.
+* **Project & Contract Management**: Create, confirm, and update contracts; view active contracts and job progress.
+* **Applications & Offers**: Track applicants, accept offers, and manage accepted tasks.
+* **Messaging & AI Chat**: Real-time chat between clients and freelancers plus an Ask-AI feature.
+* **Feedback & Ratings**: Post-project feedback and ratings to help build reputation.
 
-Freelance platforms enable remote service offerings and have grown with the rise of remote work. They enhance flexibility, communication, and work-life balance. Machine learning is increasingly used to manage projects and match freelancers to jobs, boosting success in the evolving digital marketplace.
+## UI / Pages (Primary Screens)
 
+* **Home** — Overview, popular categories, trending jobs, featured freelancers, "Why choose us" section.
+* **Registration**
 
-## Problem Description
+  * Freelancer registration (multi-step)
+  * Client registration
+* **Sign In / Auth** — Login, forgot password, email reconfirmation, change password.
+* **Account Management**
 
-Common issues include:
-
-- Communication and collaboration
-- Competition and saturation
-- Scalability and technical infrastructure
-- Legal and regulatory compliance
-- Dispute resolution
-
-## Aims and Objectives
-
-1. **Enhance Accessibility**: Simplify use for freelancers and clients to find and offer work easily.
-2. **Ensure Security and Trust**: Implement strong security and authentication to protect transactions and build trust.
-3. **Facilitate Collaboration**: Provide tools for smooth communication and teamwork.
-
-## Methodology
-
-1. **User Registration**: Account creation for freelancers and clients to connect.
-2. **Profile Creation**: Detailed freelancer profiles for better hiring decisions.
-3. **Job Posting**: Clients post job details; freelancers submit proposals.
-4. **Project Management**: Tools for managing projects and communication.
-5. **Feedback and Ratings**: Post-project feedback to enhance credibility and assist future decisions.
-6. **Chat AI**: Enhances communication, automates tasks, and improves efficiency.
-
+  * Freelancer dashboard (profile update, applied and accepted tasks)
+  * Client dashboard (my jobs, applicants, offers)
+* **Freelancers Page** — Search, favorite freelancers, view freelancer profiles and skills.
+* **Job Posts** — View all jobs, upload job, edit job, search jobs, favorite jobs.
+* **Applications** — View applicants for a job, freelancer applied tasks, accepted tasks.
+* **Contracts** — All contracts, create contract, confirm contract, update contract.
+* **Chat** — Messaging system with Ask-AI feature.
 
 
 
 # Freelance Platform Implementation
-
 
 ## Tools & Technologies
 
